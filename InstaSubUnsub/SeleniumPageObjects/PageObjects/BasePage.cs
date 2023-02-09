@@ -12,7 +12,7 @@ namespace SeleniumUtils.PageObjects
             _driver = driver;
         }
 
-        public void Load(params string[] urlParams)
+        public virtual void Load(params string[] urlParams)
         {
             _driver.Navigate().GoToUrl(string.Format(Url, urlParams));
             var wait = new WebDriverWait(_driver, new TimeSpan(0, 0, 10));

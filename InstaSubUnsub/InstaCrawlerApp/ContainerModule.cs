@@ -12,6 +12,7 @@ namespace InstaCrawlerApp
         {
             services.AddSingleton<IWebDriver>(f => new WebDriverFactory().GetInstance());
             services.AddTransient<LoginPage>();
+            services.AddTransient<FollowingPage>();
             services.AddTransient<UserCrawler>();
         }
     }
