@@ -3,17 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaCrawlerService", "InstaCrawler\InstaCrawlerService.csproj", "{178E4822-C4CE-49E4-BB6E-2BC1F98DD7D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstaDomain", "InstaDomain\InstaDomain.csproj", "{9D3D704E-E922-4D09-B3F6-7657DB342470}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaDomain", "InstaDomain\InstaDomain.csproj", "{9D3D704E-E922-4D09-B3F6-7657DB342470}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstaPersistence", "InstaPersistence\InstaPersistence.csproj", "{E88EC453-3B99-4011-A0F8-81A12433D8A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaPersistence", "InstaPersistence\InstaPersistence.csproj", "{E88EC453-3B99-4011-A0F8-81A12433D8A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SeleniumUtils", "SeleniumUtils\SeleniumUtils.csproj", "{74D4AFA0-A703-4F21-B30E-D6E9AE07B5BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeleniumUtils", "SeleniumUtils\SeleniumUtils.csproj", "{74D4AFA0-A703-4F21-B30E-D6E9AE07B5BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstaCrawlerApp", "InstaCrawlerApp\InstaCrawlerApp.csproj", "{2E9A30BF-A497-4CC0-8FD9-7C8A0B743DBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaCrawlerApp", "InstaCrawlerApp\InstaCrawlerApp.csproj", "{2E9A30BF-A497-4CC0-8FD9-7C8A0B743DBF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaCrawlerServiceWindows", "InstaCrawlerServiceWindows\InstaCrawlerServiceWindows.csproj", "{CB7B4899-A1C7-4FBB-B390-BD4CC95208A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstaCrawlerServiceWindows", "InstaCrawlerServiceWindows\InstaCrawlerServiceWindows.csproj", "{CB7B4899-A1C7-4FBB-B390-BD4CC95208A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{178E4822-C4CE-49E4-BB6E-2BC1F98DD7D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{178E4822-C4CE-49E4-BB6E-2BC1F98DD7D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{178E4822-C4CE-49E4-BB6E-2BC1F98DD7D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{178E4822-C4CE-49E4-BB6E-2BC1F98DD7D1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9D3D704E-E922-4D09-B3F6-7657DB342470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9D3D704E-E922-4D09-B3F6-7657DB342470}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9D3D704E-E922-4D09-B3F6-7657DB342470}.Release|Any CPU.ActiveCfg = Release|Any CPU
