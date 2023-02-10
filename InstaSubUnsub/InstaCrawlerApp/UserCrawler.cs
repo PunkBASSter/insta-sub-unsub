@@ -41,9 +41,9 @@ namespace InstaCrawlerApp
             var items = _followingPage.InfiniteScrollToBottomWithItemsLoading();
         }
 
-        public List<User> GetMyFollowed()
+        public List<InstaUser> GetMyFollowed()
         {
-            return new List<User>();
+            return new List<InstaUser>();
         }
     }
 }

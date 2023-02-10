@@ -1,6 +1,6 @@
 ﻿namespace InstaDomain
 {
-    public class User
+    public class InstaUser
     {
         public long Id { get; set; }
         public string Slug { get; set; } = string.Empty;

@@ -11,6 +11,6 @@ namespace InstaDomain
         public long Id { get; set; }
         public int FollowersNumber { get; set; }
         public int FollowedNumber { get; set; }
-        public IEnumerable<User> Followed { get; set; } = new List<User>();
+        public IEnumerable<InstaUser> Followed { get; set; } = new List<InstaUser>();
     }
 }

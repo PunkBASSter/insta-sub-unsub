@@ -13,5 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\InstaCrawlerApp\InstaCrawlerApp.csproj" />
+    <ProjectReference Include="..\InstaPersistence\InstaPersistence.csproj" />
   </ItemGroup>
 </Project>
