@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaDomain", "InstaDomain\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaPersistence", "InstaPersistence\InstaPersistence.csproj", "{E88EC453-3B99-4011-A0F8-81A12433D8A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeleniumUtils", "SeleniumPageObjects\SeleniumUtils.csproj", "{74D4AFA0-A703-4F21-B30E-D6E9AE07B5BC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeleniumUtils", "SeleniumUtils\SeleniumUtils.csproj", "{74D4AFA0-A703-4F21-B30E-D6E9AE07B5BC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaCrawlerApp", "InstaCrawlerApp\InstaCrawlerApp.csproj", "{2E9A30BF-A497-4CC0-8FD9-7C8A0B743DBF}"
 EndProject
