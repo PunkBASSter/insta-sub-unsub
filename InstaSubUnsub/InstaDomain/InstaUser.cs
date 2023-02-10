@@ -1,8 +1,9 @@
-﻿namespace InstaDomain
+﻿using InstaDomain.Enums;
+
+namespace InstaDomain
 {
-    public class InstaUser
+    public class InstaUser : BaseEntity
     {
-        public long Id { get; set; }
         public string Slug { get; set; } = string.Empty;
         public string? Name { get; set; }
         public int Followers { get; set; }

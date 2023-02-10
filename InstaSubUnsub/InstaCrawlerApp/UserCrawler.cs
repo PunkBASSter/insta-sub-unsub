@@ -1,4 +1,5 @@
-﻿using InstaDomain;
+﻿using InstaCrawlerApp.PersistenceInterfaces;
+using InstaDomain;
 using SeleniumUtils.PageObjects;
 
 namespace InstaCrawlerApp
@@ -10,11 +11,13 @@ namespace InstaCrawlerApp
         private readonly string _serviceUsername = "hidethetrack123";
         private readonly string _servicePassword = "Imnot4insta!1";
         private bool _isInitialized = false;
+        private readonly IRepository<InstaUser> _instaUsersRepo;
 
-        public UserCrawler(LoginPage loginPage, FollowingPage followingPage)
+        public UserCrawler(LoginPage loginPage, FollowingPage followingPage, IRepository<InstaUser> repo)
         {
             _loginPage = loginPage;
             _followingPage = followingPage;
+            _instaUsersRepo = repo;
         }
 
         public void Initialize()
@@ -33,6 +36,13 @@ namespace InstaCrawlerApp
 
         public void Crawl()
         {
+            //test DB
+            var testUsr = new InstaUser { Name = _serviceUsername, Status = InstaDomain.Enums.UserStatus.Protected };
+            //todo normal async
+            var id = _instaUsersRepo.CreateAsync(testUsr, CancellationToken.None).Result;
+            var readUser = _instaUsersRepo.Query.Take(10).ToList();
+
+
             Initialize();
 
             //ADD Check if we are on the following page

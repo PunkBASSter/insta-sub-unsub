@@ -1,4 +1,4 @@
-﻿namespace InstaDomain
+﻿namespace InstaDomain.Enums
 {
     public enum UserStatus
     {

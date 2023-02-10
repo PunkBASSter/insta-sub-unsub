@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace InstaDomain
 {
-    public class MainProfileState
+    public class MainProfileState : BaseEntity
     {
-        public long Id { get; set; }
         public int FollowersNumber { get; set; }
         public int FollowedNumber { get; set; }
         public IEnumerable<InstaUser> Followed { get; set; } = new List<InstaUser>();
