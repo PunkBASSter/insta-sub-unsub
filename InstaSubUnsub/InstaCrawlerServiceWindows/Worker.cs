@@ -5,9 +5,9 @@ namespace InstaCrawlerServiceWindows
     public class Worker : BackgroundService
     {
         private readonly ILogger<Worker> _logger;
-        private readonly UserCrawler _userCrawler;
+        private readonly IUserCrawler _userCrawler;
 
-        public Worker(ILogger<Worker> logger, UserCrawler userCrawler)
+        public Worker(ILogger<Worker> logger, IUserCrawler userCrawler)
         {
             _logger = logger;
             _userCrawler = userCrawler;

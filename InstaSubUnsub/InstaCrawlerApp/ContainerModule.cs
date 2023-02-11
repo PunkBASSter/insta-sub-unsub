@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using SeleniumPageObjects;
 using SeleniumUtils.PageObjects;
 
@@ -10,10 +8,10 @@ namespace InstaCrawlerApp
     {
         public void Register(IServiceCollection services)
         {
-            services.AddSingleton<IWebDriver>(f => new WebDriverFactory().GetInstance());
-            services.AddTransient<LoginPage>();
-            services.AddTransient<FollowingPage>();
-            services.AddTransient<UserCrawler>();
+            services.AddScoped(f => new WebDriverFactory().GetInstance());
+            services.AddScoped<LoginPage>();
+            services.AddScoped<FollowingPage>();
+            services.AddScoped<IUserCrawler, UserCrawler>();
         }
     }
 }

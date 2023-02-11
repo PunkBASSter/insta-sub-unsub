@@ -4,7 +4,7 @@ using SeleniumUtils.PageObjects;
 
 namespace InstaCrawlerApp
 {
-    public class UserCrawler
+    public class UserCrawler : IUserCrawler
     {
         private readonly LoginPage _loginPage;
         private readonly FollowingPage _followingPage;
@@ -20,6 +20,10 @@ namespace InstaCrawlerApp
             _instaUsersRepo = repo;
         }
 
+        /// <summary>
+        /// The script signs in and goes to the main user's following page (/{username}/following).
+        /// Scrolls the following page to bottom saving the users to the DB.
+        /// </summary>
         public void Initialize()
         {
             if (_isInitialized) return;
@@ -28,10 +32,12 @@ namespace InstaCrawlerApp
             _loginPage.Login(_serviceUsername, _servicePassword);
             _loginPage.HandleAfrerLoginQuestions();
 
+            //todo save cookies
+
+            _followingPage.Load("dr.imiller");
+            var items = _followingPage.InfiniteScrollToBottomWithItemsLoading();
+            var users = items.Select(i => new InstaUser { Name = i.UserName, });
             _isInitialized = true;
-            //create web driver instance
-            //login to account
-            //go to followed page and start discovery
         }
 
         public void Crawl()
@@ -45,10 +51,7 @@ namespace InstaCrawlerApp
 
             Initialize();
 
-            //ADD Check if we are on the following page
-            _followingPage.Load("dr.imiller");
-            
-            var items = _followingPage.InfiniteScrollToBottomWithItemsLoading();
+
         }
 
         public List<InstaUser> GetMyFollowed()
