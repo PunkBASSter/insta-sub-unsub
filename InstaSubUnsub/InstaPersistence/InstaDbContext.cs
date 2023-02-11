@@ -8,15 +8,13 @@ namespace InstaPersistence
     {
         public InstaDbContext() { }
 
-        public InstaDbContext(DbContextOptions<InstaDbContext> options) : base(options) { }
-
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            //TODO take connection string from config
+            optionsBuilder.UseNpgsql(@"Host=localhost;Database=insta_subs;Username=insta_service;Password=insta_service");
+        }
+        
         public DbSet<InstaUser> InstaUsers { get; set; }
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer(
-        //        @"Server=(localdb)\mssqllocaldb;Database=Blogging;Trusted_Connection=True");
-        //}
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
