@@ -4,8 +4,8 @@ using InstaCrawlerServiceWindows;
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((_, services) =>
     {
-        services.AddScoped<Worker>(); 
-        new InstaCrawlerApp.ContainerModule().Register(services);
+        services.AddHostedService<Worker>(); 
+        new InstaCrawlerApp.ContainerModule().RegisterForServiceWorker(services);
         new InstaPersistence.ContainerModule().RegisterForServiceWorker(services);
     })
     .Build();

@@ -13,5 +13,13 @@ namespace InstaCrawlerApp
             services.AddScoped<FollowingPage>();
             services.AddScoped<IUserCrawler, UserCrawler>();
         }
+
+        public void RegisterForServiceWorker(IServiceCollection services)
+        {
+            services.AddSingleton(f => new WebDriverFactory().GetInstance());
+            services.AddSingleton<LoginPage>();
+            services.AddSingleton<FollowingPage>();
+            services.AddSingleton<IUserCrawler, UserCrawler>();
+        }
     }
 }
