@@ -158,3 +158,4 @@ _ReSharper*/
 .vs/
 #Nuget packages folder
 packages/
+/InstaSubUnsub/InstaCrawlerServiceWindows/Properties/launchSettings.json
