@@ -21,8 +21,8 @@ namespace InstaCrawlerApp
             _followingPage = followingPage;
             _instaUsersRepo = repo;
             _configuration = configuration;
-            _serviceUsername = new Lazy<string>(() => _configuration.GetSection("ServiceUser:Username").Value ?? throw new ArgumentException("ServiceUsername is not provided"));
-            _servicePassword = new Lazy<string>(() => _configuration.GetSection("ServiceUser:Password").Value ?? throw new ArgumentException("ServiceUsername is not provided"));
+            _serviceUsername = new Lazy<string>(() => _configuration.GetSection("CrawlUser:Username").Value ?? throw new ArgumentException("CrawlUser:Username is not provided"));
+            _servicePassword = new Lazy<string>(() => _configuration.GetSection("CrawlUser:Password").Value ?? throw new ArgumentException("CrawlUser:Password is not provided"));
         }
 
         /// <summary>
