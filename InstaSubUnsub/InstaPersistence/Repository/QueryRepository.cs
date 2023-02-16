@@ -1,4 +1,4 @@
-﻿using InstaCrawlerApp.PersistenceInterfaces;
+﻿using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using InstaDomain;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
