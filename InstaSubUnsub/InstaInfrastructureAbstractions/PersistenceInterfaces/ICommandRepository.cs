@@ -1,11 +1,7 @@
 ﻿using InstaDomain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace InstaCrawlerApp.PersistenceInterfaces
+
+namespace InstaInfrastructureAbstractions.PersistenceInterfaces
 {
     public interface IRepository<T> : IReadRepository<T> where T : BaseEntity
     {

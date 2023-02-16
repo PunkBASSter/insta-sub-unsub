@@ -1,10 +1,11 @@
-﻿using InstaCrawlerApp.PersistenceInterfaces;
+﻿using InstaInfrastructureAbstractions.PersistenceInterfaces;
+using InstaInfrastructureAbstractions;
 using InstaPersistence.Repository;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace InstaPersistence
 {
-    public class ContainerModule
+    public class ContainerModule : IContainerModule
     {
         public void Register(IServiceCollection services)
         {

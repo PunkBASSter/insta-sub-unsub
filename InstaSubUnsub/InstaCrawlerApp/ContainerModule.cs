@@ -1,10 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using InstaInfrastructureAbstractions;
+using Microsoft.Extensions.DependencyInjection;
 using SeleniumPageObjects;
 using SeleniumUtils.PageObjects;
 
 namespace InstaCrawlerApp
 {
-    public class ContainerModule
+    public class ContainerModule : IContainerModule
     {
         public void Register(IServiceCollection services)
         {

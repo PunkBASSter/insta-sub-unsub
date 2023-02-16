@@ -1,5 +1,5 @@
-﻿using InstaCrawlerApp.PersistenceInterfaces;
-using InstaDomain;
+﻿using InstaDomain;
+using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
 using SeleniumUtils.PageObjects;
 
@@ -9,8 +9,8 @@ namespace InstaCrawlerApp
     {
         private readonly LoginPage _loginPage;
         private readonly FollowingPage _followingPage;
-        private readonly Lazy<string> _serviceUsername; //= "hidethetrack123";
-        private readonly Lazy<string> _servicePassword; // = "Imnot4insta!1";
+        private readonly Lazy<string> _serviceUsername;
+        private readonly Lazy<string> _servicePassword;
         private bool _isInitialized = false;
         private readonly IRepository<InstaUser> _instaUsersRepo;
         private readonly IConfiguration _configuration;
