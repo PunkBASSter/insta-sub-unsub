@@ -1,4 +1,5 @@
 ﻿using InstaDomain;
+using InstaPersistence.DataSeed;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -19,6 +20,8 @@ namespace InstaPersistence
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            builder.Entity<InstaUser>().HasData(new ProtectedInstaUsers().GetSeedData());
 
             base.OnModelCreating(builder);
         }

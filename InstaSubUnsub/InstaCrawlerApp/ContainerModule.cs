@@ -13,6 +13,7 @@ namespace InstaCrawlerApp
             services.AddScoped<LoginPage>();
             services.AddScoped<FollowingPage>();
             services.AddScoped<IUserCrawler, UserCrawler>();
+            services.AddScoped<Unfollower>();
         }
     }
 }

@@ -43,8 +43,20 @@ namespace InstaCrawlerApp
         {
             _followingPage.Load(_serviceUsername.Value);
             var items = _followingPage.InfiniteScrollToBottomWithItemsLoading();
+
+            //TODO filter grey buttons
+
             var users = items.Select(i => new InstaUser { Name = i.UserName, });
             return users;
+        }
+
+        public void Unfollow()
+        {
+            Initialize();
+
+            var users = GetFollowingFromUi();
+
+            //todo saving users with add/skip
         }
     }
 }
