@@ -5,6 +5,7 @@ namespace InstaInfrastructureAbstractions.PersistenceInterfaces
 {
     public interface IRepository<T> : IReadRepository<T> where T : BaseEntity
     {
-        ValueTask<long> CreateAsync(T entity, CancellationToken cancellationToken);
+        long InsertOrSkip(T entity, Func<T, bool> searchPredicate);
+        void SaveChanges();
     }
 }

@@ -14,9 +14,17 @@ namespace SeleniumUtils.PageObjects
 
         public virtual void Load(params string[] urlParams)
         {
-            _driver.Navigate().GoToUrl(string.Format(Url, urlParams));
-            var wait = new WebDriverWait(_driver, new TimeSpan(0, 0, 10));
-            wait.Until(ElementIsVisible(LoadIndicatingElementLocator));
+            var pageUrl = string.Format(Url, urlParams);
+            while (!ElementIsVisible(LoadIndicatingElementLocator)(_driver))
+            {
+                try
+                {
+                    _driver.Navigate().GoToUrl(pageUrl); //sometimes does not work for the first time
+                    var wait = new WebDriverWait(_driver, new TimeSpan(0, 0, 6));
+                    wait.Until(ElementIsVisible(LoadIndicatingElementLocator));
+                }
+                catch (WebDriverTimeoutException) { }
+            }
         }
 
         /// <summary>

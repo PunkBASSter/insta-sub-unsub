@@ -50,7 +50,8 @@ namespace InstaCrawlerApp
             //test DB
             var testUsr = new InstaUser { Name = _serviceUsername.Value, Status = InstaDomain.Enums.UserStatus.Protected };
             //todo normal async
-            var id = _instaUsersRepo.CreateAsync(testUsr, CancellationToken.None).Result;
+            _instaUsersRepo.InsertOrSkip(testUsr, u => u.Name == testUsr.Name);
+            _instaUsersRepo.SaveChanges();
             var readUser = _instaUsersRepo.Query.Take(10).ToList();
 
 

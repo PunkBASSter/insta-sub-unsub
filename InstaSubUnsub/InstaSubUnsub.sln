@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstaCrawlerApp", "InstaCra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstaCrawlerServiceWindows", "InstaCrawlerServiceWindows\InstaCrawlerServiceWindows.csproj", "{CB7B4899-A1C7-4FBB-B390-BD4CC95208A9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaInfrastructureAbstractions", "InstaInfrastructureAbstractions\InstaInfrastructureAbstractions.csproj", "{5C62833C-DA4F-478B-981E-9FFE8274F799}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InstaInfrastructureAbstractions", "InstaInfrastructureAbstractions\InstaInfrastructureAbstractions.csproj", "{5C62833C-DA4F-478B-981E-9FFE8274F799}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InstaPersistence.Tests", "InstaPersistence.Tests\InstaPersistence.Tests.csproj", "{B1908017-0DA5-4D38-A745-572E296C908E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{5C62833C-DA4F-478B-981E-9FFE8274F799}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5C62833C-DA4F-478B-981E-9FFE8274F799}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5C62833C-DA4F-478B-981E-9FFE8274F799}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1908017-0DA5-4D38-A745-572E296C908E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1908017-0DA5-4D38-A745-572E296C908E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1908017-0DA5-4D38-A745-572E296C908E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1908017-0DA5-4D38-A745-572E296C908E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

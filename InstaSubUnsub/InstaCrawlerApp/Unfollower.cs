@@ -42,7 +42,7 @@ namespace InstaCrawlerApp
         public IEnumerable<InstaUser> GetFollowingFromUi()
         {
             _followingPage.Load(_serviceUsername.Value);
-            var items = _followingPage.InfiniteScrollToBottomWithItemsLoading();
+            var items = _followingPage.GetCurrentFollowingItems(); //TODO replace with InfiniteScrollToBottom
 
             //TODO filter grey buttons
 
@@ -55,6 +55,10 @@ namespace InstaCrawlerApp
             Initialize();
 
             var users = GetFollowingFromUi();
+            var user = users.First();
+            _instaUsersRepo.InsertOrSkip(user, u => u.Name == user.Name);
+            _instaUsersRepo.SaveChanges();
+
 
             //todo saving users with add/skip
         }

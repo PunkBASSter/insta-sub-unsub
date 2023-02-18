@@ -17,6 +17,7 @@ namespace SeleniumUtils.PageObjects
         protected override By LoadIndicatingElementLocator => By.XPath("//h1/div[text()=\"Ваши подписки\"]");
 
         public ReadOnlyCollection<IWebElement> FollowingItems { get; private set; }
+            = new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
 
         public IWebElement FollowingDialogScrollableArea => _driver.FindElement(By.XPath("//div[@role=\"dialog\"]//div[@role=\"tablist\"]/following-sibling::div"));
 
@@ -32,6 +33,12 @@ namespace SeleniumUtils.PageObjects
                 """");
         }
 
+        public List<FollowingItem> GetCurrentFollowingItems()
+        {
+            WaitForItems();
+            return FollowingItems.Select(i => new FollowingItem(i)).ToList();
+        }
+
         public List<FollowingItem> InfiniteScrollToBottomWithItemsLoading()
         {
             while (WaitForItems())
@@ -42,7 +49,7 @@ namespace SeleniumUtils.PageObjects
             return FollowingItems.Select(i => new FollowingItem(i)).ToList();
         }
 
-        public bool WaitForItems()
+        private bool WaitForItems()
         {
             try
             {
@@ -78,7 +85,7 @@ namespace SeleniumUtils.PageObjects
             _element = element;
         }
 
-        public string UserName => _element.FindElement(By.XPath("//div/span/a[@role=\"link\"]")).GetAttribute("href").Replace("/", string.Empty);
+        public string UserName => _element.FindElement(By.XPath("//div/span/a[@role=\"link\"]")).GetAttribute("href").Split("/", StringSplitOptions.RemoveEmptyEntries).Last();
     
         //Todo sub/unsub buttons
     }
