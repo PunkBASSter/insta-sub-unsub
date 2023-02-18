@@ -1,6 +1,7 @@
 ﻿using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using InstaDomain;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace InstaPersistence.Repository
 {
@@ -51,9 +52,9 @@ namespace InstaPersistence.Repository
             _dbContext.Entry(entityToUpdate).State = EntityState.Modified;
         }
 
-        public virtual long InsertOrSkip(T entity, Func<T, bool> searchPredicate)
+        public virtual long InsertOrSkip(T entity, Func<T, bool> conditionToSkip)
         {
-            var storedEntity = _dbSet.Find(searchPredicate);
+            var storedEntity = _dbSet.AsQueryable().FirstOrDefault(conditionToSkip);
 
             if (storedEntity is null)
             {

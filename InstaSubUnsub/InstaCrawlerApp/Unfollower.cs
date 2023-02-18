@@ -2,7 +2,7 @@
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
 using SeleniumUtils.PageObjects;
-
+using UserStatus = InstaDomain.Enums.UserStatus;
 
 namespace InstaCrawlerApp
 {
@@ -15,6 +15,7 @@ namespace InstaCrawlerApp
         private bool _isInitialized = false;
         private readonly IRepository<InstaUser> _instaUsersRepo;
         private readonly IConfiguration _configuration;
+        private readonly int _unfollowLimitPerIteration;
 
         public Unfollower(LoginPage loginPage, FollowingPage followingPage, IRepository<InstaUser> repo, IConfiguration configuration)
         {
@@ -24,6 +25,7 @@ namespace InstaCrawlerApp
             _configuration = configuration;
             _serviceUsername = new Lazy<string>(() => _configuration.GetSection("UnfollowUser:Username").Value ?? throw new ArgumentException("UnfollowUser:Username is not provided"));
             _servicePassword = new Lazy<string>(() => _configuration.GetSection("UnfollowUser:Password").Value ?? throw new ArgumentException("UnfollowUser:Password is not provided"));
+            _unfollowLimitPerIteration = Convert.ToInt32(_configuration.GetSection("Unfollow:LimitPerIteration").Value);
         }
 
         public void Initialize()
@@ -39,15 +41,15 @@ namespace InstaCrawlerApp
             _isInitialized = true;
         }
 
-        public IEnumerable<InstaUser> GetFollowingFromUi()
+        public IList<InstaUser> GetFollowingFromUi()
         {
             _followingPage.Load(_serviceUsername.Value);
-            var items = _followingPage.GetCurrentFollowingItems(); //TODO replace with InfiniteScrollToBottom
+            var items = _followingPage.InfiniteScrollToBottomWithItemsLoading(); //TODO replace with InfiniteScrollToBottom
 
             //TODO filter grey buttons
 
-            var users = items.Select(i => new InstaUser { Name = i.UserName, });
-            return users;
+            var users = items.Select(i => new InstaUser { Name = i.UserName, Status = UserStatus.Followed });
+            return users.ToList();
         }
 
         public void Unfollow()
@@ -55,12 +57,34 @@ namespace InstaCrawlerApp
             Initialize();
 
             var users = GetFollowingFromUi();
-            var user = users.First();
-            _instaUsersRepo.InsertOrSkip(user, u => u.Name == user.Name);
+            foreach (var user in users)
+            {
+                _instaUsersRepo.InsertOrSkip(user, u => u.Name == user.Name);
+            }
             _instaUsersRepo.SaveChanges();
 
+            var subsToCancel = _instaUsersRepo.Query.Where(usr => usr.Status == UserStatus.Followed)
+                .OrderBy(usr => usr.FollowingDate)
+                .Take(_unfollowLimitPerIteration)
+                .ToList();
 
-            //todo saving users with add/skip
+            foreach(var sub in subsToCancel)
+            {
+                var uiSubItem = _followingPage.FollowingItems.FirstOrDefault(item => item.UserName == sub.Name);
+                if (uiSubItem is null)
+                {
+                    //TODO lof as warning
+                    continue;
+                }
+
+                var success = uiSubItem.Unfollow();
+                if (success)
+                {
+                    //_instaUsersRepo.Update
+                }
+                //else -- LOG Warning
+            }
+            
         }
     }
 }

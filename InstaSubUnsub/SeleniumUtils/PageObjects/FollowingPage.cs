@@ -16,7 +16,9 @@ namespace SeleniumUtils.PageObjects
 
         protected override By LoadIndicatingElementLocator => By.XPath("//h1/div[text()=\"Ваши подписки\"]");
 
-        public ReadOnlyCollection<IWebElement> FollowingItems { get; private set; }
+        public IList<FollowingItem> FollowingItems { get; private set; } = new List<FollowingItem>();
+
+        private ReadOnlyCollection<IWebElement> FollowingItemElements { get; set; }
             = new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
 
         public IWebElement FollowingDialogScrollableArea => _driver.FindElement(By.XPath("//div[@role=\"dialog\"]//div[@role=\"tablist\"]/following-sibling::div"));
@@ -33,20 +35,22 @@ namespace SeleniumUtils.PageObjects
                 """");
         }
 
-        public List<FollowingItem> GetCurrentFollowingItems()
-        {
-            WaitForItems();
-            return FollowingItems.Select(i => new FollowingItem(i)).ToList();
-        }
+        //public List<FollowingItem> GetCurrentFollowingItems()
+        //{
+        //    WaitForItems();
+        //    return FollowingItems.Select(i => new FollowingItem(i)).ToList();
+        //}
 
-        public List<FollowingItem> InfiniteScrollToBottomWithItemsLoading()
+        public IList<FollowingItem> InfiniteScrollToBottomWithItemsLoading()
         {
             while (WaitForItems())
             {
                 ScrollToBottom();
             }
 
-            return FollowingItems.Select(i => new FollowingItem(i)).ToList();
+            FollowingItems = FollowingItemElements.Select(i => new FollowingItem(i, _driver)).ToList();
+
+            return FollowingItems;
         }
 
         private bool WaitForItems()
@@ -66,27 +70,77 @@ namespace SeleniumUtils.PageObjects
             {
                 try
                 {
-                    FollowingItems = driver.FindElements(By.XPath("//div[@aria-labelledby]"));
-                    var res = _followingItemsLoaded < FollowingItems.Count;
-                    _followingItemsLoaded = FollowingItems.Count;
+                    FollowingItemElements = driver.FindElements(By.XPath("//div[@aria-labelledby]"));
+                    var res = _followingItemsLoaded < FollowingItemElements.Count;
+                    _followingItemsLoaded = FollowingItemElements.Count;
                     return res;
                 }
                 catch { return false; }
             };
-            
+
         }
     }
 
     public class FollowingItem
     {
         private readonly IWebElement _element;
-        public FollowingItem(IWebElement element)
+        private readonly IWebDriver _driver;
+        private string? _userName;
+        private bool _following = true;
+
+        public FollowingItem(IWebElement element, IWebDriver driver)
         {
             _element = element;
+            _driver = driver;
         }
 
-        public string UserName => _element.FindElement(By.XPath("//div/span/a[@role=\"link\"]")).GetAttribute("href").Split("/", StringSplitOptions.RemoveEmptyEntries).Last();
-    
-        //Todo sub/unsub buttons
+        public string UserName
+        {
+            get
+            {
+                _userName ??= _element.FindElement(By.XPath(".//div/span/a[@role=\"link\"]")).GetAttribute("href").Split("/", StringSplitOptions.RemoveEmptyEntries).Last();
+                return _userName;
+            }
+        }
+
+        public bool Unfollow()
+        {
+            //TODO Scroll to make the user item visible
+
+            var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(5));
+            
+            wait.Until(driver => TryGetGreySubButton() != null);
+            var button = TryGetGreySubButton();
+            button.Click();
+
+            wait.Until(driver => TryGetCancelSubButton() != null);
+            var cancelSubButton = TryGetCancelSubButton();
+            cancelSubButton.Click();
+
+            wait.Until(driver => TryGetBlueSubButton() != null);
+            var blueSubButton = TryGetBlueSubButton();
+            var result = blueSubButton.Enabled && blueSubButton.Displayed;
+            _following = result;
+            return result;
+        }
+
+        private IWebElement? TryGetGreySubButton()
+        {
+            try { return _element.FindElement(By.XPath(".//div/button/div/div[text()=\"Подписки\"]")); }
+            catch { return null; };
+        }
+
+        private IWebElement? TryGetBlueSubButton()
+        {
+            try { return _element.FindElement(By.XPath(".//div/button/div/div[text()=\"Подписаться\"]")); }
+            catch { return null; };
+        }
+
+        private IWebElement? TryGetCancelSubButton()
+        {
+            
+            try { return _element.FindElement(By.XPath("//div[@role=\"dialog\"]//button[text()=\"Отменить подписку\"]")); }
+            catch { return null; };
+        }
     }
 }
