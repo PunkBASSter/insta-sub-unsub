@@ -73,14 +73,14 @@ namespace InstaCrawlerApp
                 var uiSubItem = _followingPage.FollowingItems.FirstOrDefault(item => item.UserName == sub.Name);
                 if (uiSubItem is null)
                 {
-                    //TODO lof as warning
+                    //TODO log as warning and consider deleting from DB or marking as unfollowed + add date
                     continue;
                 }
 
                 var success = uiSubItem.Unfollow();
                 if (success)
                 {
-                    //_instaUsersRepo.Update
+                    //_instaUsersRepo.Update + date
                 }
                 //else -- LOG Warning
             }

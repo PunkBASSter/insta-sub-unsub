@@ -35,12 +35,6 @@ namespace SeleniumUtils.PageObjects
                 """");
         }
 
-        //public List<FollowingItem> GetCurrentFollowingItems()
-        //{
-        //    WaitForItems();
-        //    return FollowingItems.Select(i => new FollowingItem(i)).ToList();
-        //}
-
         public IList<FollowingItem> InfiniteScrollToBottomWithItemsLoading()
         {
             while (WaitForItems())
@@ -94,6 +88,17 @@ namespace SeleniumUtils.PageObjects
             _driver = driver;
         }
 
+        public void ScrollIntoView()
+        {
+            //finding the JS element by XPath with a username as a profile link part and scrolling it into view
+            _driver.ExecuteJavaScript($$"""
+                function getElementByXpath(path) { return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; }
+
+                let element = getElementByXpath("//div/span/a[contains(@href,'{{UserName}}')]");
+                element.scrollIntoView()
+                """);
+        }
+
         public string UserName
         {
             get
@@ -105,10 +110,15 @@ namespace SeleniumUtils.PageObjects
 
         public bool Unfollow()
         {
-            //TODO Scroll to make the user item visible
+            ScrollIntoView();
+            if (TryGetBlueSubButton() != null)//button is already blue, so unfollowing is done
+            {
+                _following = false;
+                return true;
+            }
 
             var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(5));
-            
+
             wait.Until(driver => TryGetGreySubButton() != null);
             var button = TryGetGreySubButton();
             button.Click();
@@ -120,7 +130,7 @@ namespace SeleniumUtils.PageObjects
             wait.Until(driver => TryGetBlueSubButton() != null);
             var blueSubButton = TryGetBlueSubButton();
             var result = blueSubButton.Enabled && blueSubButton.Displayed;
-            _following = result;
+            _following = !result;
             return result;
         }
 
