@@ -6,6 +6,9 @@ using UserStatus = InstaDomain.Enums.UserStatus;
 
 namespace InstaCrawlerApp
 {
+    /// <summary>
+    /// Acts on behalf of main account owner
+    /// </summary>
     public class Unfollower
     {
         private readonly LoginPage _loginPage;
@@ -44,9 +47,7 @@ namespace InstaCrawlerApp
         public IList<InstaUser> GetFollowingFromUi()
         {
             _followingPage.Load(_serviceUsername.Value);
-            var items = _followingPage.InfiniteScrollToBottomWithItemsLoading(); //TODO replace with InfiniteScrollToBottom
-
-            //TODO filter grey buttons
+            var items = _followingPage.InfiniteScrollToBottomWithItemsLoading();
 
             var users = items.Select(i => new InstaUser { Name = i.UserName, Status = UserStatus.Followed });
             return users.ToList();
@@ -57,34 +58,48 @@ namespace InstaCrawlerApp
             Initialize();
 
             var users = GetFollowingFromUi();
+            SaveUsersToDb(users);
+
+            var usersToUnfollow = _instaUsersRepo.Query.Where(usr => usr.Status == UserStatus.Followed)
+                .OrderBy(usr => usr.FollowingDate)
+                .Take(_unfollowLimitPerIteration)
+                .ToList();
+
+            foreach(var user in usersToUnfollow)
+            {
+                var uiFollowingItem = _followingPage.FollowingItems.FirstOrDefault(item => item.UserName == user.Name);
+                if (uiFollowingItem is null)
+                {
+                    //TODO logging of unsynchronized data between DB and UI
+                    UnfollowUserInDb(user);
+                    continue;
+                }
+
+                var success = uiFollowingItem.Unfollow();
+                if (success)
+                {
+                    UnfollowUserInDb(user);
+                }
+                //else { } -- //TODO logging of unsynchronized data between DB and UI
+            }
+
+        }
+
+        private void SaveUsersToDb(IEnumerable<InstaUser> users)
+        {
             foreach (var user in users)
             {
                 _instaUsersRepo.InsertOrSkip(user, u => u.Name == user.Name);
             }
             _instaUsersRepo.SaveChanges();
+        }
 
-            var subsToCancel = _instaUsersRepo.Query.Where(usr => usr.Status == UserStatus.Followed)
-                .OrderBy(usr => usr.FollowingDate)
-                .Take(_unfollowLimitPerIteration)
-                .ToList();
-
-            foreach(var sub in subsToCancel)
-            {
-                var uiSubItem = _followingPage.FollowingItems.FirstOrDefault(item => item.UserName == sub.Name);
-                if (uiSubItem is null)
-                {
-                    //TODO log as warning and consider deleting from DB or marking as unfollowed + add date
-                    continue;
-                }
-
-                var success = uiSubItem.Unfollow();
-                if (success)
-                {
-                    //_instaUsersRepo.Update + date
-                }
-                //else -- LOG Warning
-            }
-            
+        private void UnfollowUserInDb(InstaUser user)
+        {
+            user.Status = UserStatus.Unfollowed;
+            user.UnfollowingDate = DateTime.UtcNow;
+            _instaUsersRepo.Update(user);
+            _instaUsersRepo.SaveChanges();
         }
     }
 }
