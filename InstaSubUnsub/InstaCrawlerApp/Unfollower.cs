@@ -1,6 +1,7 @@
 ﻿using InstaDomain;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
+using SeleniumUtils;
 using SeleniumUtils.PageObjects;
 using UserStatus = InstaDomain.Enums.UserStatus;
 
@@ -19,8 +20,9 @@ namespace InstaCrawlerApp
         private readonly IRepository<InstaUser> _instaUsersRepo;
         private readonly IConfiguration _configuration;
         private readonly int _unfollowLimitPerIteration;
+        private readonly CookieUtil _cookieUtil;
 
-        public Unfollower(LoginPage loginPage, FollowingPage followingPage, IRepository<InstaUser> repo, IConfiguration configuration)
+        public Unfollower(LoginPage loginPage, FollowingPage followingPage, IRepository<InstaUser> repo, IConfiguration configuration, CookieUtil cookieUtil)
         {
             _loginPage = loginPage;
             _followingPage = followingPage;
@@ -29,6 +31,7 @@ namespace InstaCrawlerApp
             _serviceUsername = new Lazy<string>(() => _configuration.GetSection("UnfollowUser:Username").Value ?? throw new ArgumentException("UnfollowUser:Username is not provided"));
             _servicePassword = new Lazy<string>(() => _configuration.GetSection("UnfollowUser:Password").Value ?? throw new ArgumentException("UnfollowUser:Password is not provided"));
             _unfollowLimitPerIteration = Convert.ToInt32(_configuration.GetSection("Unfollow:LimitPerIteration").Value);
+            _cookieUtil = cookieUtil;
         }
 
         public void Initialize()

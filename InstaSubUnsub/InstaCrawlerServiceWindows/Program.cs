@@ -1,11 +1,13 @@
 using InstaCrawlerServiceWindows;
 
 IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices((_, services) =>
+    .ConfigureServices((hostBuilderContext, services) =>
     {
+        var config = hostBuilderContext.Configuration;
+
         services.AddHostedService<ScopedWorker>();
-        new InstaCrawlerApp.ContainerModule().Register(services);
-        new InstaPersistence.ContainerModule().Register(services);
+        new InstaCrawlerApp.ContainerModule().Register(services, config);
+        new InstaPersistence.ContainerModule().Register(services, config);
     })
     .Build();
 
