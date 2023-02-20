@@ -10,20 +10,20 @@ namespace SeleniumUtils
 {
     public class CookieUtil
     {
-        public static IEnumerable<Cookie> CookieStorageDummy = Enumerable.Empty<Cookie>();
-
+        //todo complete saving according to https://stackoverflow.com/questions/6115721/how-to-save-restore-serializable-object-to-from-file
+        
         private readonly IWebDriver _driver;
         private readonly string _savedCookiesPath;
         
         public CookieUtil(IWebDriver driver, string? savedCookiesPath = null)
         {
             _driver = driver;
-            _savedCookiesPath = savedCookiesPath ?? "SavedCookies";
+            _savedCookiesPath = savedCookiesPath ?? $"SavedCookies_{GetHashCode()}"; //??? if hash is a valid approach
         }
 
         public void SaveCookies()
         {
-            CookieStorageDummy = _driver.Manage().Cookies.AllCookies;
+            var cookies = _driver.Manage().Cookies.AllCookies;
         }
 
         public void LoadCookies()
