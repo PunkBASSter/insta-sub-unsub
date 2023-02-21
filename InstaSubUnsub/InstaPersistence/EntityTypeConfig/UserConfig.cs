@@ -1,11 +1,10 @@
 ﻿using InstaDomain;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace InstaPersistence.EntityTypeConfig
 {
-    public class UserEntityConfig : IEntityTypeConfiguration<InstaUser>
+    internal class UserEntityConfig : IEntityTypeConfiguration<InstaUser>
     {
         public void Configure(EntityTypeBuilder<InstaUser> builder)
         {
@@ -16,8 +15,9 @@ namespace InstaPersistence.EntityTypeConfig
                 .IsUnique(true)
                     .IncludeProperties(p => new { p.IsFollower, p.Status });
 
-            builder.Property(p => p.Name).IsRequired();
+            builder.Property(p => p.Name).HasMaxLength(30).IsRequired();
 
+            //builder.HasMany<UserSubscription>(p => p.FollowingUsers).WithMany(p => p.Follower);
             //builder.Property(t => t.Title)
             //    .HasMaxLength(200)
             //    .IsRequired();

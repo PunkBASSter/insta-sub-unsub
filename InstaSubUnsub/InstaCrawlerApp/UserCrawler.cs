@@ -64,11 +64,9 @@ namespace InstaCrawlerApp
 
             var users = followingItems.Select(i => new InstaUser { Name = i.UserName, Status = UserStatus.New });
 
-            long id = seedUser?.Id ?? 0;
-
             foreach (var user in users)
             {
-                id = _instaUsersRepo.InsertOrSkip(user, userToSkip => userToSkip.Name == user.Name);
+                var id = _instaUsersRepo.InsertOrSkip(user, userToSkip => userToSkip.Name == user.Name);
                 //todo use Id and current user Id to save connection to a table (potentially to build a social graph)
             }
             _instaUsersRepo.SaveChanges();

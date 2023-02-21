@@ -3,6 +3,7 @@ using System;
 using InstaPersistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace InstaPersistence.Migrations
 {
     [DbContext(typeof(InstaDbContext))]
-    partial class InstaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230221021008_UserSub_Model_added_InstaUser_fields_altered")]
+    partial class UserSubModeladdedInstaUserfieldsaltered
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

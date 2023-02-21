@@ -17,6 +17,8 @@ namespace InstaPersistence
         
         public DbSet<InstaUser> InstaUsers { get; set; }
 
+        public DbSet<UserSubscription> UserSubscriptions { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
