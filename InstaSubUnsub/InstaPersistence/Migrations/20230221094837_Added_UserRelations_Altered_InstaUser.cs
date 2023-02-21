@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace InstaPersistence.Migrations
 {
     /// <inheritdoc />
-    public partial class UserSubModeladdedInstaUserfieldsaltered : Migration
+    public partial class AddedUserRelationsAlteredInstaUser : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -42,7 +42,7 @@ namespace InstaPersistence.Migrations
                 nullable: true);
 
             migrationBuilder.CreateTable(
-                name: "UserSubscriptions",
+                name: "UserRelations",
                 columns: table => new
                 {
                     FollowerId = table.Column<long>(type: "bigint", nullable: false),
@@ -51,15 +51,15 @@ namespace InstaPersistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserSubscriptions", x => new { x.FollowerId, x.FolloweeId });
+                    table.PrimaryKey("PK_UserRelations", x => new { x.FollowerId, x.FolloweeId });
                     table.ForeignKey(
-                        name: "FK_UserSubscriptions_InstaUsers_FolloweeId",
+                        name: "FK_UserRelations_InstaUsers_FolloweeId",
                         column: x => x.FolloweeId,
                         principalTable: "InstaUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserSubscriptions_InstaUsers_FollowerId",
+                        name: "FK_UserRelations_InstaUsers_FollowerId",
                         column: x => x.FollowerId,
                         principalTable: "InstaUsers",
                         principalColumn: "Id",
@@ -228,8 +228,8 @@ namespace InstaPersistence.Migrations
                 values: new object[] { false, null });
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserSubscriptions_FolloweeId",
-                table: "UserSubscriptions",
+                name: "IX_UserRelations_FolloweeId",
+                table: "UserRelations",
                 column: "FolloweeId");
         }
 
@@ -237,7 +237,7 @@ namespace InstaPersistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "UserSubscriptions");
+                name: "UserRelations");
 
             migrationBuilder.DropColumn(
                 name: "HasRussianText",

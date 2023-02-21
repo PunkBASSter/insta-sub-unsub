@@ -17,7 +17,7 @@ namespace InstaPersistence
         
         public DbSet<InstaUser> InstaUsers { get; set; }
 
-        public DbSet<UserRelation> UserSubscriptions { get; set; }
+        public DbSet<UserRelation> UserRelations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

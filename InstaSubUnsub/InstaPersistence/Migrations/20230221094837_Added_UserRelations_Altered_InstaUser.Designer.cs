@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace InstaPersistence.Migrations
 {
     [DbContext(typeof(InstaDbContext))]
-    [Migration("20230221021853_Renamed_UserSubscription_Model_to_UserRelation")]
-    partial class RenamedUserSubscriptionModeltoUserRelation
+    [Migration("20230221094837_Added_UserRelations_Altered_InstaUser")]
+    partial class AddedUserRelationsAlteredInstaUser
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -293,7 +293,7 @@ namespace InstaPersistence.Migrations
 
                     b.HasIndex("FolloweeId");
 
-                    b.ToTable("UserSubscriptions");
+                    b.ToTable("UserRelations");
                 });
 
             modelBuilder.Entity("InstaDomain.UserRelation", b =>

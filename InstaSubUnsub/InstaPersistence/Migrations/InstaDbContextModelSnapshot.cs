@@ -290,7 +290,7 @@ namespace InstaPersistence.Migrations
 
                     b.HasIndex("FolloweeId");
 
-                    b.ToTable("UserSubscriptions");
+                    b.ToTable("UserRelations");
                 });
 
             modelBuilder.Entity("InstaDomain.UserRelation", b =>
