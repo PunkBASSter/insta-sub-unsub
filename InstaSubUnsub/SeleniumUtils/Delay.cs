@@ -20,8 +20,13 @@ namespace SeleniumUtils
 
         public void Random(Action a)
         {
-            Thread.Sleep(_random.Next(_minDelay, _maxDelay));
+            Random();
             a();
+        }
+
+        public void Random()
+        {
+            Thread.Sleep(_random.Next(_minDelay, _maxDelay));
         }
     }
 }
