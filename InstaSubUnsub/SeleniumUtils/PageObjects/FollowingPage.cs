@@ -14,7 +14,7 @@ namespace SeleniumUtils.PageObjects
 
         public override string Url => "https://www.instagram.com/{0}/following";
 
-        protected override By LoadIndicatingElementLocator => By.XPath("//h1/div[text()=\"Ваши подписки\"]");
+        protected override By LoadIndicatingElementLocator => By.XPath("//div[@role=\"dialog\"]//div[@role=\"tablist\"]/following-sibling::div");
 
         public IList<FollowingItem> FollowingItems { get; private set; } = new List<FollowingItem>();
 
