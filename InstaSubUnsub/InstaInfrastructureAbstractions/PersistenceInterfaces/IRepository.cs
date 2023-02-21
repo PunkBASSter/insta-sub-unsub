@@ -3,10 +3,11 @@
 
 namespace InstaInfrastructureAbstractions.PersistenceInterfaces
 {
-    public interface IRepository<T> : IReadRepository<T> where T : BaseEntity
+    public interface IRepository : IReadRepository
     {
-        long InsertOrSkip(T entity, Func<T, bool> conditionToSkip);
-        void Update(T entity);
+        long InsertOrUpdate<T>(T entity, Func<T, bool> conditionToMatch) where T : BaseEntity;
+        long InsertOrSkip<T>(T entity, Func<T, bool> conditionToSkip) where T : BaseEntity;
+        void Update<T>(T entity) where T : BaseEntity;
         void SaveChanges();
     }
 }

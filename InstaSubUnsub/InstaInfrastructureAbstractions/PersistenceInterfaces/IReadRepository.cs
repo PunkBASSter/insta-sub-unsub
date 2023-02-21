@@ -2,8 +2,8 @@
 
 namespace InstaInfrastructureAbstractions.PersistenceInterfaces
 {
-    public interface IReadRepository<T> where T : BaseEntity
+    public interface IReadRepository 
     {
-        IQueryable<T> Query { get; }
+        IQueryable<T> Query<T>() where T : BaseEntity;
     }
 }

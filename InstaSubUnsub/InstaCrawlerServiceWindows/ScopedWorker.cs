@@ -40,6 +40,15 @@ namespace InstaCrawlerServiceWindows
                 var unfollower = scope.ServiceProvider.GetRequiredService<Unfollower>();
                 await Task.Run(unfollower.Unfollow);
             }
+
+            using (IServiceScope scope = _serviceProvider.CreateScope())
+            {
+                //var userCrawler = scope.ServiceProvider.GetRequiredService<IUserCrawler>();
+                //await Task.Run(userCrawler.Crawl);
+
+                var crawler = scope.ServiceProvider.GetRequiredService<UserCrawler>();
+                await Task.Run(crawler.Crawl);
+            }
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)

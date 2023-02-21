@@ -3,7 +3,7 @@ using InstaDomain;
 
 namespace InstaPersistence.Repository
 {
-    public class ReadRepository<T> : IReadRepository<T> where T : BaseEntity
+    public class ReadRepository : IReadRepository
     {
         private readonly InstaDbContext _dbContext;
         public ReadRepository(InstaDbContext dbContext)
@@ -11,6 +11,9 @@ namespace InstaPersistence.Repository
             _dbContext = dbContext;
         }
 
-        public IQueryable<T> Query => _dbContext.Set<T>().AsQueryable();
+        public IQueryable<T> Query<T>() where T : BaseEntity
+        {
+            return _dbContext.Set<T>().AsQueryable();
+        }
     }
 }

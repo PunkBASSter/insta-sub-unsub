@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using SeleniumUtils.Exceptions;
 
 namespace SeleniumUtils.PageObjects
 {
@@ -18,10 +19,20 @@ namespace SeleniumUtils.PageObjects
         {
             SlowSendKeys(UserNameBox, username);
             SlowSendKeys(PasswordBox, password);
-            
-            //UserNameBox.SendKeys(username);
-            //PasswordBox.SendKeys(password);
             PasswordBox.SendKeys(Keys.Enter);
+            if (CheckErrorDisplayed())
+                throw new LoginFailedException();
+        }
+
+        public bool CheckErrorDisplayed()
+        {
+            new Delay(1000,1200).Random();
+            try
+            {
+                var error = _driver.FindElement(By.Id("slfErrorAlert"));
+                return error.Displayed;
+            }
+            catch(NoSuchElementException) { return false; }
         }
 
         public void HandleAfrerLoginQuestions()
@@ -47,7 +58,6 @@ namespace SeleniumUtils.PageObjects
                 }
                 catch (NoSuchElementException) { return false; }
             };
-            
         }
 
         public override string Url => "https://www.instagram.com/accounts/login/?source=auth_switcher";

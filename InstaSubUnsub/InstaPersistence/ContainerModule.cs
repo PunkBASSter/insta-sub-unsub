@@ -11,8 +11,8 @@ namespace InstaPersistence
         public void Register(IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<InstaDbContext>();
-            services.AddTransient(typeof(IReadRepository<>), typeof(ReadRepository<>));
-            services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+            services.AddTransient(typeof(IReadRepository), typeof(ReadRepository));
+            services.AddTransient(typeof(IRepository), typeof(Repository.Repository));
         }
     }
 }

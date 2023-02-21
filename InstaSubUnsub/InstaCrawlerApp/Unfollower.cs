@@ -17,16 +17,16 @@ namespace InstaCrawlerApp
         private readonly Lazy<string> _serviceUsername;
         private readonly Lazy<string> _servicePassword;
         private bool _isInitialized = false;
-        private readonly IRepository<InstaUser> _instaUsersRepo;
+        private readonly IRepository _repo;
         private readonly IConfiguration _configuration;
         private readonly int _unfollowLimitPerIteration;
         private readonly CookieUtil _cookieUtil;
 
-        public Unfollower(LoginPage loginPage, FollowingPage followingPage, IRepository<InstaUser> repo, IConfiguration configuration, CookieUtil cookieUtil)
+        public Unfollower(LoginPage loginPage, FollowingPage followingPage, IRepository repo, IConfiguration configuration, CookieUtil cookieUtil)
         {
             _loginPage = loginPage;
             _followingPage = followingPage;
-            _instaUsersRepo = repo;
+            _repo = repo;
             _configuration = configuration;
             _serviceUsername = new Lazy<string>(() => _configuration.GetSection("UnfollowUser:Username").Value ?? throw new ArgumentException("UnfollowUser:Username is not provided"));
             _servicePassword = new Lazy<string>(() => _configuration.GetSection("UnfollowUser:Password").Value ?? throw new ArgumentException("UnfollowUser:Password is not provided"));
@@ -63,7 +63,8 @@ namespace InstaCrawlerApp
             var users = GetFollowingFromUi();
             SaveUsersToDb(users);
 
-            var usersToUnfollow = _instaUsersRepo.Query.Where(usr => usr.Status == UserStatus.Followed)
+            var usersToUnfollow = _repo.Query<InstaUser>()                
+                .Where(usr => usr.Status == UserStatus.Followed)
                 .OrderBy(usr => usr.FollowingDate)
                 .Take(_unfollowLimitPerIteration)
                 .ToList();
@@ -92,17 +93,17 @@ namespace InstaCrawlerApp
         {
             foreach (var user in users)
             {
-                _instaUsersRepo.InsertOrSkip(user, u => u.Name == user.Name);
+                _repo.InsertOrSkip(user, u => u.Name == user.Name);
             }
-            _instaUsersRepo.SaveChanges();
+            _repo.SaveChanges();
         }
 
         private void UnfollowUserInDb(InstaUser user)
         {
             user.Status = UserStatus.Unfollowed;
             user.UnfollowingDate = DateTime.UtcNow;
-            _instaUsersRepo.Update(user);
-            _instaUsersRepo.SaveChanges();
+            _repo.Update(user);
+            _repo.SaveChanges();
         }
     }
 }

@@ -7,22 +7,22 @@ using SeleniumUtils.PageObjects;
 
 namespace InstaCrawlerApp
 {
-    public class UserCrawler : IUserCrawler
+    public class UserCrawler
     {
         private readonly LoginPage _loginPage;
         private readonly FollowingPage _followingPage;
         private readonly Lazy<string> _serviceUsername;
         private readonly Lazy<string> _servicePassword;
         private bool _isInitialized = false;
-        private readonly IRepository<InstaUser> _instaUsersRepo;
+        private readonly IRepository _repo;
         private readonly IConfiguration _configuration;
         private readonly int _crawlLimitPerIteration = 2873;
 
-        public UserCrawler(LoginPage loginPage, FollowingPage followingPage, IRepository<InstaUser> repo, IConfiguration configuration)
+        public UserCrawler(LoginPage loginPage, FollowingPage followingPage, IRepository repo, IConfiguration configuration)
         {
             _loginPage = loginPage;
             _followingPage = followingPage;
-            _instaUsersRepo = repo;
+            _repo = repo;
             _configuration = configuration;
             _serviceUsername = new Lazy<string>(() => _configuration.GetSection("CrawlUser:Username").Value ?? throw new ArgumentException("CrawlUser:Username is not provided"));
             _servicePassword = new Lazy<string>(() => _configuration.GetSection("CrawlUser:Password").Value ?? throw new ArgumentException("CrawlUser:Password is not provided"));
@@ -59,17 +59,27 @@ namespace InstaCrawlerApp
 
         private int CrawlFromLastUser()
         {
-            var seedUser = _instaUsersRepo.Query.LastOrDefault();
-            var followingItems = VisitUserAndGetFollowing(seedUser?.Name ?? _serviceUsername.Value);
+            var userQuery = _repo.Query<InstaUser>();
+            var seedUser = userQuery.OrderBy(u => u.Id).LastOrDefault(u => u.HasRussianText == true)
+                ?? userQuery.First(u => u.Name == _serviceUsername.Value);
+            var followingItems = VisitUserAndGetFollowing(seedUser.Name);
 
-            var users = followingItems.Select(i => new InstaUser { Name = i.UserName, Status = UserStatus.New });
+            var users = followingItems.Select(i => new InstaUser 
+            {
+                Name = i.UserName,
+                Status = UserStatus.New,
+                HasRussianText = i.Description.HasRussianText()
+            });
 
+            //long transaction? :/
             foreach (var user in users)
             {
-                var id = _instaUsersRepo.InsertOrSkip(user, userToSkip => userToSkip.Name == user.Name);
-                //todo use Id and current user Id to save connection to a table (potentially to build a social graph)
+                var id = _repo.InsertOrSkip(user, userToSkip => userToSkip.Name == user.Name);
+                _repo.InsertOrUpdate(
+                    new UserRelation { FolloweeId = seedUser.Id, FollowerId = id, LastUpdate = DateTime.UtcNow },
+                    rec => rec.FollowerId == seedUser.Id && rec.FolloweeId == id);
             }
-            _instaUsersRepo.SaveChanges();
+            _repo.SaveChanges();
 
             return users.Count();
         }

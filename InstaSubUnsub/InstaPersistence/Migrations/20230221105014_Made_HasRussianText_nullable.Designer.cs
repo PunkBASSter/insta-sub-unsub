@@ -3,6 +3,7 @@ using System;
 using InstaPersistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace InstaPersistence.Migrations
 {
     [DbContext(typeof(InstaDbContext))]
-    partial class InstaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230221105014_Made_HasRussianText_nullable")]
+    partial class MadeHasRussianTextnullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -47,7 +50,7 @@ namespace InstaPersistence.Migrations
                         .HasMaxLength(30)
                         .HasColumnType("character varying(30)");
 
-                    b.Property<int?>("Rank")
+                    b.Property<int>("Rank")
                         .HasColumnType("integer");
 
                     b.Property<int>("Status")
@@ -71,6 +74,7 @@ namespace InstaPersistence.Migrations
                             Id = 1L,
                             IsFollower = true,
                             Name = "hidethetrack123",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -78,6 +82,7 @@ namespace InstaPersistence.Migrations
                             Id = 2L,
                             IsFollower = true,
                             Name = "doctor_lilith",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -85,6 +90,7 @@ namespace InstaPersistence.Migrations
                             Id = 3L,
                             IsFollower = true,
                             Name = "dr.imiller",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -92,6 +98,7 @@ namespace InstaPersistence.Migrations
                             Id = 4L,
                             IsFollower = true,
                             Name = "mynameiswhm",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -99,6 +106,7 @@ namespace InstaPersistence.Migrations
                             Id = 5L,
                             IsFollower = true,
                             Name = "err_yep",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -106,6 +114,7 @@ namespace InstaPersistence.Migrations
                             Id = 6L,
                             IsFollower = true,
                             Name = "temapunk",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -113,6 +122,7 @@ namespace InstaPersistence.Migrations
                             Id = 7L,
                             IsFollower = true,
                             Name = "sergesoukonnov",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -120,6 +130,7 @@ namespace InstaPersistence.Migrations
                             Id = 8L,
                             IsFollower = true,
                             Name = "panther_amanita",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -127,6 +138,7 @@ namespace InstaPersistence.Migrations
                             Id = 9L,
                             IsFollower = true,
                             Name = "igor.gord",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -134,6 +146,7 @@ namespace InstaPersistence.Migrations
                             Id = 10L,
                             IsFollower = true,
                             Name = "olga.mikholenko",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -141,6 +154,7 @@ namespace InstaPersistence.Migrations
                             Id = 11L,
                             IsFollower = true,
                             Name = "iriska_sia",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -148,6 +162,7 @@ namespace InstaPersistence.Migrations
                             Id = 12L,
                             IsFollower = true,
                             Name = "oli4kakisskiss",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -155,6 +170,7 @@ namespace InstaPersistence.Migrations
                             Id = 13L,
                             IsFollower = true,
                             Name = "err_please",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -162,6 +178,7 @@ namespace InstaPersistence.Migrations
                             Id = 14L,
                             IsFollower = true,
                             Name = "blefamer",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -169,6 +186,7 @@ namespace InstaPersistence.Migrations
                             Id = 15L,
                             IsFollower = true,
                             Name = "lodkaissad",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -176,6 +194,7 @@ namespace InstaPersistence.Migrations
                             Id = 16L,
                             IsFollower = true,
                             Name = "anastasiya_kun",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -183,6 +202,7 @@ namespace InstaPersistence.Migrations
                             Id = 17L,
                             IsFollower = true,
                             Name = "anna.saulenko",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -190,6 +210,7 @@ namespace InstaPersistence.Migrations
                             Id = 18L,
                             IsFollower = true,
                             Name = "prikhodko5139",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -197,6 +218,7 @@ namespace InstaPersistence.Migrations
                             Id = 19L,
                             IsFollower = true,
                             Name = "saulenkosvetlana",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -204,6 +226,7 @@ namespace InstaPersistence.Migrations
                             Id = 20L,
                             IsFollower = true,
                             Name = "ira_knows_best",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -211,6 +234,7 @@ namespace InstaPersistence.Migrations
                             Id = 21L,
                             IsFollower = true,
                             Name = "meltali_handmade",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -218,6 +242,7 @@ namespace InstaPersistence.Migrations
                             Id = 22L,
                             IsFollower = true,
                             Name = "dr.ksusha_pro_edu",
+                            Rank = 0,
                             Status = 3
                         },
                         new
@@ -225,6 +250,7 @@ namespace InstaPersistence.Migrations
                             Id = 23L,
                             IsFollower = true,
                             Name = "lydok87",
+                            Rank = 0,
                             Status = 3
                         });
                 });

@@ -10,6 +10,7 @@ namespace SeleniumUtils.PageObjects
         private readonly IWebDriver _driver;
         private string? _userName;
         private bool _following = true;
+        private string? _description;
 
         public FollowingItem(IWebElement element, IWebDriver driver)
         {
@@ -35,6 +36,24 @@ namespace SeleniumUtils.PageObjects
                 _userName ??= _element.FindElement(By.XPath(".//div/span/a[@role=\"link\"]")).GetAttribute("href").Split("/", StringSplitOptions.RemoveEmptyEntries).Last();
                 return _userName;
             }
+        }
+
+        public string Description
+        {
+            get
+            {
+                _description ??= TryGetDescription();
+                return _description;
+            }
+        }
+
+        private string TryGetDescription()
+        {
+            try
+            {
+                return _element.FindElement(By.XPath(".//div[2]/div[2]/div")).Text;
+            }
+            catch(NoSuchElementException) { return string.Empty; }
         }
 
         public bool Unfollow()

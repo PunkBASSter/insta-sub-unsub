@@ -5,7 +5,7 @@ namespace InstaDomain
     public class InstaUser : BaseEntity
     {
         public string? Name { get; set; }
-        public int Rank { get; set; } // Following/Followers && Last Post/Reel Date -- todo how to extract?
+        public int? Rank { get; set; } // Following/Followers && Last Post/Reel Date -- todo how to extract?
         public bool? IsFollower { get; set; }
 
         /// <summary>
@@ -15,7 +15,7 @@ namespace InstaDomain
         public DateTime? UnfollowingDate { get; set; }
         public UserStatus Status { get; set; }
         public DateTime? LastPostDate { get; set; }
-        public bool HasRussianText { get; set; } //in description or last post
+        public bool? HasRussianText { get; set; } //in description or last post
 
         public virtual IList<UserRelation> Followees { get; set; }
         public virtual IList<UserRelation> Followers { get; set; }
