@@ -17,8 +17,8 @@ namespace InstaDomain
         public DateTime? LastPostDate { get; set; }
         public bool HasRussianText { get; set; } //in description or last post
 
-        public virtual IList<UserSubscription> Followees { get; set; }
-        public virtual IList<UserSubscription> Followers { get; set; }
+        public virtual IList<UserRelation> Followees { get; set; }
+        public virtual IList<UserRelation> Followers { get; set; }
 
     }
 }

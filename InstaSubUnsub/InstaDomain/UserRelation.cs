@@ -1,6 +1,6 @@
 ﻿namespace InstaDomain
 {
-    public class UserSubscription : BaseEntity
+    public class UserRelation : BaseEntity
     {
         public long FollowerId { get; set; }
         public virtual InstaUser Follower { get; set; }

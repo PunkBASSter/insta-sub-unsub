@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace InstaPersistence.EntityTypeConfig
 {
-    internal class UserSubscriptionEntityConfig : IEntityTypeConfiguration<UserSubscription>
+    internal class UserRelationConfig : IEntityTypeConfiguration<UserRelation>
     {
-        public void Configure(EntityTypeBuilder<UserSubscription> builder)
+        public void Configure(EntityTypeBuilder<UserRelation> builder)
         {
             builder.Ignore(e => e.Id);
             builder.HasKey(e => new { e.FollowerId, e.FolloweeId });
