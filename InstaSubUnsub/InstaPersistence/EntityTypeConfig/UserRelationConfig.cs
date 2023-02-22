@@ -12,11 +12,11 @@ namespace InstaPersistence.EntityTypeConfig
             builder.HasKey(e => new { e.FollowerId, e.FolloweeId });
 
             builder.HasOne(p => p.Follower)
-                .WithMany(p => p.Followees)
+                .WithMany(p => p.Followers)
                 .HasForeignKey(e => e.FollowerId);
 
             builder.HasOne(e => e.Followee)
-                .WithMany(p => p.Followers)
+                .WithMany(p => p.Followees)
                 .HasForeignKey(e => e.FolloweeId);
 
             //builder

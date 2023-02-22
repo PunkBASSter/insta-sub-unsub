@@ -5,6 +5,7 @@
         New, //newly discovered
         Followed, //followed by us
         Unfollowed, //unfollowed by us
-        Protected //protected from unfollowing
+        Protected, //protected from unfollowing
+        Visited //has been visited by the crawler
     }
 }

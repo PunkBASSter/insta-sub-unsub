@@ -11,6 +11,7 @@ namespace InstaCrawlerApp
     {
         private readonly LoginPage _loginPage;
         private readonly FollowingPage _followingPage;
+        private readonly ProfilePage _profilePage;
         private readonly Lazy<string> _serviceUsername;
         private readonly Lazy<string> _servicePassword;
         private bool _isInitialized = false;
@@ -18,10 +19,11 @@ namespace InstaCrawlerApp
         private readonly IConfiguration _configuration;
         private readonly int _crawlLimitPerIteration = 2873;
 
-        public UserCrawler(LoginPage loginPage, FollowingPage followingPage, IRepository repo, IConfiguration configuration)
+        public UserCrawler(LoginPage loginPage, FollowingPage followingPage, ProfilePage profilePage, IRepository repo, IConfiguration configuration)
         {
             _loginPage = loginPage;
             _followingPage = followingPage;
+            _profilePage = profilePage;
             _repo = repo;
             _configuration = configuration;
             _serviceUsername = new Lazy<string>(() => _configuration.GetSection("CrawlUser:Username").Value ?? throw new ArgumentException("CrawlUser:Username is not provided"));
@@ -74,9 +76,12 @@ namespace InstaCrawlerApp
             //long transaction? :/
             foreach (var user in users)
             {
-                var id = _repo.InsertOrSkip(user, userToSkip => userToSkip.Name == user.Name);
+                //var id = _repo.InsertOrSkip(user, userToSkip => userToSkip.Name == user.Name);
+                var userDetails = VisitUserProfile(user.Name);
+                var id = _repo.InsertOrUpdate(userDetails, usr => usr.Name == userDetails.Name);
+
                 _repo.InsertOrUpdate(
-                    new UserRelation { FolloweeId = seedUser.Id, FollowerId = id, LastUpdate = DateTime.UtcNow },
+                    new UserRelation { FollowerId = seedUser.Id, FolloweeId = id, LastUpdate = DateTime.UtcNow },
                     rec => rec.FollowerId == seedUser.Id && rec.FolloweeId == id);
             }
             _repo.SaveChanges();
@@ -90,6 +95,52 @@ namespace InstaCrawlerApp
             _followingPage.Load(userName);
             var items = _followingPage.InfiniteScrollToBottomWithItemsLoading();
             return items;
+        }
+
+        private InstaUser VisitUserProfile(string userName)
+        {
+            _profilePage.Load(userName);
+            var postInfos = _profilePage.GetLastPosts();
+            var followersNum = Convert.ToInt32(_profilePage.FollowersNumElement.Text);
+            var followingsNum = Convert.ToInt32(_profilePage.FollowingsNumElement.Text);
+            var lastPostDate = postInfos.Select(p => p.PublishDate).Max();
+            var hasRussianText = postInfos.Any(p => p.Description.HasRussianText()); //TODO Deal with empty descriptions
+            var rank = Convert.ToInt32(CalculateRank(followersNum, followingsNum, lastPostDate, hasRussianText ));
+            //var followingsLoaded = VisitUserAndGetFollowing(userName);
+            var res = new InstaUser
+            {
+                Name = userName,
+                FollowersNum = followersNum,
+                FollowingsNum = followingsNum,
+                LastPostDate = lastPostDate,
+                HasRussianText = hasRussianText,
+                Rank = rank,
+                Status = UserStatus.Visited
+            };
+
+            return res;
+        }
+
+        private double CalculateRank(double followers, double followings, DateTime lastPostDate, bool hasRussianText)
+        {
+            followers = Math.Min(followers, 1);
+            
+            var followingsRatio = followings / followers;
+            followingsRatio = Math.Min(followings, 0.1);
+
+            //todo make more readable and maintainable
+            var lastPostMultiplier = 1;
+            if (DateTime.UtcNow - lastPostDate <= TimeSpan.FromDays(30))
+                lastPostMultiplier = 2;
+            if (DateTime.UtcNow - lastPostDate <= TimeSpan.FromDays(14))
+                lastPostMultiplier = 4;
+            if (DateTime.UtcNow - lastPostDate <= TimeSpan.FromDays(7))
+                lastPostMultiplier = 5;
+            
+
+            var rusMultimplier = 1 + Convert.ToByte(hasRussianText)*3;
+
+            return (followingsRatio * lastPostMultiplier * rusMultimplier);
         }
     }
 }

@@ -18,6 +18,7 @@ namespace InstaPersistence.Repository
         public void SaveChanges()
         {
             _dbContext.SaveChanges();
+            _dbContext.ChangeTracker.Clear();
         }
 
         public IQueryable<T> Query<T>() where T : BaseEntity
@@ -48,8 +49,9 @@ namespace InstaPersistence.Repository
 
         public virtual void Update<T>(T entityToUpdate) where T : BaseEntity
         {
-            _dbContext.Set<T>().Attach(entityToUpdate);
-            _dbContext.Entry(entityToUpdate).State = EntityState.Modified;
+            _dbContext.Set<T>().Update(entityToUpdate);
+            //_dbContext.Set<T>().Attach(entityToUpdate);
+            //_dbContext.Entry(entityToUpdate).State = EntityState.Modified;
         }
 
         public virtual long InsertOrSkip<T>(T entity, Func<T, bool> conditionToSkip) where T : BaseEntity
@@ -66,7 +68,7 @@ namespace InstaPersistence.Repository
 
         public virtual long InsertOrUpdate<T>(T entity, Func<T, bool> conditionToMatch) where T : BaseEntity
         {
-            var storedEntity = _dbContext.Set<T>().AsQueryable().FirstOrDefault(conditionToMatch);
+            var storedEntity = _dbContext.Set<T>().AsNoTracking().AsQueryable().FirstOrDefault(conditionToMatch);
 
             if (storedEntity is null)
             {

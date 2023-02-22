@@ -32,14 +32,14 @@ namespace InstaCrawlerServiceWindows
             _logger.LogInformation(
                 $"{nameof(ScopedWorker)} is working.");
 
-            using (IServiceScope scope = _serviceProvider.CreateScope())
-            {
-                //var userCrawler = scope.ServiceProvider.GetRequiredService<IUserCrawler>();
-                //await Task.Run(userCrawler.Crawl);
+            //using (IServiceScope scope = _serviceProvider.CreateScope())
+            //{
+            //    //var userCrawler = scope.ServiceProvider.GetRequiredService<IUserCrawler>();
+            //    //await Task.Run(userCrawler.Crawl);
 
-                var unfollower = scope.ServiceProvider.GetRequiredService<Unfollower>();
-                await Task.Run(unfollower.Unfollow);
-            }
+            //    var unfollower = scope.ServiceProvider.GetRequiredService<Unfollower>();
+            //    await Task.Run(unfollower.Unfollow);
+            //}
 
             using (IServiceScope scope = _serviceProvider.CreateScope())
             {

@@ -10,7 +10,7 @@ namespace SeleniumUtils.PageObjects
         {
         }
 
-        protected override By LoadIndicatingElementLocator => By.XPath("//button[@type=\"submit\"]");
+        protected override By LoadIndicatingElementLocator { get; set; } = By.XPath("//button[@type=\"submit\"]");
 
         public IWebElement UserNameBox => _driver.FindElement(By.XPath("//input[@name=\"username\"]"));
         public IWebElement PasswordBox => _driver.FindElement(By.XPath("//input[@name=\"password\"]"));

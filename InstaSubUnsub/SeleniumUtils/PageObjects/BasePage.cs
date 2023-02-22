@@ -15,6 +15,9 @@ namespace SeleniumUtils.PageObjects
         public virtual void Load(params string[] urlParams)
         {
             var pageUrl = string.Format(Url, urlParams);
+            _driver.Navigate().GoToUrl(pageUrl);
+            new Wait(_driver).TryWaitForElement(LoadIndicatingElementLocator);
+
             while (!ElementIsVisible(LoadIndicatingElementLocator)(_driver))
             {
                 try
@@ -30,7 +33,7 @@ namespace SeleniumUtils.PageObjects
         /// <summary>
         /// An element on the page by which we can judge if the page is loaded or not.
         /// </summary>
-        protected abstract By LoadIndicatingElementLocator { get; }
+        protected abstract By LoadIndicatingElementLocator { get; set; }
 
         public virtual string Url { get; } = "https://www.instagram.com";
 

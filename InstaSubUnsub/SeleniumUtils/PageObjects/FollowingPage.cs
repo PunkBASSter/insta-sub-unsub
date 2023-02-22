@@ -14,7 +14,7 @@ namespace SeleniumUtils.PageObjects
 
         public override string Url => "https://www.instagram.com/{0}/following";
 
-        protected override By LoadIndicatingElementLocator => By.XPath("//div[@role=\"dialog\"]//div[@role=\"tablist\"]/following-sibling::div");
+        protected override By LoadIndicatingElementLocator { get; set; } = By.XPath("//div[@role=\"dialog\"]//div[@role=\"tablist\"]/following-sibling::div");
 
         public IList<FollowingItem> FollowingItems { get; private set; } = new List<FollowingItem>();
 
@@ -23,23 +23,11 @@ namespace SeleniumUtils.PageObjects
 
         public IWebElement FollowingDialogScrollableArea => _driver.FindElement(By.XPath("//div[@role=\"dialog\"]//div[@role=\"tablist\"]/following-sibling::div"));
 
-        public void ScrollToBottom()
-        {
-            _driver.ExecuteJavaScript(""""
-                function getElementByXpath(path) {
-                  return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                }
-
-                let scrollableArea = getElementByXpath("//div[@role='dialog']//div[@role='tablist']/following-sibling::div");
-                scrollableArea.scroll(0, scrollableArea.scrollHeight);
-                """");
-        }
-
         public IList<FollowingItem> InfiniteScrollToBottomWithItemsLoading()
         {
             while (WaitForItems())
             {
-                ScrollToBottom();
+                new Scroll(_driver).ToBottom("//div[@role='dialog']//div[@role='tablist']/following-sibling::div");
             }
 
             FollowingItems = FollowingItemElements.Select(i => new FollowingItem(i, _driver)).ToList();

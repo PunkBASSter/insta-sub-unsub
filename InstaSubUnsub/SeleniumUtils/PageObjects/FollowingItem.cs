@@ -1,6 +1,5 @@
 ﻿using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.Extensions;
 
 namespace SeleniumUtils.PageObjects
 {
@@ -16,17 +15,6 @@ namespace SeleniumUtils.PageObjects
         {
             _element = element;
             _driver = driver;
-        }
-
-        public void ScrollIntoView()
-        {
-            //finding the JS element by XPath with a username as a profile link part and scrolling it into view
-            _driver.ExecuteJavaScript($$"""
-                function getElementByXpath(path) { return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; }
-
-                let element = getElementByXpath("//div/span/a[contains(@href,'{{UserName}}')]");
-                element.scrollIntoView()
-                """);
         }
 
         public string UserName
@@ -58,7 +46,8 @@ namespace SeleniumUtils.PageObjects
 
         public bool Unfollow()
         {
-            ScrollIntoView();
+            new Scroll(_driver).IntoView($"//div/span/a[contains(@href,'{UserName}')]");
+
             if (TryGetBlueSubButton() != null)//button is already blue, so unfollowing is done
             {
                 _following = false;

@@ -13,7 +13,7 @@ namespace InstaPersistence.EntityTypeConfig
             builder
                 .HasIndex(e => e.Name)
                 .IsUnique(true)
-                    .IncludeProperties(p => new { p.IsFollower, p.Status });
+                    .IncludeProperties(p => new { p.IsFollower, p.Status, p.Rank });
 
             builder.Property(p => p.Name).HasMaxLength(30).IsRequired();
         }
