@@ -15,7 +15,20 @@ namespace InstaDomain
         /// </summary>
         public DateTime? FollowingDate { get; set; }
         public DateTime? UnfollowingDate { get; set; }
-        public UserStatus Status { get; set; }
+
+        private UserStatus _status;
+        public UserStatus Status 
+        { 
+            get 
+            {
+                return _status;
+            }
+            set
+            {
+                if (_status != UserStatus.Protected)
+                    _status = value;
+            }
+        }
         public DateTime? LastPostDate { get; set; }
         public bool? HasRussianText { get; set; } //in description or last post
 

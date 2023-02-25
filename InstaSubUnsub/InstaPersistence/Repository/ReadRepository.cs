@@ -1,5 +1,6 @@
 ﻿using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using InstaDomain;
+using Microsoft.EntityFrameworkCore;
 
 namespace InstaPersistence.Repository
 {
@@ -11,9 +12,14 @@ namespace InstaPersistence.Repository
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Exposed IQueryable without EF change tracking.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public IQueryable<T> Query<T>() where T : BaseEntity
         {
-            return _dbContext.Set<T>().AsQueryable();
+            return _dbContext.Set<T>().AsQueryable().AsNoTracking();
         }
     }
 }

@@ -15,9 +15,14 @@ namespace InstaCrawlerApp
             services.AddScoped(f => new WebDriverFactory().GetInstance());
             services.AddScoped<LoginPage>();
             services.AddScoped<FollowingPage>();
+            services.AddScoped<FollowersPage>();
             services.AddScoped<ProfilePage>();
-            services.AddScoped<UserCrawler>();
-            services.AddScoped<Unfollower>();
+            services.AddScoped<UserCrawler>()
+                .AddTransient(sp => new Account(sp.GetRequiredService<IConfiguration>(), "CrawlUser"));
+            services.AddScoped<UserDetailsProvider>()
+                .AddTransient(sp => new Account(sp.GetRequiredService<IConfiguration>(), "CrawlUser"));
+            services.AddScoped<Unfollower>()
+                .AddTransient(sp => new Account(sp.GetRequiredService<IConfiguration>(), "UnfollowUser"));
             services.AddScoped(svcProvider => new CookieUtil(svcProvider.GetRequiredService<IWebDriver>(), config.GetRequiredSection("SavedCookiesPath")?.Value));
         }
     }

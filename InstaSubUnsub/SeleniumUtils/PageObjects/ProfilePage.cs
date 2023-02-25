@@ -21,7 +21,7 @@ namespace SeleniumUtils.PageObjects
             if (urlParams.Length != 1) 
                 throw new ArgumentException("UserName param is expected.");
 
-            LoadIndicatingElementLocator = By.XPath($".//h2[contains(text(),'{urlParams[0]}')]");
+            LoadIndicatingElementLocator = By.XPath($"//header//*[contains(text(),'{urlParams[0]}')]");
             base.Load(urlParams);
         }
 

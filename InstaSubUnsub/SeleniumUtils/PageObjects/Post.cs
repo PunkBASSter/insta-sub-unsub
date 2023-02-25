@@ -10,7 +10,7 @@ namespace SeleniumUtils.PageObjects
         public Post(IWebDriver webDriver)
         {
             _driver = webDriver;
-            _element = new Lazy<IWebElement>(() => new Wait(_driver).WaitForElement(By.XPath(".//div[@role='dialog']//article")) );
+            _element = new Lazy<IWebElement>(() => new Wait(_driver).TryWaitForElement(By.XPath(".//div[@role='dialog']//article")) );
         }
 
         public IWebElement RootElement
@@ -23,7 +23,7 @@ namespace SeleniumUtils.PageObjects
             get
             {
                 _description ??= new Wait(_driver, _element.Value)
-                    .TryWaitForElement(By.XPath(".//div[@role=\"dialog\"]//ul/div[@role=\"button\"]/li//h1"))
+                    .TryWaitForElement(By.XPath("//div[@role=\"dialog\"]//ul/div[@role=\"button\"]/li//h1"))
                     ?.Text ?? string.Empty;
                 return _description;
             } 
@@ -53,6 +53,12 @@ namespace SeleniumUtils.PageObjects
             //save current to compare
             _description ??= Description;
             _date ??= PublishDate;
+
+            if (string.IsNullOrEmpty(_description) && (_date == default || _date == default(DateTime)))
+            {
+                nextPost = this;
+                return false;
+            }
 
             _element.Value.SendKeys(Keys.ArrowRight);
 

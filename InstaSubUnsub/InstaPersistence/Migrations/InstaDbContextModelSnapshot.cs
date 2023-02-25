@@ -69,7 +69,7 @@ namespace InstaPersistence.Migrations
 
                     NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex("Name"), new[] { "IsFollower", "Status", "Rank" });
 
-                    b.ToTable("InstaUsers");
+                    b.ToTable("InstaUsers", (string)null);
 
                     b.HasData(
                         new
@@ -250,7 +250,7 @@ namespace InstaPersistence.Migrations
 
                     b.HasIndex("FolloweeId");
 
-                    b.ToTable("UserRelations");
+                    b.ToTable("UserRelations", (string)null);
                 });
 
             modelBuilder.Entity("InstaDomain.UserRelation", b =>

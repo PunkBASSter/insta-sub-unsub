@@ -41,13 +41,16 @@ namespace InstaCrawlerServiceWindows
             //    await Task.Run(unfollower.Unfollow);
             //}
 
+            //using (IServiceScope scope = _serviceProvider.CreateScope())
+            //{
+            //    var crawler = scope.ServiceProvider.GetRequiredService<UserCrawler>();
+            //    await Task.Run(crawler.Crawl);
+            //}
+
             using (IServiceScope scope = _serviceProvider.CreateScope())
             {
-                //var userCrawler = scope.ServiceProvider.GetRequiredService<IUserCrawler>();
-                //await Task.Run(userCrawler.Crawl);
-
-                var crawler = scope.ServiceProvider.GetRequiredService<UserCrawler>();
-                await Task.Run(crawler.Crawl);
+                var detailsProvider = scope.ServiceProvider.GetRequiredService<UserDetailsProvider>();
+                await Task.Run(detailsProvider.ProvideUserDetails);
             }
         }
 

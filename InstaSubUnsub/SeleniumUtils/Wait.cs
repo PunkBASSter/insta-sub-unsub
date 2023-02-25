@@ -1,10 +1,5 @@
 ﻿using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeleniumUtils
 {
@@ -37,7 +32,7 @@ namespace SeleniumUtils
             catch (WebDriverTimeoutException) { return null; }
         }
 
-        public IWebElement WaitForElement(By locator, int timeoutSec = 5)
+        public IWebElement WaitForElement(By locator, int timeoutSec = 8)
         {
             var wait = new WebDriverWait(_driver, TimeSpan.FromSeconds(timeoutSec));
             IWebElement? result = default;

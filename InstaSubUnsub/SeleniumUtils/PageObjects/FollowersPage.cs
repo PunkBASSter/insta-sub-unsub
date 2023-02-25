@@ -1,34 +1,39 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace SeleniumUtils.PageObjects
 {
-    public class FollowingPage : ProfilePage
+    public class FollowersPage : ProfilePage
     {
-        private int _followingItemsLoaded = 0;
-        public FollowingPage(IWebDriver driver) : base(driver)
+        private int _followerItemsLoaded = 0;
+        public FollowersPage(IWebDriver driver) : base(driver)
         {
         }
 
-        public override string Url => "https://www.instagram.com/{0}/following";
+        public override string Url => "https://www.instagram.com/{0}/followers";
 
-        protected override By LoadIndicatingElementLocator { get; set; } = By.XPath("//div[@role=\"dialog\"]//div[@role=\"tablist\"]/following-sibling::div");
+        protected override By LoadIndicatingElementLocator { get; set; } = By.XPath("//div[@role='dialog']/div/div/following-sibling::div");
 
         public IList<FollowingItem> FollowingItems { get; private set; } = new List<FollowingItem>();
 
-        private ReadOnlyCollection<IWebElement> FollowingItemElements { get; set; }
+        private ReadOnlyCollection<IWebElement> FollowerItemElements { get; set; }
             = new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
 
         public IList<FollowingItem> InfiniteScrollToBottomWithItemsLoading()
         {
             while (WaitForItems())
             {
-                //Followings scrollable area XPath
-                new Scroll(_driver).ToBottom("//div[@role='dialog']//div[@role='tablist']/following-sibling::div");
+                //followers dialog scrollable area
+                new Scroll(_driver).ToBottom("//div[@role='dialog']//div[@role='dialog']/div/div/div/following-sibling::div");
             }
 
-            FollowingItems = FollowingItemElements.Select(i => new FollowingItem(i, _driver)).ToList();
+            FollowingItems = FollowerItemElements.Select(i => new FollowingItem(i, _driver)).ToList();
 
             return FollowingItems;
         }
@@ -50,9 +55,9 @@ namespace SeleniumUtils.PageObjects
             {
                 try
                 {
-                    FollowingItemElements = driver.FindElements(By.XPath("//div[@aria-labelledby]"));
-                    var res = _followingItemsLoaded < FollowingItemElements.Count;
-                    _followingItemsLoaded = FollowingItemElements.Count;
+                    FollowerItemElements = driver.FindElements(By.XPath("//div[@aria-labelledby]"));
+                    var res = _followerItemsLoaded < FollowerItemElements.Count;
+                    _followerItemsLoaded = FollowerItemElements.Count;
                     return res;
                 }
                 catch { return false; }

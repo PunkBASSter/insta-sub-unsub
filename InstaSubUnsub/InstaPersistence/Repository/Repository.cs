@@ -21,9 +21,19 @@ namespace InstaPersistence.Repository
             _dbContext.ChangeTracker.Clear();
         }
 
+        /// <summary>
+        /// IQueryable without EF change tracking.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
         public IQueryable<T> Query<T>() where T : BaseEntity
         {
             return _readRepository.Query<T>();
+        }
+
+        public IQueryable<T> TrackedQuery<T>() where T : BaseEntity
+        {
+            return _dbContext.Set<T>().AsQueryable();
         }
 
         public virtual long Insert<T>(T entity) where T : BaseEntity
@@ -68,13 +78,16 @@ namespace InstaPersistence.Repository
 
         public virtual long InsertOrUpdate<T>(T entity, Func<T, bool> conditionToMatch) where T : BaseEntity
         {
-            var storedEntity = _dbContext.Set<T>().AsNoTracking().AsQueryable().FirstOrDefault(conditionToMatch);
+            var set = _dbContext.Set<T>();
+            var storedEntity = set.FirstOrDefault(conditionToMatch);
 
             if (storedEntity is null)
             {
                 return Insert(entity);
             }
 
+            entity.Id = storedEntity.Id;
+            _dbContext.Entry(storedEntity).State = EntityState.Detached;
             Update(entity);
 
             return storedEntity.Id;
