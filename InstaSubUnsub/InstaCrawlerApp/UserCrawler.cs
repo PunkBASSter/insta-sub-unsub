@@ -10,16 +10,16 @@ namespace InstaCrawlerApp
     public class UserCrawler
     {
         private readonly LoginPage _loginPage;
-        private readonly FollowersPage _followingPage;
+        private readonly FollowersPage _userPage;
         private readonly Account _account;
         private bool _isInitialized = false;
         private readonly IRepository _repo;
-        private readonly int _crawlLimitPerIteration = 1873;
+        private readonly int _crawlLimitPerIteration = 1273;
 
         public UserCrawler(LoginPage loginPage, FollowersPage followingPage, IRepository repo, Account account)
         {
             _loginPage = loginPage;
-            _followingPage = followingPage;
+            _userPage = followingPage;
             _repo = repo;
             _account = account;
             _crawlLimitPerIteration += new Random(DateTime.Now.Microsecond).Next(-982, 847); //randomizing the iteration limit
@@ -118,8 +118,8 @@ namespace InstaCrawlerApp
         private IList<FollowingItem> VisitUserAndGetFollowing(string userName)
         {
             //basically a following page action
-            _followingPage.Load(userName);
-            var items = _followingPage.InfiniteScrollToBottomWithItemsLoading();
+            _userPage.Load(userName);
+            var items = _userPage.InfiniteScrollToBottomWithItemsLoading();
             return items;
         }
 

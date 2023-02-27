@@ -16,20 +16,33 @@ namespace SeleniumUtils.PageObjects
 
         protected override By LoadIndicatingElementLocator { get; set; }
 
-        public override void Load(params string[] urlParams)
+
+        public override bool Load(params string[] urlParams)
         {
             if (urlParams.Length != 1) 
                 throw new ArgumentException("UserName param is expected.");
 
             LoadIndicatingElementLocator = By.XPath($"//header//*[contains(text(),'{urlParams[0]}')]");
-            base.Load(urlParams);
+            return base.Load(urlParams);
+        }
+
+        
+
+        public ReadOnlyCollection<IWebElement> DescriptionParts =>
+            _driver.FindElements(By.XPath("//header/section/div[3]/*[text()]"));
+
+        public string GetDescriptionText()
+        {
+            var textParts = DescriptionParts.Select(p => p.Text).ToArray();
+            if (textParts.Length < 1) textParts = new string[] { "placeholder" };
+            return string.Join("\r\n", textParts);
         }
 
         public IWebElement FollowersNumElement =>
-            _driver.FindElement(By.XPath(".//section/ul/li[2]/a/div/span/span"));
+            _driver.FindElement(By.XPath(".//section/ul/li[2]/*/div/span/span"));
 
         public IWebElement FollowingsNumElement =>
-            _driver.FindElement(By.XPath(".//section/ul/li[3]/a/div/span/span"));
+            _driver.FindElement(By.XPath(".//section/ul/li[3]/*/div/span/span"));
 
         public ReadOnlyCollection<IWebElement> PostLinks =>
             _driver.FindElements(By.XPath(".//article/div/div//a"));

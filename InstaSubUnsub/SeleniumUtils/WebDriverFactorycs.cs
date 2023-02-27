@@ -7,7 +7,12 @@ namespace SeleniumPageObjects
     {
         public IWebDriver GetInstance()
         {
-            return new ChromeDriver("chromedriver.exe");
+            var options = new ChromeOptions();
+            options.AddArgument("--incognito");
+            //DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+            //capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+
+            return new ChromeDriver("chromedriver.exe", options);
         }
     }
 }

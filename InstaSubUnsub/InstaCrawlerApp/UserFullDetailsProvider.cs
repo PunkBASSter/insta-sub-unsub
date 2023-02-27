@@ -7,16 +7,16 @@ using SeleniumUtils.Extensions;
 
 namespace InstaCrawlerApp
 {
-    public class UserDetailsProvider
+    public class UserFullDetailsProvider
     {
         private readonly LoginPage _loginPage;
         private readonly ProfilePage _profilePage;
         private readonly Account _account;
         private bool _isInitialized = false;
         private readonly IRepository _repo;
-        private readonly int _visitsLimitPerIteration = 287;
+        private readonly int _visitsLimitPerIteration = 387;
 
-        public UserDetailsProvider(LoginPage loginPage, ProfilePage profilePage, IRepository repo, Account account)
+        public UserFullDetailsProvider(LoginPage loginPage, ProfilePage profilePage, IRepository repo, Account account)
         {
             _loginPage = loginPage;
             _profilePage = profilePage;
@@ -66,7 +66,6 @@ namespace InstaCrawlerApp
             {
                 _profilePage.Load(user.Name);
                 //TODO handle obsolete user names when page is not loaded properly
-
                 
                 var followersNum = _profilePage.FollowersNumElement.GetInstaSubNumber();
                 var followingsNum = _profilePage.FollowingsNumElement.GetInstaSubNumber();
@@ -115,7 +114,8 @@ namespace InstaCrawlerApp
             followers = Math.Max(followers, 1);
 
             var followingsRatio = followings / followers;
-            followingsRatio = Math.Max(followingsRatio, 0.1);
+            if (followingsRatio < 3)
+                return -1;
 
             //todo make more readable and maintainable
             var lastPostMultiplier = 1;
