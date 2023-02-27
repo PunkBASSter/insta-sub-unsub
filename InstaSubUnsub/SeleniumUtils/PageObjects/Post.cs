@@ -5,17 +5,12 @@ namespace SeleniumUtils.PageObjects
     public class Post
     {
         private readonly IWebDriver _driver;
-        private readonly Lazy<IWebElement> _element;
+        private readonly Lazy<IWebElement?> _element;
         
         public Post(IWebDriver webDriver)
         {
             _driver = webDriver;
-            _element = new Lazy<IWebElement>(() => new Wait(_driver).TryWaitForElement(By.XPath(".//div[@role='dialog']//article")) );
-        }
-
-        public IWebElement RootElement
-        { 
-            get { return _element.Value; } 
+            _element = new Lazy<IWebElement?>(() => new Wait(_driver).TryWaitForElement(By.XPath(".//div[@role='dialog']//article")));
         }
 
         private string? _description;
@@ -50,23 +45,30 @@ namespace SeleniumUtils.PageObjects
         
         public bool TrySwitchToNext(out Post nextPost)
         {
-            //save current to compare
-            _description ??= Description;
-            _date ??= PublishDate;
+            try
+            {
+                _description ??= Description;
+                _date ??= PublishDate;
 
-            if (string.IsNullOrEmpty(_description) && (_date == default || _date == default(DateTime)))
+                if (string.IsNullOrEmpty(_description) && (_date == default || _date == default(DateTime)))
+                {
+                    nextPost = this;
+                    return false;
+                }
+
+                _element.Value?.SendKeys(Keys.ArrowRight);
+
+                nextPost = new Post(_driver);
+                var nextPostDesc = nextPost.Description;
+                var nextPostDate = nextPost.PublishDate;
+
+                return !(_description == nextPostDesc && _date == nextPostDate);
+            }
+            catch(Exception)
             {
                 nextPost = this;
-                return false;
+                return false; 
             }
-
-            _element.Value.SendKeys(Keys.ArrowRight);
-
-            nextPost = new Post(_driver);
-            var nextPostDesc = nextPost.Description;
-            var nextPostDate = nextPost.PublishDate;
-
-            return !(_description == nextPostDesc && _date == nextPostDate);
         }
     }
 }

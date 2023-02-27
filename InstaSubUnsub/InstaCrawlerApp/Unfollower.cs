@@ -40,7 +40,6 @@ namespace InstaCrawlerApp
 
             _loginPage.Load();
             _loginPage.Login(_serviceUsername.Value, _servicePassword.Value);
-            _loginPage.HandleAfrerLoginQuestions();
 
             //todo save cookies
 

@@ -11,7 +11,7 @@ namespace SeleniumUtils
         private readonly IWebDriver _driver;
         private readonly IWebElement? _element;
 
-        public Wait(IWebDriver driver, IWebElement element) : this(driver)
+        public Wait(IWebDriver driver, IWebElement? element) : this(driver)
         {
             _element= element;
         }

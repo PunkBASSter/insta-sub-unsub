@@ -1,123 +1,83 @@
 ﻿using InstaDomain;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
-using SeleniumUtils;
 using SeleniumUtils.PageObjects;
 using InstaDomain.Enums;
-using SeleniumUtils.Extensions;
+using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
 
 namespace InstaCrawlerApp
 {
-    public class UserFullDetailsProvider
+    public class UserFullDetailsProvider : UserQuickDetailsProvider
     {
-        private readonly LoginPage _loginPage;
-        private readonly ProfilePage _profilePage;
         private readonly Account _account;
         private bool _isInitialized = false;
-        private readonly IRepository _repo;
-        private readonly int _visitsLimitPerIteration = 387;
-
-        public UserFullDetailsProvider(LoginPage loginPage, ProfilePage profilePage, IRepository repo, Account account)
+        
+        public UserFullDetailsProvider(IWebDriver driver, IRepository repo, Account account, ILogger<UserFullDetailsProvider> logger)
+            : base(driver, repo, logger)
         {
-            _loginPage = loginPage;
-            _profilePage = profilePage;
-            _repo = repo;
             _account = account;
-            _visitsLimitPerIteration += new Random(DateTime.Now.Microsecond).Next(-83, 84); //randomizing the iteration limit
         }
 
-        public void Initialize()
+        protected override bool Initialize()
         {
-            if (_isInitialized) return;
+            if (_isInitialized) return true;
 
-            _loginPage.Load();
-            _loginPage.Login(_account.Username, _account.Password);
-            _loginPage.HandleAfrerLoginQuestions();
+            var loginPage = new LoginPage(_webDriver);
+            loginPage.Load();
+            loginPage.Login(_account.Username, _account.Password);
             _isInitialized = true;
             //todo save cookies (now or before quitting iteration?)
+
+            return _isInitialized;
         }
 
-        public void ProvideUserDetails()
+        protected override IList<InstaUser> FetchUsersToFill()
         {
-            Initialize();
+            var usersToVisit = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New && u.HasRussianText == true && (u.Rank == default || u.Rank > -1)).Take(_batchSize).ToList();
 
-            var visited = 0;
-            var usersToVisit = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New && u.HasRussianText == true).ToList();
-
-            if (!usersToVisit.Any())
-                usersToVisit = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New && u.HasRussianText == null).ToList();
-
-            foreach (var user in usersToVisit)
-            {
-                if (visited >= _visitsLimitPerIteration)
-                    break;
-
-                var userDetails = VisitUserProfile(user);
-                _repo.Update(userDetails);
-                _repo.SaveChanges();
-
-                new Delay().Random();
-                visited++;
-            }
+            return usersToVisit;
         }
 
-        private InstaUser VisitUserProfile(InstaUser user)
+        protected override bool VisitUserProfileExtended(ProfilePage profilePage, InstaUser user, out InstaUser modified)
         {
+            modified = user;
             try
             {
-                _profilePage.Load(user.Name);
-                //TODO handle obsolete user names when page is not loaded properly
-                
-                var followersNum = _profilePage.FollowersNumElement.GetInstaSubNumber();
-                var followingsNum = _profilePage.FollowingsNumElement.GetInstaSubNumber();
-                user.FollowersNum = followersNum;
-                user.FollowingsNum = followingsNum;
-                user.Status = UserStatus.Visited;
+                IEnumerable<Post>? postInfos = null;
 
-                var ratio = followingsNum / Math.Max(followersNum, 1);
-                if (ratio < 3) //consider as useless subs and skip
+                if (profilePage.CheckHasStory())
                 {
-                    user.Rank = -1;
-                    return user;
+                    modified.LastPostDate = DateTime.UtcNow;
                 }
-
-                try
+                else
                 {
-                    var postInfos = _profilePage.GetLastPosts().ToList();
-                    var lastPostDate = postInfos.Select(p => p.PublishDate).Max().ToUniversalTime();
-                    var hasRussianText = postInfos.Any(p => p.Description.HasRussianText()); //TODO Deal with empty descriptions
-                    var rank = Convert.ToInt32(CalculateRank(followersNum, followingsNum, lastPostDate, hasRussianText));
-
-
-                    user.LastPostDate = lastPostDate;
-                    user.HasRussianText = user.HasRussianText == true || hasRussianText;
-                    user.Rank = rank;
+                    postInfos ??= profilePage.GetLastPosts().ToList();
+                    modified.LastPostDate = postInfos.Select(p => p.PublishDate).Max().ToUniversalTime();
                 }
-                catch(Exception ex) 
-                { 
-                    user.Status = UserStatus.Visited;
-                    user.Rank = Convert.ToInt32(CalculateRank(followersNum, followingsNum, default, user.HasRussianText == true));
-                }
-
                 
+                if (! modified.HasRussianText == true)
+                {
+                    postInfos ??= profilePage.GetLastPosts().ToList();
+                    user.HasRussianText = postInfos.Any(p => p.Description.HasRussianText());
+                }
+
+                modified.Rank = Convert.ToInt32(CalculateRank(modified));
+                modified.Status = UserStatus.Visited;
+
+                return true;
             }
-            catch (Exception ex)
+            catch(Exception ex) 
             {
-                //todo logging
-                user.Status = UserStatus.Error;
+                _logger.LogError("Error while getting extended user data. Ex: {0}", ex.Data.Values);
+                return false;
             }
-
-            return user;
         }
 
-        private double CalculateRank(double followers, double followings, DateTime lastPostDate, bool hasRussianText)
+        protected override double CalculateRank(InstaUser user)
         {
-            followers = Math.Max(followers, 1);
+            var baseRank = base.CalculateRank(user);
 
-            var followingsRatio = followings / followers;
-            if (followingsRatio < 3)
-                return -1;
-
-            //todo make more readable and maintainable
+            var lastPostDate = user.LastPostDate;
             var lastPostMultiplier = 1;
             if (DateTime.UtcNow - lastPostDate <= TimeSpan.FromDays(30))
                 lastPostMultiplier = 2;
@@ -126,10 +86,7 @@ namespace InstaCrawlerApp
             if (DateTime.UtcNow - lastPostDate <= TimeSpan.FromDays(7))
                 lastPostMultiplier = 5;
 
-
-            var rusMultimplier = 1 + Convert.ToByte(hasRussianText) * 3;
-
-            return (followingsRatio * lastPostMultiplier * rusMultimplier);
+            return (baseRank * lastPostMultiplier);
         }
     }
 }

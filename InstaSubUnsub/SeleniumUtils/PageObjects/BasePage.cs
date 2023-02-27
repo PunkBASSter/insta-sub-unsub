@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using SeleniumUtils.Extensions;
+using SeleniumUtils.Exceptions;
 
 namespace SeleniumUtils.PageObjects
 {
@@ -24,19 +24,26 @@ namespace SeleniumUtils.PageObjects
                 try
                 {
                     _driver.Navigate().GoToUrl(pageUrl); //sometimes does not work for the first time
-                    var wait = new WebDriverWait(_driver, new TimeSpan(0, 0, 6));
-                    wait.Until(ElementIsVisible(LoadIndicatingElementLocator));
+                    HandlePageLoading();
                 }
                 catch (WebDriverException) { }
 
-                //Instagram error is displayed on the page (anti-bot or something like that).
-                if (ElementIsVisible(LoadErrorElementLocator)(_driver))
-                    throw new InstaAntiBotException("К сожалению, эта страница недоступна. -- detected.");
+                if (HandleLoadErrors())
+                    return true;
+                    
             }
             while (!ElementIsVisible(LoadIndicatingElementLocator)(_driver) && attempts > 0);
 
             return ElementIsVisible(LoadIndicatingElementLocator)(_driver);
         }
+
+        protected virtual void HandlePageLoading()
+        {
+            var wait = new WebDriverWait(_driver, new TimeSpan(0, 0, 6));
+            wait.Until(ElementIsVisible(LoadIndicatingElementLocator));
+        }
+
+        protected virtual bool HandleLoadErrors() { return true; }
 
         /// <summary>
         /// An element on the page by which we can judge if the page is loaded or not.

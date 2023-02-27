@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumUtils.Exceptions;
+using SeleniumUtils.Extensions;
 
 namespace SeleniumUtils.PageObjects
 {
@@ -17,11 +18,14 @@ namespace SeleniumUtils.PageObjects
 
         public void Login(string username, string password)
         {
-            SlowSendKeys(UserNameBox, username);
-            SlowSendKeys(PasswordBox, password);
+            UserNameBox.SlowSendKeys(username);
+            PasswordBox.SlowSendKeys(password);
             PasswordBox.SendKeys(Keys.Enter);
             if (CheckErrorDisplayed())
                 throw new LoginFailedException();
+
+            HandleAfrerLoginQuestions();
+            Thread.Sleep(4000); //TODO replace with something scenario-based.
         }
 
         public bool CheckErrorDisplayed()
@@ -35,7 +39,7 @@ namespace SeleniumUtils.PageObjects
             catch(NoSuchElementException) { return false; }
         }
 
-        public void HandleAfrerLoginQuestions()
+        private void HandleAfrerLoginQuestions()
         {
             try
             {
@@ -61,15 +65,5 @@ namespace SeleniumUtils.PageObjects
         }
 
         public override string Url => "https://www.instagram.com/accounts/login/?source=auth_switcher";
-
-        //TODO extract to extension methods
-        public void SlowSendKeys(IWebElement target, string str) 
-        {
-            var delay = new Delay(200,600);
-            foreach(var c in str)
-            {
-                delay.Random(() => target.SendKeys(c.ToString()));
-            }
-        }
     }
 }

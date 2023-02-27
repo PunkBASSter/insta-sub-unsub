@@ -47,17 +47,17 @@ namespace InstaCrawlerServiceWindows
             //    await Task.Run(crawler.Crawl);
             //}
 
-            //using (IServiceScope scope = _serviceProvider.CreateScope())
-            //{
-            //    var detailsProvider = scope.ServiceProvider.GetRequiredService<UserFullDetailsProvider>();
-            //    await Task.Run(detailsProvider.ProvideUserDetails);
-            //}
-
             using (IServiceScope scope = _serviceProvider.CreateScope())
             {
-                var quickDetailsProvider = scope.ServiceProvider.GetRequiredService<UserQuickDetailsProvider>();
-                await Task.Run(quickDetailsProvider.AnonymousProvideDetails);
+                var detailsProvider = scope.ServiceProvider.GetRequiredService<UserFullDetailsProvider>();
+                await Task.Run(detailsProvider.ProvideDetails);
             }
+
+            //using (IServiceScope scope = _serviceProvider.CreateScope())
+            //{
+            //    var quickDetailsProvider = scope.ServiceProvider.GetRequiredService<UserQuickDetailsProvider>();
+            //    await Task.Run(quickDetailsProvider.ProvideDetails);
+            //}
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)

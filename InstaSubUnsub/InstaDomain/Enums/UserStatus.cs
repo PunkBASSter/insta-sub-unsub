@@ -7,6 +7,7 @@
         Unfollowed, //unfollowed by us
         Protected, //protected from unfollowing
         Visited, //has been visited by the crawler
-        Error //has been visited and something went wrong during the visit
+        Error, //has been visited and something went wrong during the visit
+        Unavailable
     }
 }

@@ -16,5 +16,14 @@ namespace SeleniumUtils.Extensions
             var dbl = Convert.ToDouble(txt) * mul;
             return Convert.ToInt32(dbl);
         }
+
+        public static void SlowSendKeys(this IWebElement target, string str)
+        {
+            var delay = new Delay(200, 600);
+            foreach (var c in str)
+            {
+                delay.Random(() => target.SendKeys(c.ToString()));
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using InstaDomain;
 using InstaDomain.Enums;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
-using OpenQA.Selenium.DevTools.V107.Page;
 using SeleniumUtils;
 using SeleniumUtils.PageObjects;
 
@@ -35,7 +34,6 @@ namespace InstaCrawlerApp
 
             _loginPage.Load();
             _loginPage.Login(_account.Username, _account.Password);
-            _loginPage.HandleAfrerLoginQuestions();
             _isInitialized = true;
             //todo save cookies (now or before quitting iteration?)
         }

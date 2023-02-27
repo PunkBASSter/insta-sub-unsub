@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using SeleniumUtils.Exceptions;
 using System.Collections.ObjectModel;
 
 namespace SeleniumUtils.PageObjects
@@ -8,10 +9,14 @@ namespace SeleniumUtils.PageObjects
     /// </summary>
     public class ProfilePage : BasePage
     {
+        private readonly TitleObserver _titleObserver;
+        private string _userName;
+
         public override string Url => "https://www.instagram.com/{0}";
 
         public ProfilePage(IWebDriver driver) : base(driver)
         {
+            _titleObserver = new TitleObserver(driver);
         }
 
         protected override By LoadIndicatingElementLocator { get; set; }
@@ -22,11 +27,40 @@ namespace SeleniumUtils.PageObjects
             if (urlParams.Length != 1) 
                 throw new ArgumentException("UserName param is expected.");
 
-            LoadIndicatingElementLocator = By.XPath($"//header//*[contains(text(),'{urlParams[0]}')]");
-            return base.Load(urlParams);
+            _userName= urlParams[0];
+            LoadIndicatingElementLocator = By.XPath($"//header//*[contains(text(),'{_userName}')]");
+            return base.Load(_userName);
         }
 
-        
+        protected override void HandlePageLoading()
+        {
+            _titleObserver.SetObserver();
+            base.HandlePageLoading();
+        }
+
+        protected override bool HandleLoadErrors()
+        {
+            //Instagram error is displayed on the page (anti-bot or something like that).
+            if (ElementIsVisible(LoadErrorElementLocator)(_driver))
+            {
+                if (_titleObserver.GetTitleChanges().FirstOrDefault(title => title.Contains(_userName)) != null)
+                    throw new InstaAntiBotException($"Detected: К сожалению, эта страница недоступна." +
+                        $" However page title contained {_userName} which indicates that the page exists but Instagram hides it for the current user agent.");
+                else
+                    throw new UserPageUnavailable("Detected: К сожалению, эта страница недоступна. But there's no sign of anti-scrapping measures.");
+            }
+            return base.HandleLoadErrors();
+        }
+
+        public bool CheckHasStory()
+        {
+            return new Wait(_driver).TryFindElement(By.XPath("//section//header//div[@style='cursor: pointer;']"), out _);
+        }
+
+        public bool CheckClosedAccount()
+        {
+            return new Wait(_driver).TryFindElement(By.XPath(".//article/div//*[contains(text(),'закрытый аккаунт')]"), out _);
+        }
 
         public ReadOnlyCollection<IWebElement> DescriptionParts =>
             _driver.FindElements(By.XPath("//header/section/div[3]/*[text()]"));
@@ -39,19 +73,19 @@ namespace SeleniumUtils.PageObjects
         }
 
         public IWebElement FollowersNumElement =>
-            _driver.FindElement(By.XPath(".//section/ul/li[2]/*/div/span/span"));
+            _driver.FindElement(By.XPath(".//section/ul/li[2]//div/span/span"));
 
         public IWebElement FollowingsNumElement =>
-            _driver.FindElement(By.XPath(".//section/ul/li[3]/*/div/span/span"));
+            _driver.FindElement(By.XPath(".//section/ul/li[3]//div/span/span"));
 
         public ReadOnlyCollection<IWebElement> PostLinks =>
-            _driver.FindElements(By.XPath(".//article/div/div//a"));
+            _driver.FindElements(By.XPath(".//article/div/div/div/div/a"));
 
-        public bool OpenPost(out Post postObj, int postNumFromTopLeft = 0)
+        public bool OpenPost(out Post? postObj, int postNumFromTopLeft = 0)
         {
             if (PostLinks.Count < 1)
             {
-                postObj = default;
+                postObj = null;
                 return false;
             }
             
@@ -62,11 +96,14 @@ namespace SeleniumUtils.PageObjects
 
         public IList<Post> GetLastPosts(int limit = 4)
         {
-            var opened = OpenPost(out Post current);
+            if (CheckClosedAccount())
+                return new List<Post>();
+
+            var opened = OpenPost(out Post? current);
             var result = new List<Post>();
             var count = 1;
 
-            while (opened && count <= limit)
+            while (opened && count <= Math.Min(limit, PostLinks.Count))
             {
                 result.Add(current);
                 count++;
