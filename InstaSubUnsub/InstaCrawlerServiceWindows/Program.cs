@@ -1,4 +1,6 @@
 using InstaCrawlerServiceWindows;
+using InstaPersistence;
+using Microsoft.EntityFrameworkCore;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostBuilderContext, services) =>
@@ -10,5 +12,8 @@ IHost host = Host.CreateDefaultBuilder(args)
         new InstaPersistence.ContainerModule().Register(services, config);
     })
     .Build();
+
+var db = host.Services.GetRequiredService<InstaDbContext>();
+db.Database.Migrate();
 
 host.Run();

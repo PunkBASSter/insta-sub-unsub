@@ -7,13 +7,7 @@ namespace InstaPersistence
 {
     public class InstaDbContext : DbContext
     {
-        public InstaDbContext() { }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            //TODO take connection string from config
-            optionsBuilder.UseNpgsql(@"Host=localhost;Database=insta_subs;Username=insta_service;Password=insta_service");
-        }
+        public InstaDbContext(DbContextOptions options) : base(options) { }
         
         public DbSet<InstaUser> InstaUsers { get; set; }
 
