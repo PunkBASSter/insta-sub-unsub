@@ -1,7 +1,7 @@
 ﻿using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
 
-namespace SeleniumUtils
+namespace SeleniumUtils.Helpers
 {
     /// <summary>
     /// More lightweight and usable wrapper for Selenium WebDriverWait
@@ -13,7 +13,7 @@ namespace SeleniumUtils
 
         public Wait(IWebDriver driver, IWebElement? element) : this(driver)
         {
-            _element= element;
+            _element = element;
         }
 
         public Wait(IWebDriver driver)
@@ -51,14 +51,14 @@ namespace SeleniumUtils
                     result = _driver.FindElement(locator);
                     return true;
                 }
-                
+
                 result = _element.FindElement(locator);
                 return true;
             }
-            catch (NoSuchElementException) 
+            catch (NoSuchElementException)
             {
                 result = null;
-                return false; 
+                return false;
             }
             catch (StaleElementReferenceException)
             {

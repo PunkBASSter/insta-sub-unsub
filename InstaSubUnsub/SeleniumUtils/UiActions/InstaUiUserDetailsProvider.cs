@@ -1,0 +1,88 @@
+﻿using InstaCommon;
+using InstaCommon.Extensions;
+using InstaDomain;
+using InstaDomain.Enums;
+using InstaInfrastructureAbstractions.DataProviderInterfaces;
+using Microsoft.Extensions.Logging;
+using OpenQA.Selenium;
+using SeleniumUtils.Extensions;
+using SeleniumUtils.PageObjects;
+
+namespace SeleniumUtils.UiActions
+{
+    public class InstaUiUserDetailsProvider : UiActionBase, IUserDetailsProvider
+    {
+        private const double MinimumRank = 3.0; //minimum ratio of followings/followers to proceed with user data mining
+
+        public InstaUiUserDetailsProvider(IWebDriver driver, ILogger<InstaUiUserDetailsProvider> logger) : base(driver, logger)
+        {
+        }
+
+        protected virtual InstaUser VisitUserProfileExtended(ProfilePage profilePage, InstaUser user)
+        {
+            //Data available only for logged in users
+            var modified = user;
+            IEnumerable<Post>? postInfos = null;
+
+            if (profilePage.CheckHasStory())
+            {
+                modified.LastPostDate = DateTime.UtcNow;
+            }
+            else
+            {
+                postInfos ??= profilePage.GetLastPosts().ToList();
+                modified.LastPostDate = postInfos.Select(p => p.PublishDate).Max().ToUniversalTime();
+            }
+
+            if (!modified.HasRussianText == true)
+            {
+                postInfos ??= profilePage.GetLastPosts().ToList();
+                user.HasRussianText = postInfos.Any(p => p.Description.HasRussianText());
+            }
+
+            return modified;
+        }
+
+        public InstaUser GetUserDetails(InstaUser user, InstaAccount? account = null)
+        {
+            if (account != null)
+                Login(account);
+
+            //Data available for anonymous users
+            var detailedUser = user;
+            var profilePage = new ProfilePage(_webDriver, user.Name);
+
+            if (!profilePage.Load())
+                return detailedUser;
+
+            var followersNum = profilePage.FollowersNumElement.GetInstaSubNumber();
+            var followingsNum = profilePage.FollowingsNumElement.GetInstaSubNumber();
+            var hasRussianText = profilePage.GetDescriptionText().HasRussianText();
+            detailedUser.FollowersNum = followersNum;
+            detailedUser.FollowingsNum = followingsNum;
+            detailedUser.HasRussianText = hasRussianText;
+            detailedUser.Rank = Convert.ToInt32(CalculateRank(detailedUser));
+            detailedUser.Status = UserStatus.Visited;
+
+            if (_loggedInUser != null && detailedUser.Rank >= MinimumRank)
+                //Data available for logged in users
+                detailedUser = VisitUserProfileExtended(profilePage, detailedUser);
+
+            new Delay(1831, 3342).Random();
+
+            return detailedUser;
+        }
+
+        protected virtual double CalculateRank(InstaUser user)
+        {
+            var followers = Math.Max(user.FollowersNum ?? 1, 1);
+            var followings = user.FollowingsNum ?? 0;
+
+            var followingsRatio = followings / followers;
+            if (followingsRatio < 3)
+                return -1;
+
+            return followingsRatio;
+        }
+    }
+}

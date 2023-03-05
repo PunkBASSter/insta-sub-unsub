@@ -8,11 +8,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\InstaCrawlerApp\InstaCrawlerApp.csproj" />
     <ProjectReference Include="..\InstaPersistence\InstaPersistence.csproj" />
+    <ProjectReference Include="..\SeleniumUtils\SeleniumUtils.csproj" />
   </ItemGroup>
 </Project>

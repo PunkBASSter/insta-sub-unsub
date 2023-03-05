@@ -6,15 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SeleniumUtils
+namespace SeleniumUtils.Helpers
 {
     public class CookieUtil
     {
         //todo complete saving according to https://stackoverflow.com/questions/6115721/how-to-save-restore-serializable-object-to-from-file
-        
+
         private readonly IWebDriver _driver;
         private readonly string _savedCookiesPath;
-        
+
         public CookieUtil(IWebDriver driver, string? savedCookiesPath = null)
         {
             _driver = driver;

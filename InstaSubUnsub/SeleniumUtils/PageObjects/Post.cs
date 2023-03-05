@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using SeleniumUtils.Helpers;
 
 namespace SeleniumUtils.PageObjects
 {

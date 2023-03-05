@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SeleniumUtils
+﻿namespace InstaCommon
 {
     public class Delay
     {
@@ -12,7 +6,7 @@ namespace SeleniumUtils
         private readonly int _maxDelay;
         private readonly Random _random = new Random(DateTime.UtcNow.Microsecond);
 
-        public Delay(int min=200, int max = 900) 
+        public Delay(int min = 200, int max = 900)
         {
             _minDelay = min;
             _maxDelay = max;

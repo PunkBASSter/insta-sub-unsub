@@ -1,4 +1,4 @@
-﻿namespace SeleniumUtils.Exceptions
+﻿namespace InstaCommon.Exceptions
 {
     public class UserPageUnavailable : Exception
     {

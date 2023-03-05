@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using InstaCommon;
+using OpenQA.Selenium;
 
 namespace SeleniumUtils.Extensions
 {

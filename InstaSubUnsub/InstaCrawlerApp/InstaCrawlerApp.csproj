@@ -13,9 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\InstaCommon\InstaCommon.csproj" />
     <ProjectReference Include="..\InstaDomain\InstaDomain.csproj" />
     <ProjectReference Include="..\InstaInfrastructureAbstractions\InstaInfrastructureAbstractions.csproj" />
-    <ProjectReference Include="..\SeleniumUtils\SeleniumUtils.csproj" />
   </ItemGroup>
 
 </Project>

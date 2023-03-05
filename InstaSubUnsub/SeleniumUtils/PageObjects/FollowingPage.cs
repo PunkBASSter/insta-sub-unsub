@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using SeleniumUtils.Helpers;
 using System.Collections.ObjectModel;
 
 namespace SeleniumUtils.PageObjects
@@ -7,7 +8,7 @@ namespace SeleniumUtils.PageObjects
     public class FollowingPage : ProfilePage
     {
         private int _followingItemsLoaded = 0;
-        public FollowingPage(IWebDriver driver) : base(driver)
+        public FollowingPage(IWebDriver driver, string username) : base(driver, username)
         {
         }
 

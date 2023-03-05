@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium;
+using SeleniumUtils.Helpers;
 
 namespace SeleniumUtils.PageObjects
 {
@@ -58,14 +59,20 @@ namespace SeleniumUtils.PageObjects
 
             wait.Until(driver => TryGetGreySubButton() != null);
             var button = TryGetGreySubButton();
+            if (button == null)
+                return false;
             button.Click();
 
             wait.Until(driver => TryGetCancelSubButton() != null);
             var cancelSubButton = TryGetCancelSubButton();
+            if (cancelSubButton == null) 
+                return false;
             cancelSubButton.Click();
 
             wait.Until(driver => TryGetBlueSubButton() != null);
             var blueSubButton = TryGetBlueSubButton();
+            if (blueSubButton == null)
+                return false;
             var result = blueSubButton.Enabled && blueSubButton.Displayed;
             _following = !result;
             return result;

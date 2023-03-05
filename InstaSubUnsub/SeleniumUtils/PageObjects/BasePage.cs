@@ -1,6 +1,5 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using SeleniumUtils.Exceptions;
 
 namespace SeleniumUtils.PageObjects
 {

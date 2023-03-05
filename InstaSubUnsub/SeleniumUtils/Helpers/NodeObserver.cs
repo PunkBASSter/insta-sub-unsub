@@ -2,7 +2,7 @@
 using OpenQA.Selenium.Support.Extensions;
 using System.Collections.ObjectModel;
 
-namespace SeleniumUtils
+namespace SeleniumUtils.Helpers
 {
     /// <summary>
     /// The class is to track the changes of the page's title while it's loading.
@@ -16,7 +16,7 @@ namespace SeleniumUtils
     public class TitleObserver
     {
         private readonly IWebDriver _driver;
-        public TitleObserver(IWebDriver driver) 
+        public TitleObserver(IWebDriver driver)
         {
             _driver = driver;
         }

@@ -1,7 +1,8 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using SeleniumUtils.Exceptions;
+using InstaCommon.Exceptions;
 using SeleniumUtils.Extensions;
+using InstaCommon;
 
 namespace SeleniumUtils.PageObjects
 {
@@ -22,10 +23,10 @@ namespace SeleniumUtils.PageObjects
             PasswordBox.SlowSendKeys(password);
             PasswordBox.SendKeys(Keys.Enter);
             if (CheckErrorDisplayed())
-                throw new LoginFailedException();
+                throw new LoginFailedException($"Login failed for {username}.");
 
             HandleAfrerLoginQuestions();
-            Thread.Sleep(4000); //TODO replace with something scenario-based.
+            Thread.Sleep(2000); //TODO replace with something scenario-based.
         }
 
         public bool CheckErrorDisplayed()

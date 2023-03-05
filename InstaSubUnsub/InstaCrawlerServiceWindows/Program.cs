@@ -10,6 +10,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         services.AddHostedService<ScopedWorker>();
         new InstaCrawlerApp.ContainerModule().Register(services, config);
         new InstaPersistence.ContainerModule().Register(services, config);
+        new SeleniumUtils.ContainerModule().Register(services, config);
     })
     .Build();
 

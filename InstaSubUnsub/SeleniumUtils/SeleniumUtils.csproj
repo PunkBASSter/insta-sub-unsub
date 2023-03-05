@@ -8,8 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
     <PackageReference Include="Selenium.Support" Version="4.8.0" />
     <PackageReference Include="Selenium.WebDriver" Version="4.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InstaCommon\InstaCommon.csproj" />
+    <ProjectReference Include="..\InstaInfrastructureAbstractions\InstaInfrastructureAbstractions.csproj" />
   </ItemGroup>
 
   <ItemGroup>

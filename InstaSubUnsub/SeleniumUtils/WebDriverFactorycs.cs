@@ -9,7 +9,7 @@ namespace SeleniumPageObjects
     {
         public IWebDriver GetInstance()
         {
-            var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
 
             var options = new ChromeOptions();
             options.AddArgument("--incognito");

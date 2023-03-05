@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.Extensions;
-namespace SeleniumUtils
+
+namespace SeleniumUtils.Helpers
 {
     public class Scroll
     {

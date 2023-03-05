@@ -4,8 +4,15 @@ namespace InstaDomain
 {
     public class InstaUser : BaseEntity
     {
-        public string Name { get; set; }
-        public int? Rank { get; set; }
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        private string _name;
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        public string Name 
+        {
+            get { return _name; } 
+            set { if (!string.IsNullOrWhiteSpace(value)) _name = value; } 
+        }
+        public double Rank { get; set; }
         public bool? IsFollower { get; set; }
         public int? FollowersNum { get; set; }
         public int? FollowingsNum { get; set; }
@@ -29,7 +36,20 @@ namespace InstaDomain
                     _status = value;
             }
         }
-        public DateTime? LastPostDate { get; set; }
+
+        private DateTime? _lastPostDate;
+        public DateTime? LastPostDate
+        { 
+            get 
+            {
+                return _lastPostDate;
+            }
+            set
+            {
+                if (value > (_lastPostDate ?? default))
+                    _lastPostDate = value;
+            }
+        }
 
         private bool? _hasRussianText;
 

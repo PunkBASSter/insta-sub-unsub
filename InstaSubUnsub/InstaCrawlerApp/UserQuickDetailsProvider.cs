@@ -1,12 +1,9 @@
-﻿using InstaDomain;
+﻿using InstaCommon.Exceptions;
+using InstaDomain;
 using InstaDomain.Enums;
+using InstaInfrastructureAbstractions.DataProviderInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
-using OpenQA.Selenium;
-using SeleniumUtils;
-using SeleniumUtils.Exceptions;
-using SeleniumUtils.Extensions;
-using SeleniumUtils.PageObjects;
 
 namespace InstaCrawlerApp
 {
@@ -17,18 +14,20 @@ namespace InstaCrawlerApp
     /// </summary>
     public class UserQuickDetailsProvider
     {
-        protected readonly IWebDriver _webDriver;
+        protected readonly IUserDetailsProvider _userDetailsProvider;
         protected readonly IRepository _repo;
         protected readonly int _batchSize;
         private int _consequentAntiBotFailures = 0;
         protected readonly ILogger<UserQuickDetailsProvider> _logger;
+        protected readonly InstaAccount? _account;
 
-        public UserQuickDetailsProvider(IWebDriver driver, IRepository repo, ILogger<UserQuickDetailsProvider> logger)
+        public UserQuickDetailsProvider(IUserDetailsProvider userDetailsProvider, IRepository repo, ILogger<UserQuickDetailsProvider> logger, InstaAccount? account=null)
         {
-            _webDriver = driver;
-            _repo= repo;
+            _userDetailsProvider = userDetailsProvider;
+            _repo = repo;
             _batchSize = 200 + new Random(DateTime.Now.Microsecond).Next(-14, 17);
             _logger = logger;
+            _account = account;
         }
 
         public void ProvideDetails()
@@ -77,42 +76,17 @@ namespace InstaCrawlerApp
             return _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New && u.Rank == default).Take(_batchSize).ToList();
         }
 
-        protected virtual bool VisitUserProfileExtended(ProfilePage profilePage, InstaUser user, out InstaUser modified)
-        {
-            modified = user;
-            return true; 
-        }
-
         protected bool VisitUserProfile(InstaUser user, out InstaUser modified)
         {
             modified = user;
-            var profilePage = new ProfilePage(_webDriver);
             try
             {
-                if (!profilePage.Load(user.Name))
-                    return false;
-                    
-                _consequentAntiBotFailures = 0;
-
-                var followersNum = profilePage.FollowersNumElement.GetInstaSubNumber();
-                var followingsNum = profilePage.FollowingsNumElement.GetInstaSubNumber();
-                var hasRussianText = profilePage.GetDescriptionText().HasRussianText();
-                modified.FollowersNum = followersNum;
-                modified.FollowingsNum = followingsNum;
-                modified.HasRussianText = hasRussianText;
-                modified.Rank = Convert.ToInt32(CalculateRank(modified));
-
-                var result = true;
-                if (modified.Rank > 0)
-                    result = VisitUserProfileExtended(profilePage, modified, out modified);
-                                
-                new Delay(1831, 3342).Random();
-
-                return result;
+                modified = _userDetailsProvider.GetUserDetails(user, _account);
+                return modified != null;
             }
             catch (InstaAntiBotException ex)
             {
-                _logger.LogError(ex, ex.Message, ex.Data.Values); //TODO make sure it's optimal set of params
+                _logger.LogError(ex, ex.Message, ex.Data.Values);
                 _consequentAntiBotFailures++;
                 return false;
             }
@@ -129,20 +103,6 @@ namespace InstaCrawlerApp
                 _logger.LogError(ex, ex.Message, ex.Data.Values);
                 return false;
             }
-        }
-
-        protected virtual double CalculateRank(InstaUser user)
-        {
-            var followers = Math.Max(user.FollowersNum ?? 1, 1);
-            var followings = user.FollowingsNum ?? 0;
-
-            var followingsRatio = followings / followers;
-            if (followingsRatio < 3)
-                return -1;
-
-            var rusMultimplier = 1 + Convert.ToByte(user.HasRussianText ?? false) * 3;
-
-            return (followingsRatio * rusMultimplier);
         }
     }
 }

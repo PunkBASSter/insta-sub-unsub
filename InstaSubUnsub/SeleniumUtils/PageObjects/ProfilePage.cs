@@ -1,5 +1,6 @@
-﻿using OpenQA.Selenium;
-using SeleniumUtils.Exceptions;
+﻿using InstaCommon.Exceptions;
+using OpenQA.Selenium;
+using SeleniumUtils.Helpers;
 using System.Collections.ObjectModel;
 
 namespace SeleniumUtils.PageObjects
@@ -10,24 +11,21 @@ namespace SeleniumUtils.PageObjects
     public class ProfilePage : BasePage
     {
         private readonly TitleObserver _titleObserver;
-        private string _userName;
+        private readonly string _userName;
 
         public override string Url => "https://www.instagram.com/{0}";
 
-        public ProfilePage(IWebDriver driver) : base(driver)
+        public ProfilePage(IWebDriver driver, string username) : base(driver)
         {
             _titleObserver = new TitleObserver(driver);
+            _userName = username;
         }
 
-        protected override By LoadIndicatingElementLocator { get; set; }
+        protected override By LoadIndicatingElementLocator { get; set; } = By.XPath("");
 
 
         public override bool Load(params string[] urlParams)
         {
-            if (urlParams.Length != 1) 
-                throw new ArgumentException("UserName param is expected.");
-
-            _userName= urlParams[0];
             LoadIndicatingElementLocator = By.XPath($"//header//*[contains(text(),'{_userName}')]");
             return base.Load(_userName);
         }
@@ -103,7 +101,7 @@ namespace SeleniumUtils.PageObjects
             var result = new List<Post>();
             var count = 1;
 
-            while (opened && count <= Math.Min(limit, PostLinks.Count))
+            while (opened && current != null && count <= Math.Min(limit, PostLinks.Count))
             {
                 result.Add(current);
                 count++;

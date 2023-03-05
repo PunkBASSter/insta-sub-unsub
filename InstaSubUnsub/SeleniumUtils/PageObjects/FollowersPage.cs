@@ -1,18 +1,14 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using System;
-using System.Collections.Generic;
+using SeleniumUtils.Helpers;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SeleniumUtils.PageObjects
 {
     public class FollowersPage : ProfilePage
     {
         private int _followerItemsLoaded = 0;
-        public FollowersPage(IWebDriver driver) : base(driver)
+        public FollowersPage(IWebDriver driver, string username) : base(driver, username)
         {
         }
 
