@@ -9,17 +9,15 @@ namespace InstaCrawlerApp
     {
         private readonly IUserFollower _userFollower;
         private readonly IRepository _repo;
-        private readonly InstaAccount _account;
         private readonly int _subLimitPerIteration;
         private readonly ILogger<Follower> _logger;
 
-        public Follower(IUserFollower userFollower, IRepository repo, ILogger<Follower> logger, InstaAccount account)
+        public Follower(IUserFollower userFollower, IRepository repo, ILogger<Follower> logger)
         {
             _userFollower = userFollower;
             _repo = repo;
             _logger = logger;
-            _account = account;
-            _subLimitPerIteration = 15 + new Random(DateTime.Now.Millisecond).Next(-2,2);
+            _subLimitPerIteration = 13 + new Random(DateTime.Now.Millisecond).Next(-2,2);
         }
 
         public void Follow()
@@ -35,7 +33,7 @@ namespace InstaCrawlerApp
 
             foreach (var user in usersToFollow)
             {
-                if (_userFollower.Follow(user, _account))
+                if (_userFollower.Follow(user))
                 {
                     var updated = user;
                     updated.FollowingDate = DateTime.UtcNow;

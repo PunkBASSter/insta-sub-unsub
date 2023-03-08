@@ -7,18 +7,16 @@ namespace InstaCrawlerApp
 {
     public class UserCrawler
     {
-        private readonly InstaAccount _account;
         private readonly IRepository _repo;
         private readonly IFollowersProvider _followersProvider;
         private readonly IUserDetailsProvider _detailsProvider;
         private readonly int _crawlLimitPerIteration = 973;
 
-        public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider, IRepository repo, InstaAccount account)
+        public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider, IRepository repo)
         {
             _followersProvider = followersProvider;
             _detailsProvider = detailsProvider;
             _repo = repo;
-            _account = account;
             _crawlLimitPerIteration += new Random(DateTime.Now.Microsecond).Next(-82, 47); //randomizing the iteration limit
         }
 
@@ -42,12 +40,12 @@ namespace InstaCrawlerApp
                 .LastOrDefault(u => (u.HasRussianText == true) && !lastStuckUserIds.Contains(u.Id))
                 ?? userQuery.Last(u => !lastStuckUserIds.Contains(u.Id));
 
-            var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser, _account);
+            var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser);
             _repo.Update(detailedSeedUser);
             _repo.SaveChanges();
 
-            _followersProvider.LoggedInUsername = _account.Username; //to avoid re-logging, todo move user session management to lower provider level
-            var followerItems = _followersProvider.GetByUser(detailedSeedUser, _account);
+            _followersProvider.LoggedInUsername = _detailsProvider.LoggedInUsername; //to avoid re-logging, todo move user session management to lower provider level
+            var followerItems = _followersProvider.GetByUser(detailedSeedUser);
 
             int savedCount = 0;
             foreach (var user in followerItems)

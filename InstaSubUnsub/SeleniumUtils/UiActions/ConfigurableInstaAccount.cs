@@ -1,7 +1,7 @@
 ﻿using InstaDomain;
 using Microsoft.Extensions.Configuration;
 
-namespace InstaCrawlerApp
+namespace SeleniumUtils.UiActions
 {
     public class ConfigurableInstaAccount : InstaAccount
     {

@@ -1,7 +1,7 @@
-﻿using InstaCommon.Exceptions;
-using InstaCommon.Extensions;
+﻿using InstaCommon.Extensions;
 using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.PageObjects;
@@ -10,9 +10,11 @@ namespace SeleniumUtils.UiActions
 {
     public class InstaUiFollowersProvider : UiActionBase, IFollowersProvider
     {
-        public InstaUiFollowersProvider(IWebDriver driver, ILogger<InstaUiFollowersProvider> logger) : base(driver, logger) { }
+        public InstaUiFollowersProvider(IWebDriver driver, ILogger<InstaUiFollowersProvider> logger, IConfiguration config) : base(driver, logger, config) { }
 
-        public IList<InstaUser> GetByUser(InstaUser user, InstaAccount account)
+        protected override string ConfigSectionName => "CrawlUser";
+
+        public IList<InstaUser> GetByUser(InstaUser user, InstaAccount? account = null)
         {
             Login(account);
 

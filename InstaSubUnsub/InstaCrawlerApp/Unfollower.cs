@@ -14,7 +14,7 @@ namespace InstaCrawlerApp
         private readonly IConfiguration _configuration;
         private readonly int _unfollowLimitPerIteration;
 
-        public Unfollower(IRepository repo, IConfiguration configuration, InstaAccount account)
+        public Unfollower(IRepository repo, IConfiguration configuration)
         {
             _repo = repo;
             _configuration = configuration;

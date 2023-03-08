@@ -1,5 +1,6 @@
 ﻿using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.PageObjects;
@@ -8,19 +9,33 @@ namespace SeleniumUtils.UiActions
 {
     public class InstaUiUserFollower : UiActionBase, IUserFollower
     {
-        public InstaUiUserFollower(IWebDriver driver, ILogger<InstaUiUserFollower> logger) : base(driver, logger)
+        private readonly int _postsToLike = 2;
+
+        public InstaUiUserFollower(IWebDriver driver, ILogger<InstaUiUserFollower> logger, IConfiguration conf) : base(driver, logger, conf)
         {
         }
 
-        public bool Follow(InstaUser user, InstaAccount account)
+        protected override string ConfigSectionName => "FollowUser";
+
+        public bool Follow(InstaUser user, InstaAccount? account = null)
         {
-            if (account != null)
-                Login(account);
+            Login(account);
 
             var profilePage = new ProfilePage(_webDriver, user.Name);
             profilePage.Load();
-            return profilePage.Follow();
 
+            //Leave likes under last 2 posts
+            for (var i = 0; i< _postsToLike; i++)
+            {
+                profilePage.OpenPost(out Post? post, i);
+                if (post != null)
+                {
+                    post.LikeWithRetries(2);
+                    post.Close();
+                }
+            }
+            
+            return profilePage.Follow();
         }
     }
 }

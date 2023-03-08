@@ -106,7 +106,7 @@ namespace SeleniumUtils.PageObjects
         private ReadOnlyCollection<IWebElement> PostLinks =>
             _driver.FindElements(By.XPath(".//article/div/div/div/div/a"));
 
-        private bool OpenPost(out Post? postObj, int postNumFromTopLeft = 0)
+        public bool OpenPost(out Post? postObj, int postNumFromTopLeft = 0)
         {
             if (PostLinks.Count < 1)
             {

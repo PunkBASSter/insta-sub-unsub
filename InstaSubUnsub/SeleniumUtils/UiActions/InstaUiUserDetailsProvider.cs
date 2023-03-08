@@ -3,6 +3,7 @@ using InstaCommon.Extensions;
 using InstaDomain;
 using InstaDomain.Enums;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.Extensions;
@@ -14,9 +15,11 @@ namespace SeleniumUtils.UiActions
     {
         private const double MinimumRank = 3.0; //minimum ratio of followings/followers to proceed with user data mining
 
-        public InstaUiUserDetailsProvider(IWebDriver driver, ILogger<InstaUiUserDetailsProvider> logger) : base(driver, logger)
+        public InstaUiUserDetailsProvider(IWebDriver driver, ILogger<InstaUiUserDetailsProvider> logger, IConfiguration config) : base(driver, logger, config)
         {
         }
+
+        protected override string ConfigSectionName => "CrawlUser";
 
         protected virtual InstaUser VisitUserProfileExtended(ProfilePage profilePage, InstaUser user)
         {
@@ -46,8 +49,7 @@ namespace SeleniumUtils.UiActions
 
         public InstaUser GetUserDetails(InstaUser user, InstaAccount? account = null)
         {
-            if (account != null)
-                Login(account);
+            Login(account);
 
             //Data available for anonymous users
             var detailedUser = user;

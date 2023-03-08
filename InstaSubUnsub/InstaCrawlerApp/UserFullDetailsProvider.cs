@@ -11,8 +11,8 @@ namespace InstaCrawlerApp
     /// </summary>
     public class UserFullDetailsProvider : UserQuickDetailsProvider
     {
-        public UserFullDetailsProvider(IUserDetailsProvider detailsProvider, IRepository repo, InstaAccount account, ILogger<UserFullDetailsProvider> logger)
-            : base(detailsProvider, repo, logger, account)
+        public UserFullDetailsProvider(IUserDetailsProvider detailsProvider, IRepository repo, ILogger<UserFullDetailsProvider> logger)
+            : base(detailsProvider, repo, logger)
         {
         }
 

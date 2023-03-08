@@ -43,7 +43,38 @@ namespace SeleniumUtils.PageObjects
                 return _date ?? default;
             }
         }
-        
+
+        public bool LikeWithRetries(int attempts = 2)
+        {
+            bool likeResult;
+            do
+            {
+                attempts--;
+                likeResult = Like();
+            }
+            while (!likeResult && attempts > 0);
+            return likeResult;
+        }
+
+        public bool Like()
+        {
+            if (_element.Value == null)
+                return false;
+
+            var wait = new Wait(_driver, _element.Value);
+            var likeButton = wait.WaitForElement(By.XPath("//article//section//button//*[@aria-label='Нравится']/ancestor::button"));
+            if (likeButton != null && likeButton.Displayed)
+                likeButton.Click();
+
+            var dislikeButton = _element.Value.FindElement(By.XPath("//article//section//button//*[@aria-label='Не нравится']/ancestor::button"));
+            return dislikeButton!= null && dislikeButton.Displayed;
+        }
+
+        public void Close()
+        {
+            _element.Value?.SendKeys(Keys.Escape);
+        }
+
         public bool TrySwitchToNext(out Post nextPost)
         {
             try

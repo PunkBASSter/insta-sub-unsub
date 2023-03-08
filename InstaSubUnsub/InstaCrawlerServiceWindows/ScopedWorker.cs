@@ -21,7 +21,7 @@ namespace InstaCrawlerServiceWindows
             {
                 _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                 await DoWorkAsync(stoppingToken);
-                await Task.Delay(10000, stoppingToken);
+                await Task.Delay(1000000, stoppingToken);
             }
         }
 
@@ -33,19 +33,19 @@ namespace InstaCrawlerServiceWindows
             using (IServiceScope scope = _serviceProvider.CreateScope())
             {
                 var userCrawler = scope.ServiceProvider.GetRequiredService<UserCrawler>();
-                //await Task.Run(userCrawler.Crawl, stoppingToken);
+                await Task.Run(userCrawler.Crawl, stoppingToken);
             }
 
             using (IServiceScope scope = _serviceProvider.CreateScope())
             {
                 var detailsProvider = scope.ServiceProvider.GetRequiredService<UserFullDetailsProvider>();
-                //await Task.Run(detailsProvider.ProvideDetails, stoppingToken);
+                await Task.Run(detailsProvider.ProvideDetails, stoppingToken);
             }
 
             using (IServiceScope scope = _serviceProvider.CreateScope())
             {
-                var detailsProvider = scope.ServiceProvider.GetRequiredService<Follower>();
-                await Task.Run(detailsProvider.Follow, stoppingToken);
+                //var detailsProvider = scope.ServiceProvider.GetRequiredService<Follower>();
+                //await Task.Run(detailsProvider.Follow, stoppingToken);
             }
 
             //using (IServiceScope scope = _serviceProvider.CreateScope())

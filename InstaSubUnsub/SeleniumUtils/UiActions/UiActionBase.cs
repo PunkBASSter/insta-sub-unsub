@@ -1,26 +1,39 @@
 ﻿using InstaCommon.Exceptions;
 using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.PageObjects;
 
 namespace SeleniumUtils.UiActions
 {
-    public class UiActionBase : ILoggedInUserState
+    public abstract class UiActionBase : ILoggedInUserState
     {
         protected readonly IWebDriver _webDriver;
         public string? LoggedInUsername { get; set; } = null;
         protected readonly ILogger<UiActionBase> _logger;
+        protected readonly IConfiguration _configuration;
 
-        public UiActionBase(IWebDriver driver, ILogger<UiActionBase> logger)
+        public UiActionBase(IWebDriver driver, ILogger<UiActionBase> logger, IConfiguration configuration)
         {
             _webDriver = driver;
             _logger = logger;
+            _configuration = configuration;
         }
 
-        protected virtual bool Login(InstaAccount account)
+        protected abstract string ConfigSectionName { get; }
+
+        protected virtual InstaAccount GetInstaAccount()
         {
+            return new ConfigurableInstaAccount(_configuration, ConfigSectionName);
+        }
+
+        protected virtual bool Login(InstaAccount? account = null)
+        {
+            if (account == null)
+                account = GetInstaAccount();
+
             if (account.Username == LoggedInUsername)
                 return true;
 

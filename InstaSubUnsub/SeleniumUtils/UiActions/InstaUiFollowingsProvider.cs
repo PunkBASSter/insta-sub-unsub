@@ -1,6 +1,7 @@
 ﻿using InstaCommon.Exceptions;
 using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.PageObjects;
@@ -10,9 +11,11 @@ namespace SeleniumUtils.UiActions
     public class InstaUiFollowingsProvider : UiActionBase, IFollowingsProvider
     {
         //Not sure if the UI-based class will be reqired for unsubscribing
-        public InstaUiFollowingsProvider(IWebDriver driver, ILogger<UiActionBase> logger) : base(driver, logger)
+        public InstaUiFollowingsProvider(IWebDriver driver, ILogger<UiActionBase> logger, IConfiguration conf) : base(driver, logger, conf)
         {
         }
+
+        protected override string ConfigSectionName => "CrawlUser";
 
         /// <summary>
         /// Gets the list of users followed by us from InstaUI, the output needs to be filtered by Status != Protected (3)

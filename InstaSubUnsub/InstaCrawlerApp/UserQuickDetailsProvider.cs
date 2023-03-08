@@ -14,15 +14,13 @@ namespace InstaCrawlerApp
         protected readonly int _batchSize;
         private int _consequentAntiBotFailures = 0;
         protected readonly ILogger<UserQuickDetailsProvider> _logger;
-        protected readonly InstaAccount? _account;
 
-        public UserQuickDetailsProvider(IUserDetailsProvider userDetailsProvider, IRepository repo, ILogger<UserQuickDetailsProvider> logger, InstaAccount? account=null)
+        public UserQuickDetailsProvider(IUserDetailsProvider userDetailsProvider, IRepository repo, ILogger<UserQuickDetailsProvider> logger)
         {
             _userDetailsProvider = userDetailsProvider;
             _repo = repo;
             _batchSize = 200 + new Random(DateTime.Now.Microsecond).Next(-14, 17);
             _logger = logger;
-            _account = account;
         }
 
         public void ProvideDetails()
@@ -76,7 +74,7 @@ namespace InstaCrawlerApp
             modified = user;
             try
             {
-                modified = _userDetailsProvider.GetUserDetails(user, _account);
+                modified = _userDetailsProvider.GetUserDetails(user);
                 return modified != null;
             }
             catch (InstaAntiBotException ex)
