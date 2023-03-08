@@ -23,7 +23,7 @@ namespace SeleniumUtils.PageObjects
             PasswordBox.SlowSendKeys(password);
             PasswordBox.SendKeys(Keys.Enter);
             if (CheckErrorDisplayed())
-                throw new LoginFailedException($"Login failed for {username}.");
+                throw new LoginFailedException($"FATAL: Login is broken or blocked on Instagram side, could not sign in as {username}.");
 
             HandleAfrerLoginQuestions();
             Thread.Sleep(2000); //TODO replace with something scenario-based.

@@ -24,38 +24,51 @@ namespace InstaCrawlerApp
         {
             var crawledUsersCount = 0;
 
-            var lastStuckUserIds = new List<long>(); //last users from which 0 new followings were saved
             while (crawledUsersCount <= _crawlLimitPerIteration)
             {
-                crawledUsersCount += CrawlFromLastUser(lastStuckUserIds);
+                crawledUsersCount += CrawlFromLastUser();
                 new Delay().Random();
             }
         }
 
-        private int CrawlFromLastUser(List<long> lastStuckUserIds)
+        private InstaUser GetSeedUser()
         {
             var userQuery = _repo.Query<InstaUser>();
-                        
-            var seedUser = userQuery.OrderBy(u => u.Id)
-                .LastOrDefault(u => (u.HasRussianText == true) && !lastStuckUserIds.Contains(u.Id))
-                ?? userQuery.Last(u => !lastStuckUserIds.Contains(u.Id));
+            InstaUser? seedUser;
+            var attempts = 10;
+            do
+            {
+                seedUser = userQuery.Where(u => (u.HasRussianText == true) && (u.IsClosed != true))
+                    .OrderBy(u => u.Id)
+                    .LastOrDefault();
 
-            var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser);
-            _repo.Update(detailedSeedUser);
-            _repo.SaveChanges();
+                if (seedUser == null)
+                    throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
 
-            _followersProvider.LoggedInUsername = _detailsProvider.LoggedInUsername; //to avoid re-logging, todo move user session management to lower provider level
+                var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser);
+                _repo.Update(detailedSeedUser);
+                _repo.SaveChanges();
+                seedUser = detailedSeedUser;
+                attempts--;
+            }
+            while (seedUser != null && seedUser.IsClosed != true && seedUser.FollowersNum > 0 && attempts > 0);
+            
+            return seedUser;
+        }
+
+        private int CrawlFromLastUser()
+        {
+            var detailedSeedUser = GetSeedUser();
+
+            _followersProvider.LoggedInUsername = _detailsProvider.LoggedInUsername; //wierd way to transfer state between infrastructure services
             var followerItems = _followersProvider.GetByUser(detailedSeedUser);
 
             int savedCount = 0;
             foreach (var user in followerItems)
             {
                 var saved = SaveInstaUser(user, ref savedCount);
-                SaveUserRelation(saved, seedUser);
+                SaveUserRelation(saved, detailedSeedUser);
             }
-
-            if (savedCount == 0)
-                lastStuckUserIds.Add(seedUser.Id);
 
             return savedCount;
         }

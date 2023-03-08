@@ -31,8 +31,7 @@ namespace SeleniumUtils.UiActions
 
         protected virtual bool Login(InstaAccount? account = null)
         {
-            if (account == null)
-                account = GetInstaAccount();
+            account ??= GetInstaAccount();
 
             if (account.Username == LoggedInUsername)
                 return true;
@@ -40,21 +39,13 @@ namespace SeleniumUtils.UiActions
             if (!string.IsNullOrWhiteSpace(LoggedInUsername))
                 //TODO implement re-logging as the required user
                 return false;
+            
+            var loginPage = new LoginPage(_webDriver);
+            loginPage.Load();
+            loginPage.Login(account.Username, account.Password);
+            LoggedInUsername = account.Username;
 
-            try
-            {
-                var loginPage = new LoginPage(_webDriver);
-                loginPage.Load();
-                loginPage.Login(account.Username, account.Password);
-                LoggedInUsername = account.Username;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message, ex.Data.Values);
-                LoggedInUsername = null;
-                throw new LoginFailedException($"Login failed for user {account.Username}.");
-            }
+            return true;
         }
     }
 }
