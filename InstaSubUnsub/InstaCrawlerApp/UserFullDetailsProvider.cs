@@ -2,7 +2,7 @@
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using InstaDomain.Enums;
 using Microsoft.Extensions.Logging;
-using InstaInfrastructureAbstractions.DataProviderInterfaces;
+using InstaInfrastructureAbstractions.InstagramInterfaces;
 
 namespace InstaCrawlerApp
 {

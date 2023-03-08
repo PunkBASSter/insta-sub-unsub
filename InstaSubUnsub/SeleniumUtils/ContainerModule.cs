@@ -1,5 +1,5 @@
 ﻿using InstaInfrastructureAbstractions;
-using InstaInfrastructureAbstractions.DataProviderInterfaces;
+using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SeleniumPageObjects;
@@ -12,7 +12,8 @@ namespace SeleniumUtils
         public void Register(IServiceCollection services, IConfiguration config)
         {
             services.AddTransient<IFollowersProvider, InstaUiFollowersProvider>();
-            services.AddTransient<IFollowingsProvider, InstaUiFollowingsProvider>(); //maybe useless
+            services.AddTransient<IUserFollower, InstaUiUserFollower>();
+            //services.AddTransient<IFollowingsProvider, InstaUiFollowingsProvider>(); //currently useless
             services.AddTransient<IUserDetailsProvider, InstaUiUserDetailsProvider>();
             services.AddScoped(f => new WebDriverFactory().GetInstance());
         }

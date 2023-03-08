@@ -1,7 +1,7 @@
 ﻿using InstaCommon.Exceptions;
 using InstaCommon.Extensions;
 using InstaDomain;
-using InstaInfrastructureAbstractions.DataProviderInterfaces;
+using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.PageObjects;
@@ -14,8 +14,7 @@ namespace SeleniumUtils.UiActions
 
         public IList<InstaUser> GetByUser(InstaUser user, InstaAccount account)
         {
-            if (!Login(account))
-                throw new LoginFailedException($"Login failed for username {account.Username}");
+            Login(account);
 
             var followersPage = new FollowersPage(_webDriver, user.Name);
             followersPage.Load();

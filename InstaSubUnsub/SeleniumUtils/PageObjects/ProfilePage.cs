@@ -50,17 +50,44 @@ namespace SeleniumUtils.PageObjects
             return base.HandleLoadErrors();
         }
 
+        private readonly By _followButtonLocator = By.XPath("//header/section//button//*[contains(text(),'Подписаться')]");
+        private readonly By _followingsButtonLocator = By.XPath("//header/section//button//*[contains(text(),'Подписки')]");
+        
+        public bool Follow()
+        {
+            var blueButton = new Wait(_driver).WaitForElement(_followButtonLocator);
+            blueButton?.Click();
+
+            var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator);
+            return greyButton != null && greyButton.Displayed;
+        }
+
+        public bool Unfollow() 
+        {
+            var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator);
+            greyButton?.Click();
+
+            var unfollowMenuItem = new Wait(_driver)
+                .WaitForElement(By.XPath("//div[@role='dialog']//div[@aria-labelledby]//*[contains(text(),'Отменить подписку')]"));
+            unfollowMenuItem?.Click();
+
+            var blueButton = new Wait(_driver).WaitForElement(_followButtonLocator);
+            return blueButton != null && blueButton.Displayed;
+        }
+
         public bool CheckHasStory()
         {
-            return new Wait(_driver).TryFindElement(By.XPath("//section//header//div[@style='cursor: pointer;']"), out _);
+            new Wait(_driver).TryFindElement(By.XPath(".//section//header//div[@style='cursor: pointer;']"), out IWebElement? storyElem);
+            return storyElem != null && storyElem.Displayed;
         }
 
         public bool CheckClosedAccount()
         {
-            return new Wait(_driver).TryFindElement(By.XPath(".//article/div//*[contains(text(),'закрытый аккаунт')]"), out _);
+            new Wait(_driver).TryFindElement(By.XPath(".//article/div//*[contains(text(),'закрытый аккаунт')]"), out IWebElement? closedElement);
+            return closedElement != null && closedElement.Displayed;
         }
 
-        public ReadOnlyCollection<IWebElement> DescriptionParts =>
+        private ReadOnlyCollection<IWebElement> DescriptionParts =>
             _driver.FindElements(By.XPath("//header/section/div[3]/*[text()]"));
 
         public string GetDescriptionText()
@@ -76,10 +103,10 @@ namespace SeleniumUtils.PageObjects
         public IWebElement FollowingsNumElement =>
             _driver.FindElement(By.XPath(".//section/ul/li[3]//div/span/span"));
 
-        public ReadOnlyCollection<IWebElement> PostLinks =>
+        private ReadOnlyCollection<IWebElement> PostLinks =>
             _driver.FindElements(By.XPath(".//article/div/div/div/div/a"));
 
-        public bool OpenPost(out Post? postObj, int postNumFromTopLeft = 0)
+        private bool OpenPost(out Post? postObj, int postNumFromTopLeft = 0)
         {
             if (PostLinks.Count < 1)
             {

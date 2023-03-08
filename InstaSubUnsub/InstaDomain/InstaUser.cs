@@ -59,6 +59,8 @@ namespace InstaDomain
             set { _hasRussianText = (_hasRussianText == true) || (value == true); }
         }
 
+        public bool? IsClosed { get; set; }
+
         public virtual IList<UserRelation>? Followees { get; set; }
         public virtual IList<UserRelation>? Followers { get; set; }
 

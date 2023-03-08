@@ -1,17 +1,12 @@
 ﻿using InstaCommon.Exceptions;
 using InstaDomain;
 using InstaDomain.Enums;
-using InstaInfrastructureAbstractions.DataProviderInterfaces;
+using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
 
 namespace InstaCrawlerApp
 {
-    /// <summary>
-    /// Updates user DB record with the number of followers and followings and presence of Russian
-    /// characters in the profile description.
-    /// Takes users with Status==New, updates Rank, FollowersNum, FollowingsNum and HasRussianText.
-    /// </summary>
     public class UserQuickDetailsProvider
     {
         protected readonly IUserDetailsProvider _userDetailsProvider;
@@ -40,7 +35,7 @@ namespace InstaCrawlerApp
             _logger.LogInformation("Started {0} iteration. Max BatchSize is {1}", GetType().Name, _batchSize);
 
             var processed = 0;
-            var rankAboveZero = 0;
+            var rankAbove3 = 0;
             var errors = 0;
             foreach (var user in users)
             {
@@ -54,7 +49,7 @@ namespace InstaCrawlerApp
                 {
                     _repo.Update(modified);
                     _repo.SaveChanges();
-                    if (modified.Rank > 0) rankAboveZero++;
+                    if (modified.Rank > 3) rankAbove3++;
                     processed++;
                 }
                 else if (modified.Status == UserStatus.Error || modified.Status == UserStatus.Unavailable)
@@ -66,7 +61,7 @@ namespace InstaCrawlerApp
             }
 
             _logger.LogInformation("Finished {0} iteration. Successfully processed {1} of {2} fetched. Errors: {3}. RankAboveZero items: {4}",
-                GetType().Name, processed, users.Count, errors, rankAboveZero);
+                GetType().Name, processed, users.Count, errors, rankAbove3);
         }
 
         protected virtual bool Initialize() { return true; }

@@ -1,6 +1,6 @@
 ﻿using InstaDomain;
 
-namespace InstaInfrastructureAbstractions.DataProviderInterfaces
+namespace InstaInfrastructureAbstractions.InstagramInterfaces
 {
     public interface IFollowingsProvider
     {

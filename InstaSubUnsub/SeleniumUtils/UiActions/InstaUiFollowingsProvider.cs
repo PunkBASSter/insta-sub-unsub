@@ -1,6 +1,6 @@
 ﻿using InstaCommon.Exceptions;
 using InstaDomain;
-using InstaInfrastructureAbstractions.DataProviderInterfaces;
+using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.PageObjects;

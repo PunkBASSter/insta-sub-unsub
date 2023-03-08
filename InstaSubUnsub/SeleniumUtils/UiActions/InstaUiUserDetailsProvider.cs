@@ -2,7 +2,7 @@
 using InstaCommon.Extensions;
 using InstaDomain;
 using InstaDomain.Enums;
-using InstaInfrastructureAbstractions.DataProviderInterfaces;
+using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.Extensions;
@@ -31,7 +31,8 @@ namespace SeleniumUtils.UiActions
             else
             {
                 postInfos ??= profilePage.GetLastPosts().ToList();
-                modified.LastPostDate = postInfos.Select(p => p.PublishDate).Max().ToUniversalTime();
+                if (postInfos.Any())
+                    modified.LastPostDate = postInfos.Select(p => p.PublishDate).Max().ToUniversalTime();
             }
 
             if (!modified.HasRussianText == true)
@@ -61,10 +62,11 @@ namespace SeleniumUtils.UiActions
             detailedUser.FollowersNum = followersNum;
             detailedUser.FollowingsNum = followingsNum;
             detailedUser.HasRussianText = hasRussianText;
-            detailedUser.Rank = Convert.ToInt32(CalculateRank(detailedUser));
+            detailedUser.Rank = CalculateRank(detailedUser);
             detailedUser.Status = UserStatus.Visited;
+            detailedUser.IsClosed = profilePage.CheckClosedAccount();
 
-            if (_loggedInUser != null && detailedUser.Rank >= MinimumRank)
+            if (!string.IsNullOrWhiteSpace(LoggedInUsername) && detailedUser.Rank >= MinimumRank)
                 //Data available for logged in users
                 detailedUser = VisitUserProfileExtended(profilePage, detailedUser);
 
@@ -79,8 +81,6 @@ namespace SeleniumUtils.UiActions
             var followings = user.FollowingsNum ?? 0;
 
             var followingsRatio = followings / followers;
-            if (followingsRatio < 3)
-                return -1;
 
             return followingsRatio;
         }

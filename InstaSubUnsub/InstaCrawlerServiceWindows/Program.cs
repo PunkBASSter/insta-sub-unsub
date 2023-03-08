@@ -14,7 +14,8 @@ IHost host = Host.CreateDefaultBuilder(args)
     })
     .Build();
 
-var db = host.Services.GetRequiredService<InstaDbContext>();
+using var scope = host.Services.CreateScope();
+var db = scope.ServiceProvider.GetRequiredService<InstaDbContext>();
 db.Database.Migrate();
 
 host.Run();

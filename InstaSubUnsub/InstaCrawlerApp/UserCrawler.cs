@@ -1,6 +1,6 @@
 ﻿using InstaCommon;
 using InstaDomain;
-using InstaInfrastructureAbstractions.DataProviderInterfaces;
+using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 
 namespace InstaCrawlerApp
@@ -10,14 +10,16 @@ namespace InstaCrawlerApp
         private readonly InstaAccount _account;
         private readonly IRepository _repo;
         private readonly IFollowersProvider _followersProvider;
-        private readonly int _crawlLimitPerIteration = 1273;
+        private readonly IUserDetailsProvider _detailsProvider;
+        private readonly int _crawlLimitPerIteration = 973;
 
-        public UserCrawler(IFollowersProvider followersProvider, IRepository repo, InstaAccount account)
+        public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider, IRepository repo, InstaAccount account)
         {
             _followersProvider = followersProvider;
+            _detailsProvider = detailsProvider;
             _repo = repo;
             _account = account;
-            _crawlLimitPerIteration += new Random(DateTime.Now.Microsecond).Next(-982, 847); //randomizing the iteration limit
+            _crawlLimitPerIteration += new Random(DateTime.Now.Microsecond).Next(-82, 47); //randomizing the iteration limit
         }
 
         public void Crawl()
@@ -37,16 +39,21 @@ namespace InstaCrawlerApp
             var userQuery = _repo.Query<InstaUser>();
                         
             var seedUser = userQuery.OrderBy(u => u.Id)
-                .LastOrDefault(u => (u.HasRussianText == true || u.HasRussianText == null) && !lastStuckUserIds.Contains(u.Id))
+                .LastOrDefault(u => (u.HasRussianText == true) && !lastStuckUserIds.Contains(u.Id))
                 ?? userQuery.Last(u => !lastStuckUserIds.Contains(u.Id));
 
-            var followerItems = _followersProvider.GetByUser(seedUser, _account);
+            var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser, _account);
+            _repo.Update(detailedSeedUser);
+            _repo.SaveChanges();
+
+            _followersProvider.LoggedInUsername = _account.Username; //to avoid re-logging, todo move user session management to lower provider level
+            var followerItems = _followersProvider.GetByUser(detailedSeedUser, _account);
 
             int savedCount = 0;
             foreach (var user in followerItems)
             {
                 var saved = SaveInstaUser(user, ref savedCount);
-                SaveUserRelation(saved, seedUser);                
+                SaveUserRelation(saved, seedUser);
             }
 
             if (savedCount == 0)

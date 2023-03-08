@@ -13,7 +13,9 @@ namespace InstaCrawlerApp
                 .AddTransient<InstaAccount>(sp => new ConfigurableInstaAccount(sp.GetRequiredService<IConfiguration>(), "CrawlUser"));
             services.AddScoped<UserFullDetailsProvider>()
                 .AddTransient<InstaAccount>(sp => new ConfigurableInstaAccount(sp.GetRequiredService<IConfiguration>(), "CrawlUser"));
-            services.AddScoped<UserQuickDetailsProvider>();
+            //services.AddScoped<UserQuickDetailsProvider>(); potentially useless
+            services.AddScoped<Follower>()
+                .AddTransient<InstaAccount>(sp => new ConfigurableInstaAccount(sp.GetRequiredService<IConfiguration>(), "FollowUser"));
             services.AddScoped<Unfollower>()
                 .AddTransient<InstaAccount>(sp => new ConfigurableInstaAccount(sp.GetRequiredService<IConfiguration>(), "FollowUser"));
         }
