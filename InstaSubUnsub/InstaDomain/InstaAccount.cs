@@ -1,5 +1,8 @@
 ﻿namespace InstaDomain
 {
+    /// <summary>
+    /// It's more like an infrastructure-related model, but not actually a domain one
+    /// </summary>
     public class InstaAccount
     {
         private readonly string _username;
@@ -7,7 +10,7 @@
 
         public InstaAccount(string? username, string? password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrEmpty(password))
                 throw new ArgumentException("Missing username or password for Account object creation.");
 
             _username = username;
