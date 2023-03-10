@@ -66,7 +66,16 @@ namespace InstaCrawlerApp
 
         protected virtual IList<InstaUser> FetchUsersToFill()
         {
-            return _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New && u.Rank == default).Take(_batchSize).ToList();
+            throw new NotImplementedException("Unathenticated qiuck data mining is not supposed to be supported.");
+
+            return _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New
+                && u.HasRussianText == true
+                && u.IsClosed != true
+                && u.Rank == 0
+                && u.FollowingDate == null
+                && u.UnfollowingDate == null
+             )
+            .Take(_batchSize).ToList();
         }
 
         protected bool VisitUserProfile(InstaUser user, out InstaUser modified)

@@ -1,4 +1,5 @@
 ﻿using InstaCommon.Exceptions;
+using InstaCommon.Extensions;
 using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
@@ -36,7 +37,9 @@ namespace SeleniumUtils.UiActions
             var result = items.Select(i => new InstaUser
             {
                 Name = i.UserName,
-                Status = InstaDomain.Enums.UserStatus.Followed
+                Status = InstaDomain.Enums.UserStatus.Followed,
+                HasRussianText = i.Description.HasRussianText(),
+                LastPostDate = i.CheckHasStory() ? DateTime.UtcNow : null,
             }).ToList();
 
             return result;

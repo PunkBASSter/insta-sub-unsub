@@ -116,7 +116,8 @@ namespace SeleniumUtils.PageObjects
             
             PostLinks[postNumFromTopLeft].Click();
             postObj = new Post(_driver);
-            return true;
+            
+            return (postObj.PublishDate > default(DateTime));
         }
 
         public IList<Post> GetLastPosts(int limit = 4)

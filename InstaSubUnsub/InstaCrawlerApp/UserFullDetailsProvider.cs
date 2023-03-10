@@ -18,7 +18,13 @@ namespace InstaCrawlerApp
 
         protected override IList<InstaUser> FetchUsersToFill()
         {
-            var usersToVisit = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New && u.HasRussianText == true && (u.Rank == default || u.Rank > -1)).Take(_batchSize).ToList();
+            var usersToVisit = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New 
+                && u.HasRussianText == true 
+                && u.IsClosed != true 
+                && u.Rank == 0
+                && u.FollowingDate == null
+                && u.UnfollowingDate == null
+            ).Take(_batchSize).ToList();
 
             return usersToVisit;
         }

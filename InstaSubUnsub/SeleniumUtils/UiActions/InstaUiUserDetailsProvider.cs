@@ -68,7 +68,7 @@ namespace SeleniumUtils.UiActions
             detailedUser.Status = UserStatus.Visited;
             detailedUser.IsClosed = profilePage.CheckClosedAccount();
 
-            if (!string.IsNullOrWhiteSpace(LoggedInUsername) && detailedUser.Rank >= MinimumRank)
+            if (detailedUser.IsClosed != true && !string.IsNullOrWhiteSpace(LoggedInUsername) && detailedUser.Rank >= MinimumRank)
                 //Data available for logged in users
                 detailedUser = VisitUserProfileExtended(profilePage, detailedUser);
 

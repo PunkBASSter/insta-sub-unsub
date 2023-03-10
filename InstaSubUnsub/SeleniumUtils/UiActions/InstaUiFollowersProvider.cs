@@ -26,7 +26,8 @@ namespace SeleniumUtils.UiActions
             {
                 Name = i.UserName,
                 Status = InstaDomain.Enums.UserStatus.New,
-                HasRussianText = i.Description.HasRussianText()
+                HasRussianText = i.Description.HasRussianText(),
+                LastPostDate = i.CheckHasStory() ? DateTime.UtcNow : null,
             }).ToList();
 
             return result;

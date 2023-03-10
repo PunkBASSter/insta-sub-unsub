@@ -27,7 +27,11 @@ namespace SeleniumUtils.UiActions
             //Leave likes under last 2 posts
             for (var i = 0; i< _postsToLike; i++)
             {
-                profilePage.OpenPost(out Post? post, i);
+                var openingAttempts = 2;
+                Post? post;
+                while (!profilePage.OpenPost(out post, i) && openingAttempts > 0)
+                    openingAttempts--;
+
                 if (post != null)
                 {
                     post.LikeWithRetries(2);

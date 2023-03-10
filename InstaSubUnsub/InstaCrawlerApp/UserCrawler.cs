@@ -38,12 +38,20 @@ namespace InstaCrawlerApp
             var attempts = 10;
             do
             {
-                seedUser = userQuery.Where(u => (u.HasRussianText == true) && (u.IsClosed != true))
+                seedUser = userQuery.Where(u =>
+                u.HasRussianText == true
+                    && u.IsClosed != true
+                    && u.Rank >= 3
+                    && u.LastPostDate >= DateTime.UtcNow.AddDays(-15))
                     .OrderBy(u => u.Id)
                     .LastOrDefault();
 
-                if (seedUser == null)
-                    throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
+                //softer criteria
+                seedUser ??= userQuery.Where(u => (u.HasRussianText == true) && (u.IsClosed != true))
+                    .OrderBy(u => u.Id)
+                    .LastOrDefault();
+                    if (seedUser == null)
+                        throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
 
                 var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser);
                 _repo.Update(detailedSeedUser);
@@ -51,7 +59,7 @@ namespace InstaCrawlerApp
                 seedUser = detailedSeedUser;
                 attempts--;
             }
-            while (seedUser != null && seedUser.IsClosed != true && seedUser.FollowersNum > 0 && attempts > 0);
+            while ((seedUser.IsClosed == true || seedUser.FollowersNum == 0) && attempts > 0);
             
             return seedUser;
         }

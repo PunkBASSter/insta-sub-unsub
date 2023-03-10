@@ -45,6 +45,19 @@ namespace SeleniumUtils.PageObjects
             catch(NoSuchElementException) { return string.Empty; }
         }
 
+        public bool CheckHasStory()
+        {
+            try
+            {
+                var photoDiv = _element.FindElement(By.XPath(".//div[@role='button']"));
+                var ariaDisabled = photoDiv.GetAttribute("aria-disabled").ToLowerInvariant() == "false";
+                var styleCursor = photoDiv.GetAttribute("style").ToLowerInvariant().Contains("cursor: pointer;");
+                return ariaDisabled && styleCursor;
+            }
+            catch(NoSuchElementException) { return false; }
+            
+        }
+
         public bool Unfollow()
         {
             new Scroll(_driver).IntoView($"//div/span/a[contains(@href,'{UserName}')]");
