@@ -3,26 +3,26 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
+using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
 
 namespace SeleniumUtils.UiActions
 {
-    public class InstaUiUserFollower : UiActionBase, IUserFollower
+    public class InstaUiUserFollower : PersistentAuthActionBase, IUserFollower
     {
         private readonly int _postsToLike = 2;
 
-        public InstaUiUserFollower(IWebDriver driver, ILogger<InstaUiUserFollower> logger, IConfiguration conf) : base(driver, logger, conf)
+        public InstaUiUserFollower(IWebDriver driver, PersistentCookieUtil cookieUtil,
+            ILogger<InstaUiUserFollower> logger, IConfiguration conf) : base(driver, cookieUtil, logger, conf)
         {
         }
-
-        protected override string ConfigSectionName => "FollowUser";
 
         public bool Follow(InstaUser user, InstaAccount? account = null)
         {
             Login(account);
 
             var profilePage = new ProfilePage(_webDriver, user.Name);
-            profilePage.Load();
+            //profilePage.Load(); (Already loaded during login)
 
             //Leave likes under last 2 posts
             for (var i = 0; i< _postsToLike; i++)

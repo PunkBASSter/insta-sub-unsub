@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using InstaCommon;
+using OpenQA.Selenium;
 using SeleniumUtils.Helpers;
 
 namespace SeleniumUtils.PageObjects
@@ -56,7 +57,7 @@ namespace SeleniumUtils.PageObjects
             return likeResult;
         }
 
-        public bool Like()
+        private bool Like()
         {
             if (_element.Value == null)
                 return false;
@@ -66,7 +67,11 @@ namespace SeleniumUtils.PageObjects
             if (likeButton != null && likeButton.Displayed)
                 likeButton.Click();
 
-            var dislikeButton = _element.Value.FindElement(By.XPath("//article//section//button//*[@aria-label='Не нравится']/ancestor::button"));
+            new Delay().Random();
+
+            wait.TryFindElement(
+                By.XPath("//article//section//button//*[@aria-label='Не нравится']/ancestor::button"),
+                out IWebElement? dislikeButton);
             return dislikeButton!= null && dislikeButton.Displayed;
         }
 

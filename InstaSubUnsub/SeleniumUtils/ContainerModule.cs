@@ -2,7 +2,9 @@
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenQA.Selenium;
 using SeleniumPageObjects;
+using SeleniumUtils.Helpers;
 using SeleniumUtils.UiActions;
 
 namespace SeleniumUtils
@@ -15,7 +17,9 @@ namespace SeleniumUtils
             services.AddTransient<IUserFollower, InstaUiUserFollower>();
             //services.AddTransient<IFollowingsProvider, InstaUiFollowingsProvider>(); //currently useless
             services.AddTransient<IUserDetailsProvider, InstaUiUserDetailsProvider>();
-            services.AddScoped(f => new WebDriverFactory().GetInstance());
+            services.AddScoped<IWebDriver>(f => new WebDriverFactory().GetInstance());
+            
+            services.AddScoped<PersistentCookieUtil>();
         }
     }
 }

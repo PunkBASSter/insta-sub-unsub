@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using SeleniumUtils.Helpers;
 
 namespace SeleniumUtils.PageObjects
 {
@@ -34,6 +35,12 @@ namespace SeleniumUtils.PageObjects
             while (!ElementIsVisible(LoadIndicatingElementLocator)(_driver) && attempts > 0);
 
             return ElementIsVisible(LoadIndicatingElementLocator)(_driver);
+        }
+
+        public bool IsLoggedIn()
+        {
+            new Wait(_driver).TryFindElement(By.XPath("//*[@aria-label='Главная']"), out IWebElement? home);
+            return home != null && home.Displayed;
         }
 
         protected virtual void HandlePageLoading()

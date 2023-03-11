@@ -14,14 +14,16 @@ namespace SeleniumPageObjects
             var options = new ChromeOptions();
             options.AddArgument("--incognito");
 
-            if (File.Exists(Path.Combine(currentDir, "chromedriver.exe")))
-                return new ChromeDriver("chromedriver.exe", options);
+            var chromeDriverPath = Path.Combine(currentDir, "chromedriver.exe");
+            if (File.Exists(chromeDriverPath))
+                return new ChromeDriver(chromeDriverPath, options);
 
             var edgeConfig = new EdgeOptions();
             edgeConfig.AddArgument("--inPrivate");
 
-            if (File.Exists(Path.Combine(currentDir, "msedgedriver.exe")))
-                return new EdgeDriver("msedgedriver.exe", edgeConfig);
+            var edgeDriverPath = Path.Combine(currentDir, "msedgedriver.exe");
+            if (File.Exists(edgeDriverPath))
+                return new EdgeDriver(edgeDriverPath, edgeConfig);
 
             throw new NotImplementedException("Unable to find supported WebDriver EXE file.");
         }

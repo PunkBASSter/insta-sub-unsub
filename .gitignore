@@ -159,3 +159,4 @@ _ReSharper*/
 #Nuget packages folder
 packages/
 /InstaSubUnsub/InstaCrawlerServiceWindows/Properties/launchSettings.json
+/InstaSubUnsub/InstaCrawlerServiceWindows/SavedCookies
