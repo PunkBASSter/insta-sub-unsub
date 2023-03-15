@@ -22,7 +22,7 @@ namespace SeleniumUtils.UiActions
             Login(account);
 
             var profilePage = new ProfilePage(_webDriver, user.Name);
-            //profilePage.Load(); (Already loaded during login)
+            profilePage.Load();
 
             //Leave likes under last 2 posts
             for (var i = 0; i< _postsToLike; i++)

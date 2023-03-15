@@ -2,7 +2,7 @@
 
 namespace InstaCommon
 {
-    public class JsonFileIo
+    public class JsonFileIO
     {
         public static void Write<T>(string filePath, T objectToWrite, bool append = false) where T : new()
         {

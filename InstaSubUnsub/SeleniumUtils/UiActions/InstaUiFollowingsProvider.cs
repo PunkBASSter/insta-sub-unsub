@@ -25,7 +25,7 @@ namespace SeleniumUtils.UiActions
         /// <param name="account"></param>
         /// <returns></returns>
         /// <exception cref="LoginFailedException"></exception>
-        public IList<InstaUser> GetByUser(InstaUser user, InstaAccount account)
+        public IList<InstaUser> GetByUser(InstaUser user, InstaAccount? account=null)
         {
             if (!Login(account))
                 throw new LoginFailedException($"Login failed for username {account.Username}");

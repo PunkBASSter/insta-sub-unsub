@@ -2,6 +2,9 @@
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
 using InstaDomain.Enums;
+using InstaInfrastructureAbstractions.InstagramInterfaces;
+using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace InstaCrawlerApp
 {
@@ -10,55 +13,82 @@ namespace InstaCrawlerApp
     /// </summary>
     public class Unfollower
     {
+        private readonly IUserUnfollower _userUnfollower;
+        private readonly IFollowingsProvider _followingsProvider;
         private readonly IRepository _repo;
         private readonly IConfiguration _configuration;
         private readonly int _unfollowLimitPerIteration;
-
-        public Unfollower(IRepository repo, IConfiguration configuration)
+        private readonly InstaAccount _account;
+        
+        public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider, IRepository repo, ILogger<Follower> logger, IConfiguration conf)
         {
+            _userUnfollower = unfollower;
             _repo = repo;
-            _configuration = configuration;
-            _unfollowLimitPerIteration = Convert.ToInt32(_configuration.GetSection("Unfollow:LimitPerIteration").Value);
+            _configuration = conf;
+            _followingsProvider = followingsProvider;
+            _account = new InstaAccount(conf.GetRequiredSection("FollowUser:Username").Value, conf.GetRequiredSection("FollowUser:Password").Value);
+        }
+
+        private InstaUser _mainAccountUser;
+        private InstaUser MainAccountUser 
+        {
+            get
+            {
+                _mainAccountUser ??= _repo.Query<InstaUser>().First(u => u.Name == _account.Username);
+                return _mainAccountUser; 
+            } 
         }
 
         public void Unfollow()
         {
-//            var users = GetFollowingFromUi();
-//            SaveUsersToDb(users);
+            _userUnfollower.Login(_account);
 
-            var usersToUnfollow = _repo.Query<InstaUser>()                
-                .Where(usr => usr.Status == UserStatus.Followed)
-                .OrderBy(usr => usr.FollowingDate)
-                .Take(_unfollowLimitPerIteration)
-                .ToList();
+            var unfollowedCount = UnfollowBasedOnDb();
 
-            foreach(var user in usersToUnfollow)
-            {
-                //var uiFollowingItem = _followingPage.FollowingItems.FirstOrDefault(item => item.UserName == user.Name);
-                //if (uiFollowingItem is null)
-                //{
-                //    //TODO logging of unsynchronized data between DB and UI
-                //    UnfollowUserInDb(user);
-                //    continue;
-                //}
+            if (unfollowedCount >= _unfollowLimitPerIteration)
+                return;
 
-                //var success = uiFollowingItem.Unfollow();
-                //if (success)
-                //{
-                //    UnfollowUserInDb(user);
-                //}
-                //else { } -- //TODO logging of unsynchronized data between DB and UI
-            }
+            var numberToUnfollowInUi = _unfollowLimitPerIteration - unfollowedCount;
+            unfollowedCount += UnfollowBasedOnUi(numberToUnfollowInUi);
 
+            //todo logging to output numbers
         }
 
-        private void SaveUsersToDb(IEnumerable<InstaUser> users)
+        private int UnfollowBasedOnDb()
         {
+            var dbUsersToUnfollow = _repo.Query<InstaUser>()
+                .Where(usr => usr.Status == UserStatus.Followed && usr.FollowingDate > default(DateTime) && usr.UnfollowingDate == null)
+                .OrderBy(usr => usr.FollowingDate)
+                .Take(_unfollowLimitPerIteration)
+                .ToArray();
+
+            return UnfollowFromUsers(dbUsersToUnfollow);
+        }
+
+        private int UnfollowBasedOnUi(int number)
+        {
+            _followingsProvider.LoggedInUsername = _account.Username;
+            var uiUsersToUnfollow = _followingsProvider.GetByUser(MainAccountUser, _account);
+
+            var protectedUserNames = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.Protected).Select(u => u.Name).ToArray();
+            _ = uiUsersToUnfollow.ExceptBy(protectedUserNames, u => u.Name).ToArray();
+
+            return UnfollowFromUsers(uiUsersToUnfollow);
+        }
+
+        private int UnfollowFromUsers(IEnumerable<InstaUser> users)
+        {
+            var total = 0;
             foreach (var user in users)
             {
-                _repo.InsertOrSkip(user, u => u.Name == user.Name);
+                if (_userUnfollower.Unfollow(user))
+                {
+                    var updUser = user;
+                    UnfollowUserInDb(updUser);
+                    total++;
+                }
             }
-            _repo.SaveChanges();
+            return total;
         }
 
         private void UnfollowUserInDb(InstaUser user)
