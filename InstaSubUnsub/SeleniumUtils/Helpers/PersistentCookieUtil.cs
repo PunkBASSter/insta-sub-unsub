@@ -24,7 +24,7 @@ namespace SeleniumUtils.Helpers
             ValidatePath();
 
             var cookies = _driver.Manage().Cookies.AllCookies.ToList();
-            JsonFileIo.Write(_savedCookiesPath, cookies);
+            JsonFileIO.Write(_savedCookiesPath, cookies);
         }
 
         public bool LoadCookies()
@@ -35,7 +35,7 @@ namespace SeleniumUtils.Helpers
                 return false;
 
             _driver.Manage().Cookies.DeleteAllCookies();
-            var loadedCookies = JsonFileIo.Read<List<DeserializeableCookie>>(_savedCookiesPath) ?? new List<DeserializeableCookie>();
+            var loadedCookies = JsonFileIO.Read<List<DeserializeableCookie>>(_savedCookiesPath) ?? new List<DeserializeableCookie>();
             loadedCookies
                 .ForEach(_driver.Manage().Cookies.AddCookie);
 

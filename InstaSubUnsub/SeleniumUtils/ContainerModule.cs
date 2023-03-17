@@ -15,7 +15,8 @@ namespace SeleniumUtils
         {
             services.AddTransient<IFollowersProvider, InstaUiFollowersProvider>();
             services.AddTransient<IUserFollower, InstaUiUserFollower>();
-            //services.AddTransient<IFollowingsProvider, InstaUiFollowingsProvider>(); //currently useless
+            services.AddTransient<IUserUnfollower, InstaUiUserUnfollower>();
+            services.AddTransient<IFollowingsProvider, InstaUiFollowingsProvider>();
             services.AddTransient<IUserDetailsProvider, InstaUiUserDetailsProvider>();
             services.AddScoped<IWebDriver>(f => new WebDriverFactory().GetInstance());
             

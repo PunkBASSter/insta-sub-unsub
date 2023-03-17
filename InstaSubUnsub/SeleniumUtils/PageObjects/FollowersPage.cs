@@ -42,7 +42,7 @@ namespace SeleniumUtils.PageObjects
                 wait.Until(CheckItemsLoaded());
                 return true;
             }
-            catch { return false; } //for some reason the condition is not satisfied
+            catch { return false; }
         }
 
         private Func<IWebDriver, bool> CheckItemsLoaded()
@@ -51,7 +51,7 @@ namespace SeleniumUtils.PageObjects
             {
                 try
                 {
-                    FollowerItemElements = driver.FindElements(By.XPath("//div[@aria-labelledby]"));
+                    FollowerItemElements = driver.FindElements(By.XPath("//div[@role='dialog']//div[contains(@style, 'overflow: hidden')]/div/div[@role='button']"));
                     var res = _followerItemsLoaded < FollowerItemElements.Count;
                     _followerItemsLoaded = FollowerItemElements.Count;
                     return res;

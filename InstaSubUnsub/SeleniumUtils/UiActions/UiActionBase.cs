@@ -34,7 +34,7 @@ namespace SeleniumUtils.UiActions
         /// </summary>
         /// <param name="account"></param>
         /// <returns></returns>
-        protected virtual bool Login(InstaAccount? account = null)
+        public virtual bool Login(InstaAccount? account = null)
         {
             account ??= GetInstaAccount();
 

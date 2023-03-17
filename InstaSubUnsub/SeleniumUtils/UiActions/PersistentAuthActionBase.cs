@@ -24,7 +24,7 @@ namespace SeleniumUtils.UiActions
         /// </summary>
         /// <param name="account"></param>
         /// <returns></returns>
-        protected override bool Login(InstaAccount? account = null)
+        public override bool Login(InstaAccount? account = null)
         {
             account ??= GetInstaAccount();
             var profilePage = new ProfilePage(_webDriver, account.Username);

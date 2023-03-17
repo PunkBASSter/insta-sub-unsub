@@ -21,10 +21,12 @@ namespace SeleniumUtils.PageObjects
         private ReadOnlyCollection<IWebElement> FollowingItemElements { get; set; }
             = new ReadOnlyCollection<IWebElement>(new List<IWebElement>());
 
-        public IList<FollowingItem> InfiniteScrollToBottomWithItemsLoading()
+        public IList<FollowingItem> InfiniteScrollToBottomWithItemsLoading(int limit = 0)
         {
             while (WaitForItems())
             {
+                if (limit > 0 && FollowingItemElements.Count >= limit)
+                    break;
                 //Followings scrollable area XPath
                 new Scroll(_driver).ToBottom("//div[@role='dialog']//div[@role='tablist']/following-sibling::div");
             }
@@ -51,7 +53,8 @@ namespace SeleniumUtils.PageObjects
             {
                 try
                 {
-                    FollowingItemElements = driver.FindElements(By.XPath("//div[@aria-labelledby]"));
+                    FollowingItemElements = driver
+                        .FindElements(By.XPath("//div[@role='dialog']//div[contains(@style, 'overflow: hidden')]/div/div[@role='button']"));
                     var res = _followingItemsLoaded < FollowingItemElements.Count;
                     _followingItemsLoaded = FollowingItemElements.Count;
                     return res;

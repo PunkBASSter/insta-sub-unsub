@@ -68,7 +68,7 @@ namespace SeleniumUtils.PageObjects
             greyButton?.Click();
 
             var unfollowMenuItem = new Wait(_driver)
-                .WaitForElement(By.XPath("//div[@role='dialog']//div[@aria-labelledby]//*[contains(text(),'Отменить подписку')]"));
+                .WaitForElement(By.XPath(".//div[@role='dialog']//span[contains(text(),'Отменить подписку')]"));
             unfollowMenuItem?.Click();
 
             var blueButton = new Wait(_driver).WaitForElement(_followButtonLocator);
