@@ -1,4 +1,5 @@
 using InstaCrawlerServiceWindows;
+using InstaCrawlerServiceWindows.Jobs;
 using InstaPersistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         new InstaCrawlerApp.ContainerModule().Register(services, config);
         new InstaPersistence.ContainerModule().Register(services, config);
         new SeleniumUtils.ContainerModule().Register(services, config);
+        //services.AddScoped<QuartzJobWrapper<>>();
     })
     .Build();
 

@@ -16,20 +16,22 @@ namespace InstaCrawlerApp
         private readonly IUserUnfollower _userUnfollower;
         private readonly IFollowingsProvider _followingsProvider;
         private readonly IRepository _repo;
-        private readonly IConfiguration _configuration;
         private readonly int _unfollowLimitPerIteration;
         private readonly InstaAccount _account;
+        private readonly ILogger<Unfollower> _logger;
         
-        public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider, IRepository repo, ILogger<Follower> logger, IConfiguration conf)
+        public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider, IRepository repo, ILogger<Unfollower> logger, IConfiguration conf)
         {
             _userUnfollower = unfollower;
             _repo = repo;
-            _configuration = conf;
             _followingsProvider = followingsProvider;
             _account = new InstaAccount(conf.GetRequiredSection("FollowUser:Username").Value, conf.GetRequiredSection("FollowUser:Password").Value);
+            _logger = logger;
+            _unfollowLimitPerIteration = Convert.ToInt32(conf.GetRequiredSection("Unfollow:LimitPerIteration").Value)
+                + new Random(DateTime.Now.Microsecond).Next(-4,4);
         }
 
-        private InstaUser _mainAccountUser;
+        private InstaUser? _mainAccountUser;
         private InstaUser MainAccountUser 
         {
             get
@@ -41,6 +43,8 @@ namespace InstaCrawlerApp
 
         public void Unfollow()
         {
+            _logger.LogInformation("Started unfollowing. Limit: {0}", _unfollowLimitPerIteration);
+
             _userUnfollower.Login(_account);
 
             var unfollowedCount = UnfollowBasedOnDb();
@@ -51,13 +55,15 @@ namespace InstaCrawlerApp
             var numberToUnfollowInUi = _unfollowLimitPerIteration - unfollowedCount;
             unfollowedCount += UnfollowBasedOnUi(numberToUnfollowInUi);
 
-            //todo logging to output numbers
+            _logger.LogInformation("Completed unfollowing. Processed: {0}", unfollowedCount);
         }
 
         private int UnfollowBasedOnDb()
         {
             var dbUsersToUnfollow = _repo.Query<InstaUser>()
-                .Where(usr => usr.Status == UserStatus.Followed && usr.FollowingDate > default(DateTime) && usr.UnfollowingDate == null)
+                .Where(usr => usr.Status == UserStatus.Followed 
+                    && usr.FollowingDate > default(DateTime) 
+                    && usr.FollowingDate <= DateTime.UtcNow.AddDays(-14) && usr.UnfollowingDate == null)
                 .OrderBy(usr => usr.FollowingDate)
                 .Take(_unfollowLimitPerIteration)
                 .ToArray();
@@ -67,11 +73,13 @@ namespace InstaCrawlerApp
 
         private int UnfollowBasedOnUi(int number)
         {
+            var protectedUserNames = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.Protected).Select(u => u.Name).ToArray();
+
             _followingsProvider.LoggedInUsername = _account.Username;
+            _followingsProvider.Limit = number + protectedUserNames.Length;
             var uiUsersToUnfollow = _followingsProvider.GetByUser(MainAccountUser, _account);
 
-            var protectedUserNames = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.Protected).Select(u => u.Name).ToArray();
-            _ = uiUsersToUnfollow.ExceptBy(protectedUserNames, u => u.Name).ToArray();
+            uiUsersToUnfollow = uiUsersToUnfollow.ExceptBy(protectedUserNames, u => u.Name).Take(number).ToArray();
 
             return UnfollowFromUsers(uiUsersToUnfollow);
         }
