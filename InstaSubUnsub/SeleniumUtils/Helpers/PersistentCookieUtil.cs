@@ -24,7 +24,9 @@ namespace SeleniumUtils.Helpers
             ValidatePath();
 
             var cookies = _driver.Manage().Cookies.AllCookies.ToList();
+#pragma warning disable CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
             JsonFileIO.Write(_savedCookiesPath, cookies);
+#pragma warning restore CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
         }
 
         public bool LoadCookies()

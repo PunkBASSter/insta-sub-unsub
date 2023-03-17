@@ -2,38 +2,54 @@
 using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
+using Microsoft.Extensions.Logging;
 
 namespace InstaCrawlerApp
 {
-    public class UserCrawler
+    public class UserCrawler : JobBase
     {
-        private readonly IRepository _repo;
         private readonly IFollowersProvider _followersProvider;
         private readonly IUserDetailsProvider _detailsProvider;
-        private readonly int _crawlLimitPerIteration = 973;
-
-        public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider, IRepository repo)
+        
+        public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider,
+            IRepository repo, ILogger<UserCrawler> logger) : base(repo, logger)
         {
             _followersProvider = followersProvider;
             _detailsProvider = detailsProvider;
-            _repo = repo;
-            _crawlLimitPerIteration += new Random(DateTime.Now.Microsecond).Next(-82, 47); //randomizing the iteration limit
+            LimitPerIteration += new Random(DateTime.Now.Microsecond).Next(-82, 47); //randomizing the iteration limit
         }
 
-        public void Crawl()
+        protected override int LimitPerIteration { get; set; }
+
+        protected override async Task<JobAuditRecord> ExecuteInternal(JobAuditRecord auditRecord, CancellationToken stoppingToken)
+        {   
+            return await Task.Run(() =>
+            {
+                var crawled = Crawl();
+                auditRecord.ProcessedNumber = crawled;
+                auditRecord.LimitPerIteration = LimitPerIteration;
+                auditRecord.AccountName = _followersProvider.LoggedInUsername ?? string.Empty;
+
+                return auditRecord;
+            });
+        }
+
+        public int Crawl()
         {
             var crawledUsersCount = 0;
 
-            while (crawledUsersCount <= _crawlLimitPerIteration)
+            while (crawledUsersCount <= LimitPerIteration)
             {
                 crawledUsersCount += CrawlFromLastUser();
                 new Delay().Random();
             }
+
+            return crawledUsersCount;
         }
 
         private InstaUser GetSeedUser()
         {
-            var userQuery = _repo.Query<InstaUser>();
+            var userQuery = Repository.Query<InstaUser>();
             InstaUser? seedUser;
             var attempts = 10;
             do
@@ -54,8 +70,8 @@ namespace InstaCrawlerApp
                         throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
 
                 var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser);
-                _repo.Update(detailedSeedUser);
-                _repo.SaveChanges();
+                Repository.Update(detailedSeedUser);
+                Repository.SaveChanges();
                 seedUser = detailedSeedUser;
                 attempts--;
             }
@@ -83,11 +99,11 @@ namespace InstaCrawlerApp
 
         private InstaUser SaveInstaUser(InstaUser user, ref int savedCount)
         {
-            var savedEntity = _repo.Query<InstaUser>().FirstOrDefault(u => u.Name == user.Name);
+            var savedEntity = Repository.Query<InstaUser>().FirstOrDefault(u => u.Name == user.Name);
             if (savedEntity is null)
             {
-                _repo.Insert(user);
-                _repo.SaveChanges();
+                Repository.Insert(user);
+                Repository.SaveChanges();
                 savedCount++;
                 return user;
             }
@@ -98,19 +114,20 @@ namespace InstaCrawlerApp
 
         private void SaveUserRelation(InstaUser follower, InstaUser followed)
         {
-            var relation = _repo.Query<UserRelation>().FirstOrDefault(ur => ur.FollowerId == follower.Id && ur.FolloweeId == followed.Id);
+            var relation = Repository.Query<UserRelation>().FirstOrDefault(ur => ur.FollowerId == follower.Id && ur.FolloweeId == followed.Id);
 
             if (relation is null)
             {
                 var rel = new UserRelation { FollowerId = follower.Id, FolloweeId = followed.Id, LastUpdate = DateTime.UtcNow };
-                _repo.Insert(rel);
-                _repo.SaveChanges();
+                Repository.Insert(rel);
+                Repository.SaveChanges();
                 return;
             }
             
             relation.LastUpdate = DateTime.UtcNow;
-            _repo.Update(relation);
-            _repo.SaveChanges();
+            Repository.Update(relation);
+            Repository.SaveChanges();
         }
+
     }
 }

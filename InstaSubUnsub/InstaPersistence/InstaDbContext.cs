@@ -1,4 +1,5 @@
-﻿using InstaDomain;
+﻿using InstaCrawlerApp;
+using InstaDomain;
 using InstaPersistence.DataSeed;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -12,6 +13,8 @@ namespace InstaPersistence
         public DbSet<InstaUser> InstaUsers { get; set; }
 
         public DbSet<UserRelation> UserRelations { get; set; }
+
+        public DbSet<JobAuditRecord> JobAudit { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
