@@ -31,7 +31,7 @@ namespace InstaCrawlerApp
                 auditRecord.AccountName = _followersProvider.LoggedInUsername ?? string.Empty;
 
                 return auditRecord;
-            });
+            }, stoppingToken);
         }
 
         public int Crawl()

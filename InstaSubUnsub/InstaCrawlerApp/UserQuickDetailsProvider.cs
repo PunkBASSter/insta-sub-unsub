@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace InstaCrawlerApp
 {
-    public class UserQuickDetailsProvider
+    public class UserQuickDetailsProvider : JobBase
     {
         protected readonly IUserDetailsProvider _userDetailsProvider;
         protected readonly IRepository _repo;
@@ -15,7 +15,8 @@ namespace InstaCrawlerApp
         private int _consequentAntiBotFailures = 0;
         protected readonly ILogger<UserQuickDetailsProvider> _logger;
 
-        public UserQuickDetailsProvider(IUserDetailsProvider userDetailsProvider, IRepository repo, ILogger<UserQuickDetailsProvider> logger)
+        public UserQuickDetailsProvider(IUserDetailsProvider userDetailsProvider, IRepository repo,
+            ILogger<UserQuickDetailsProvider> logger) : base(repo, logger)
         {
             _userDetailsProvider = userDetailsProvider;
             _repo = repo;
@@ -23,18 +24,31 @@ namespace InstaCrawlerApp
             _logger = logger;
         }
 
-        public void ProvideDetails()
+        protected override int LimitPerIteration { get; set; }
+
+        protected override async Task<JobAuditRecord> ExecuteInternal(JobAuditRecord auditRecord, CancellationToken stoppingToken)
+        {
+            return await Task.Run(() =>
+            {
+                var crawled = ProvideDetails();
+                auditRecord.ProcessedNumber = crawled;
+                auditRecord.LimitPerIteration = LimitPerIteration;
+                auditRecord.AccountName = _userDetailsProvider.LoggedInUsername ?? string.Empty;
+
+                return auditRecord;
+            }, stoppingToken);
+        }
+
+        public int ProvideDetails()
         {
             var users = FetchUsersToFill();
 
             if (users.Count < 1 || !Initialize())
-                return;
+                return 0;
 
             _logger.LogInformation("Started {0} iteration. Max BatchSize is {1}", GetType().Name, _batchSize);
 
             var processed = 0;
-            var rankAbove3 = 0;
-            var errors = 0;
             foreach (var user in users)
             {
                 if (_consequentAntiBotFailures >= 3)
@@ -47,19 +61,16 @@ namespace InstaCrawlerApp
                 {
                     _repo.Update(modified);
                     _repo.SaveChanges();
-                    if (modified.Rank > 3) rankAbove3++;
                     processed++;
                 }
                 else if (modified.Status == UserStatus.Error || modified.Status == UserStatus.Unavailable)
                 {
                     _repo.Update(modified);
-                    _repo.SaveChanges();
-                    errors++;
-                }
+                    _repo.SaveChanges();;
+                }    
             }
 
-            _logger.LogInformation("Finished {0} iteration. Successfully processed {1} of {2} fetched. Errors: {3}. RankAboveZero items: {4}",
-                GetType().Name, processed, users.Count, errors, rankAbove3);
+            return processed;
         }
 
         protected virtual bool Initialize() { return true; }

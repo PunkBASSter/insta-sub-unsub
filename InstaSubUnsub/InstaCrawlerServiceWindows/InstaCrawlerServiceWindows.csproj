@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\InstaCrawlerApp\InstaCrawlerApp.csproj" />
+    <ProjectReference Include="..\InstaJobs\InstaJobs.csproj" />
     <ProjectReference Include="..\InstaPersistence\InstaPersistence.csproj" />
     <ProjectReference Include="..\SeleniumUtils\SeleniumUtils.csproj" />
   </ItemGroup>

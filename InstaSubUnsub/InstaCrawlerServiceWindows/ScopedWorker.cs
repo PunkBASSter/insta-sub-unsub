@@ -51,7 +51,7 @@ namespace InstaCrawlerServiceWindows
             using (IServiceScope scope = _serviceProvider.CreateScope())
             {
                 var detailsProvider = scope.ServiceProvider.GetRequiredService<Unfollower>();
-                await Task.Run(detailsProvider.Unfollow, stoppingToken);
+                //await Task.Run(detailsProvider.Unfollow, stoppingToken);
             }
 
             //using (IServiceScope scope = _serviceProvider.CreateScope())

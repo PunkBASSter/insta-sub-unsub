@@ -2,7 +2,7 @@
 
 namespace InstaInfrastructureAbstractions.InstagramInterfaces
 {
-    public interface IUserFollower
+    public interface IUserFollower : ILoggedInUserState
     {
         bool Follow(InstaUser user, InstaAccount? account = null);
     }

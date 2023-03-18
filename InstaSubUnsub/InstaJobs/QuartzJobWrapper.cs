@@ -1,13 +1,11 @@
 ﻿using InstaCrawlerApp;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Quartz;
 
-namespace InstaCrawlerServiceWindows.Jobs
+namespace InstaJobs
 {
-    public class QuartzJobWrapper<T> where T: JobBase //Todo implement IJob
+    [DisallowConcurrentExecution]
+    public sealed class QuartzJobWrapper<T> : IJob where T: JobBase
     {
         private readonly IServiceProvider _serviceProvider;
 
@@ -16,12 +14,17 @@ namespace InstaCrawlerServiceWindows.Jobs
             _serviceProvider = serviceProvider;
         }
 
-        public async Task Execute(CancellationToken stoppingToken)
+        private async Task Execute(CancellationToken stoppingToken)
         {
             using var scope = _serviceProvider.CreateScope();
             
             var job = scope.ServiceProvider.GetRequiredService<T>();
             await job.Execute(stoppingToken);
+        }
+
+        public async Task Execute(IJobExecutionContext context)
+        {
+            await Execute(context.CancellationToken);
         }
     }
 }

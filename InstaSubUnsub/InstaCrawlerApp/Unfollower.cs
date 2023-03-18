@@ -11,23 +11,22 @@ namespace InstaCrawlerApp
     /// <summary>
     /// Acts on behalf of main account owner
     /// </summary>
-    public class Unfollower
+    public class Unfollower : JobBase
     {
         private readonly IUserUnfollower _userUnfollower;
         private readonly IFollowingsProvider _followingsProvider;
         private readonly IRepository _repo;
-        private readonly int _unfollowLimitPerIteration;
         private readonly InstaAccount _account;
-        private readonly ILogger<Unfollower> _logger;
         
-        public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider, IRepository repo, ILogger<Unfollower> logger, IConfiguration conf)
+        public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider,
+            IRepository repo, ILogger<Unfollower> logger, IConfiguration conf) : base(repo, logger)
         {
             _userUnfollower = unfollower;
             _repo = repo;
             _followingsProvider = followingsProvider;
-            _account = new InstaAccount(conf.GetRequiredSection("FollowUser:Username").Value, conf.GetRequiredSection("FollowUser:Password").Value);
-            _logger = logger;
-            _unfollowLimitPerIteration = Convert.ToInt32(conf.GetRequiredSection("Unfollow:LimitPerIteration").Value)
+            _account = new InstaAccount(conf.GetRequiredSection("FollowUser:Username").Value,
+                conf.GetRequiredSection("FollowUser:Password").Value);
+            LimitPerIteration = Convert.ToInt32(conf.GetRequiredSection("Unfollow:LimitPerIteration").Value)
                 + new Random(DateTime.Now.Microsecond).Next(-4,4);
         }
 
@@ -41,21 +40,34 @@ namespace InstaCrawlerApp
             } 
         }
 
-        public void Unfollow()
-        {
-            _logger.LogInformation("Started unfollowing. Limit: {0}", _unfollowLimitPerIteration);
+        protected override int LimitPerIteration { get; set; }
 
+        protected override async Task<JobAuditRecord> ExecuteInternal(JobAuditRecord auditRecord, CancellationToken stoppingToken)
+        {
+            return await Task.Run(() =>
+            {
+                var crawled = Unfollow();
+                auditRecord.ProcessedNumber = crawled;
+                auditRecord.LimitPerIteration = LimitPerIteration;
+                auditRecord.AccountName = _followingsProvider.LoggedInUsername ?? string.Empty;
+
+                return auditRecord;
+            }, stoppingToken);
+        }
+
+        public int Unfollow()
+        {
             _userUnfollower.Login(_account);
 
             var unfollowedCount = UnfollowBasedOnDb();
 
-            if (unfollowedCount >= _unfollowLimitPerIteration)
-                return;
+            if (unfollowedCount >= LimitPerIteration)
+                return unfollowedCount;
 
-            var numberToUnfollowInUi = _unfollowLimitPerIteration - unfollowedCount;
+            var numberToUnfollowInUi = LimitPerIteration - unfollowedCount;
             unfollowedCount += UnfollowBasedOnUi(numberToUnfollowInUi);
 
-            _logger.LogInformation("Completed unfollowing. Processed: {0}", unfollowedCount);
+            return unfollowedCount;
         }
 
         private int UnfollowBasedOnDb()
@@ -65,7 +77,7 @@ namespace InstaCrawlerApp
                     && usr.FollowingDate > default(DateTime) 
                     && usr.FollowingDate <= DateTime.UtcNow.AddDays(-14) && usr.UnfollowingDate == null)
                 .OrderBy(usr => usr.FollowingDate)
-                .Take(_unfollowLimitPerIteration)
+                .Take(LimitPerIteration)
                 .ToArray();
 
             return UnfollowFromUsers(dbUsersToUnfollow);
