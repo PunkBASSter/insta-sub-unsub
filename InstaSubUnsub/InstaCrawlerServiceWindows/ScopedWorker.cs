@@ -1,7 +1,8 @@
-﻿using InstaCrawlerApp;
+﻿using InstaCrawlerApp.Jobs;
 
 namespace InstaCrawlerServiceWindows
 {
+    [Obsolete("Since Quartz.Net was introduced it replaced this class with its own ServiceHost.")]
     public sealed class ScopedWorker : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;

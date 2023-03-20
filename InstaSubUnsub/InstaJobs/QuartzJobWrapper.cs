@@ -1,20 +1,20 @@
-﻿using InstaCrawlerApp;
+﻿using InstaCrawlerApp.Jobs;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 
 namespace InstaJobs
 {
     [DisallowConcurrentExecution]
-    public sealed class QuartzJobWrapper<T> : IJob where T: JobBase
+    public class QuartzJobWrapper<T> : IJob where T: JobBase
     {
-        private readonly IServiceProvider _serviceProvider;
+        protected readonly IServiceProvider _serviceProvider;
 
         public QuartzJobWrapper(IServiceProvider serviceProvider) 
         {
             _serviceProvider = serviceProvider;
         }
 
-        private async Task Execute(CancellationToken stoppingToken)
+        protected virtual async Task Execute(CancellationToken stoppingToken)
         {
             using var scope = _serviceProvider.CreateScope();
             

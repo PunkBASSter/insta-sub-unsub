@@ -5,7 +5,7 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
 
-namespace InstaCrawlerApp
+namespace InstaCrawlerApp.Jobs
 {
     public class UserQuickDetailsProvider : JobBase
     {
@@ -66,8 +66,8 @@ namespace InstaCrawlerApp
                 else if (modified.Status == UserStatus.Error || modified.Status == UserStatus.Unavailable)
                 {
                     _repo.Update(modified);
-                    _repo.SaveChanges();;
-                }    
+                    _repo.SaveChanges(); ;
+                }
             }
 
             return processed;

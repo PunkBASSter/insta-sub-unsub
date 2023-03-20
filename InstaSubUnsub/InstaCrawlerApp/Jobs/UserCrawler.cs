@@ -4,13 +4,13 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
 
-namespace InstaCrawlerApp
+namespace InstaCrawlerApp.Jobs
 {
     public class UserCrawler : JobBase
     {
         private readonly IFollowersProvider _followersProvider;
         private readonly IUserDetailsProvider _detailsProvider;
-        
+
         public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider,
             IRepository repo, ILogger<UserCrawler> logger) : base(repo, logger)
         {
@@ -22,7 +22,7 @@ namespace InstaCrawlerApp
         protected override int LimitPerIteration { get; set; }
 
         protected override async Task<JobAuditRecord> ExecuteInternal(JobAuditRecord auditRecord, CancellationToken stoppingToken)
-        {   
+        {
             return await Task.Run(() =>
             {
                 var crawled = Crawl();
@@ -63,11 +63,11 @@ namespace InstaCrawlerApp
                     .LastOrDefault();
 
                 //softer criteria
-                seedUser ??= userQuery.Where(u => (u.HasRussianText == true) && (u.IsClosed != true))
+                seedUser ??= userQuery.Where(u => u.HasRussianText == true && u.IsClosed != true)
                     .OrderBy(u => u.Id)
                     .LastOrDefault();
-                    if (seedUser == null)
-                        throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
+                if (seedUser == null)
+                    throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
 
                 var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser);
                 Repository.Update(detailedSeedUser);
@@ -76,7 +76,7 @@ namespace InstaCrawlerApp
                 attempts--;
             }
             while ((seedUser.IsClosed == true || seedUser.FollowersNum == 0) && attempts > 0);
-            
+
             return seedUser;
         }
 
@@ -107,7 +107,7 @@ namespace InstaCrawlerApp
                 savedCount++;
                 return user;
             }
-            
+
             //skip if exists
             return savedEntity;
         }
@@ -123,7 +123,7 @@ namespace InstaCrawlerApp
                 Repository.SaveChanges();
                 return;
             }
-            
+
             relation.LastUpdate = DateTime.UtcNow;
             Repository.Update(relation);
             Repository.SaveChanges();

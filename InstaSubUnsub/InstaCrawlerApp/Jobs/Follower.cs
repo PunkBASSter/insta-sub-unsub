@@ -3,7 +3,7 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
 
-namespace InstaCrawlerApp
+namespace InstaCrawlerApp.Jobs
 {
     public class Follower : JobBase
     {
@@ -15,7 +15,7 @@ namespace InstaCrawlerApp
         {
             _userFollower = userFollower;
             _repo = repo;
-            _subLimitPerIteration = 13 + new Random(DateTime.Now.Millisecond).Next(-2,2);
+            _subLimitPerIteration = 13 + new Random(DateTime.Now.Millisecond).Next(-2, 2);
         }
 
         protected override int LimitPerIteration { get; set; }

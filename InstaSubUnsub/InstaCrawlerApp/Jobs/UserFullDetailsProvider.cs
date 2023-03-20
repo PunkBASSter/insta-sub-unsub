@@ -4,7 +4,7 @@ using InstaDomain.Enums;
 using Microsoft.Extensions.Logging;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 
-namespace InstaCrawlerApp
+namespace InstaCrawlerApp.Jobs
 {
     /// <summary>
     /// Supposed to get a not-null account parameter in the ctor to somehow differ from its ancestor.
@@ -18,9 +18,9 @@ namespace InstaCrawlerApp
 
         protected override IList<InstaUser> FetchUsersToFill()
         {
-            var usersToVisit = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New 
-                && u.HasRussianText == true 
-                && u.IsClosed != true 
+            var usersToVisit = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New
+                && u.HasRussianText == true
+                && u.IsClosed != true
                 && u.Rank == 0
                 && u.FollowingDate == null
                 && u.UnfollowingDate == null

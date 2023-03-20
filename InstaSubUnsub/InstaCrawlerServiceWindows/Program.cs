@@ -9,7 +9,7 @@ IHost host = Host.CreateDefaultBuilder(args)
         new InstaCrawlerApp.ContainerModule().Register(services, config);
         new InstaPersistence.ContainerModule().Register(services, config);
         new SeleniumUtils.ContainerModule().Register(services, config);
-        new InstaJobs.ContainerModule().Register(services, config);
+        new InstaJobs.ContainerModule().Register(services, config); //Already contains Quartz HostService registration.
         //services.AddHostedService<ScopedWorker>();
     })
     .Build();

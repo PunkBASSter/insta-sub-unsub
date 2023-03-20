@@ -2,35 +2,35 @@
 using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace InstaCrawlerApp
+namespace InstaCrawlerApp.Jobs
 {
     public abstract class JobBase
     {
         protected readonly IRepository Repository;
         protected readonly ILogger<JobBase> Logger;
-        
+
         protected abstract int LimitPerIteration { get; set; }
         protected JobBase(IRepository repo, ILogger<JobBase> logger)
         {
             Repository = repo;
-            Logger= logger;
+            Logger = logger;
         }
 
         public async Task Execute(CancellationToken stoppingToken)
         {
             Logger.LogInformation("Job {0} started, limit per iteration: {1}.", GetType().Name, LimitPerIteration);
             var auditRecord = new JobAuditRecord
-            { 
+            {
                 JobName = GetType().Name,
                 ExecutionStart = DateTime.UtcNow,
-                LimitPerIteration= LimitPerIteration,
+                LimitPerIteration = LimitPerIteration,
             };
 
             try
             {
                 auditRecord = await ExecuteInternal(auditRecord, stoppingToken);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 auditRecord.ErrorInfo = JsonSerializer.Serialize(ex);
             }

@@ -1,4 +1,5 @@
-﻿using InstaDomain;
+﻿using InstaCrawlerApp.Jobs;
+using InstaDomain;
 using InstaInfrastructureAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,15 +1,8 @@
-﻿using InstaCrawlerApp;
+﻿using InstaCrawlerApp.Jobs;
 using InstaInfrastructureAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
-using Quartz.Impl.Calendar;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace InstaJobs
 {
@@ -19,8 +12,8 @@ namespace InstaJobs
         {
             services.AddTransient<QuartzJobWrapper<UserCrawler>>();
             services.AddTransient<QuartzJobWrapper<UserFullDetailsProvider>>();
-            services.AddTransient<QuartzJobWrapper<Follower>>();
-            services.AddTransient<QuartzJobWrapper<Unfollower>>();
+            services.AddTransient<QuartzFuzzyJobWrapper<Follower>>();
+            services.AddTransient<QuartzFuzzyJobWrapper<Unfollower>>();
             //services.AddTransient<>
 
             //var quartzOptions = 
@@ -39,17 +32,29 @@ namespace InstaJobs
                 q.UseInMemoryStore();
                 q.UseDefaultThreadPool(tp =>
                 {
-                    tp.MaxConcurrency = 2;
+                    tp.MaxConcurrency = 4; // 1 for each possible job
                 });
 
                 // quickest way to create a job with single trigger is to use ScheduleJob
                 // (requires version 3.2)
-                q.ScheduleJob<QuartzJobWrapper<Unfollower>>(trigger => trigger
-                    .WithIdentity("Combined Configuration Trigger")
-                    .StartAt(DateBuilder.EvenSecondDate(DateTimeOffset.UtcNow.AddSeconds(7)))
-                    .WithDailyTimeIntervalSchedule(x => x.WithInterval(10, IntervalUnit.Second))
-                    .WithDescription("my awesome trigger configured for a job with single call")
+                //var jobKey = new JobKey(nameof(Unfollower));
+
+                q.ScheduleJob<QuartzFuzzyJobWrapper<Unfollower>>(trigger => trigger
+                    .WithIdentity(nameof(Unfollower))
+                    .StartNow()
+                    //.StartAt(DateBuilder.EvenHourDate(DateTimeOffset.Now))
+                    //.WithDailyTimeIntervalSchedule(x => x.WithInterval(2, IntervalUnit.Day))
+                    //.WithCronSchedule("0 0 1-31/2 * *")
+                    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(1, 41))
                 );
+
+                /*
+                 * # Will only run on odd days:
+0 0 1-31/2 * * command
+
+# Will only run on even days:
+0 0 2-30/2 * * command
+                 */
 
                 // you can also configure individual jobs and triggers with code
                 // this allows you to associated multiple triggers with same job

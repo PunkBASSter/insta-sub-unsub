@@ -6,7 +6,7 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Logging;
 using System.Data;
 
-namespace InstaCrawlerApp
+namespace InstaCrawlerApp.Jobs
 {
     /// <summary>
     /// Acts on behalf of main account owner
@@ -17,7 +17,7 @@ namespace InstaCrawlerApp
         private readonly IFollowingsProvider _followingsProvider;
         private readonly IRepository _repo;
         private readonly InstaAccount _account;
-        
+
         public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider,
             IRepository repo, ILogger<Unfollower> logger, IConfiguration conf) : base(repo, logger)
         {
@@ -27,17 +27,17 @@ namespace InstaCrawlerApp
             _account = new InstaAccount(conf.GetRequiredSection("FollowUser:Username").Value,
                 conf.GetRequiredSection("FollowUser:Password").Value);
             LimitPerIteration = Convert.ToInt32(conf.GetRequiredSection("Unfollow:LimitPerIteration").Value)
-                + new Random(DateTime.Now.Microsecond).Next(-4,4);
+                + new Random(DateTime.Now.Microsecond).Next(-4, 4);
         }
 
         private InstaUser? _mainAccountUser;
-        private InstaUser MainAccountUser 
+        private InstaUser MainAccountUser
         {
             get
             {
                 _mainAccountUser ??= _repo.Query<InstaUser>().First(u => u.Name == _account.Username);
-                return _mainAccountUser; 
-            } 
+                return _mainAccountUser;
+            }
         }
 
         protected override int LimitPerIteration { get; set; }
@@ -73,8 +73,8 @@ namespace InstaCrawlerApp
         private int UnfollowBasedOnDb()
         {
             var dbUsersToUnfollow = _repo.Query<InstaUser>()
-                .Where(usr => usr.Status == UserStatus.Followed 
-                    && usr.FollowingDate > default(DateTime) 
+                .Where(usr => usr.Status == UserStatus.Followed
+                    && usr.FollowingDate > default(DateTime)
                     && usr.FollowingDate <= DateTime.UtcNow.AddDays(-14) && usr.UnfollowingDate == null)
                 .OrderBy(usr => usr.FollowingDate)
                 .Take(LimitPerIteration)

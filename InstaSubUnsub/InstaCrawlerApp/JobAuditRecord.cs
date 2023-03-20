@@ -1,4 +1,5 @@
-﻿using InstaDomain;
+﻿using InstaCrawlerApp.Jobs;
+using InstaDomain;
 
 namespace InstaCrawlerApp
 {
