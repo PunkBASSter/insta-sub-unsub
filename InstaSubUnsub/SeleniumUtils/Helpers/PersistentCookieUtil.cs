@@ -1,7 +1,7 @@
-﻿using InstaCommon;
+﻿using InstaCommon.Contracts;
+using InstaInfrastructureAbstractions;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
-using System.Text.Json.Serialization;
 
 namespace SeleniumUtils.Helpers
 {
@@ -11,52 +11,42 @@ namespace SeleniumUtils.Helpers
     public class PersistentCookieUtil
     {
         private readonly IWebDriver _driver;
-        private readonly string? _savedCookiesPath;
+        private readonly string? _cookieKey;
+        private readonly IKeyValueObjectStorage<InstaCookies> _cookieStorage;
 
-        public PersistentCookieUtil(IWebDriver driver, IConfiguration conf)
+        public PersistentCookieUtil(IWebDriver driver, IConfiguration conf, IKeyValueObjectStorage<InstaCookies> cookieStorage)
         {
             _driver = driver;
-            _savedCookiesPath = conf.GetRequiredSection("SavedCookiesPath").Value;
+            _cookieKey = conf.GetRequiredSection("SavedCookiesPath").Value;
+            _cookieStorage = cookieStorage;
         }
 
-        public void SaveCookies() //TODO Maybe validate cookies for expiration ?
+        public void SaveCookies(string username)
         {
-            ValidatePath();
+            ValidateKey(username);
 
-            var cookies = _driver.Manage().Cookies.AllCookies.ToList();
-#pragma warning disable CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
-            JsonFileIO.Write(_savedCookiesPath, cookies);
-#pragma warning restore CS8604 // Возможно, аргумент-ссылка, допускающий значение NULL.
+            var cookies = new InstaCookies(_driver.Manage().Cookies.AllCookies.Cast<DeserializeableCookie>());
+#pragma warning disable CS8604 //validation will fail if null
+            _cookieStorage.Write(_cookieKey + username, cookies);
+#pragma warning restore CS8604
         }
 
-        public bool LoadCookies()
+        public bool LoadCookies(string username)
         {
-            ValidatePath();
-
-            if (!File.Exists(_savedCookiesPath))
-                return false;
+            ValidateKey(username);
 
             _driver.Manage().Cookies.DeleteAllCookies();
-            var loadedCookies = JsonFileIO.Read<List<DeserializeableCookie>>(_savedCookiesPath) ?? new List<DeserializeableCookie>();
+            var loadedCookies = _cookieStorage.Read(_cookieKey + username) ?? new List<DeserializeableCookie>();
             loadedCookies
                 .ForEach(_driver.Manage().Cookies.AddCookie);
 
             return loadedCookies.Count > 0;
         }
 
-        private void ValidatePath() 
+        private void ValidateKey(string username)
         {
-            if (_savedCookiesPath is null)
+            if (string.IsNullOrWhiteSpace(_cookieKey + username))
                 throw new ArgumentNullException("No value assigned for SavedCookiePath parameter.");
         }
-    }
-
-    internal class DeserializeableCookie : Cookie
-    {
-        [JsonConstructor]
-        public DeserializeableCookie(string name, string value,
-            string domain, string path, DateTime? expiry, bool secure, bool isHttpOnly, string sameSite) :
-            base(name, value, domain, path, expiry, secure, isHttpOnly, sameSite)
-        { }
     }
 }

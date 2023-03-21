@@ -15,6 +15,8 @@ namespace SeleniumUtils.UiActions
         {
         }
 
+        protected override string ConfigSectionName => "FollowUser";
+
         public bool Unfollow(InstaUser user, InstaAccount? account = null)
         {
             Login(account);

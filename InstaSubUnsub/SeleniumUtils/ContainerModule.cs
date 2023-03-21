@@ -1,4 +1,5 @@
-﻿using InstaInfrastructureAbstractions;
+﻿using InstaCommon.Contracts;
+using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

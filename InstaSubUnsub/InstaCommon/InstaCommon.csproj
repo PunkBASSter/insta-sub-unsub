@@ -6,4 +6,12 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Selenium.WebDriver" Version="4.8.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\InstaInfrastructureAbstractions\InstaInfrastructureAbstractions.csproj" />
+  </ItemGroup>
+
 </Project>

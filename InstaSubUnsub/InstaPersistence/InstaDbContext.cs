@@ -1,6 +1,8 @@
-﻿using InstaCrawlerApp;
+﻿using InstaCommon.Contracts;
+using InstaCrawlerApp;
 using InstaDomain;
 using InstaPersistence.DataSeed;
+using InstaPersistence.Utils;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -15,6 +17,8 @@ namespace InstaPersistence
         public DbSet<UserRelation> UserRelations { get; set; }
 
         public DbSet<JobAuditRecord> JobAudit { get; set; }
+
+        public DbSet<KeyValueJson> KeyValueJsonObjects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

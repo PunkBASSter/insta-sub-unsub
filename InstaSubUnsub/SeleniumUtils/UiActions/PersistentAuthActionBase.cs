@@ -7,7 +7,7 @@ using SeleniumUtils.PageObjects;
 
 namespace SeleniumUtils.UiActions
 {
-    public class PersistentAuthActionBase : UiActionBase
+    public abstract class PersistentAuthActionBase : UiActionBase
     {
         private readonly PersistentCookieUtil _cookieUtil;
 
@@ -15,8 +15,6 @@ namespace SeleniumUtils.UiActions
         {
             _cookieUtil = persistentCookieUtil;
         }
-
-        protected override string ConfigSectionName => "FollowUser";
 
         /// <summary>
         /// Tries to load and apply previously saved cookies if possible.
@@ -30,7 +28,7 @@ namespace SeleniumUtils.UiActions
             var profilePage = new ProfilePage(_webDriver, account.Username);
             profilePage.Load();
 
-            if (!_cookieUtil.LoadCookies())
+            if (!_cookieUtil.LoadCookies(account.Username))
             {
                 return UiLogInSaveCookies(account);
             }
@@ -42,15 +40,15 @@ namespace SeleniumUtils.UiActions
             }
 
             LoggedInUsername ??= account.Username;
-            _cookieUtil.SaveCookies();
+            _cookieUtil.SaveCookies(account.Username);
 
             return true;
         }
 
-        private bool UiLogInSaveCookies(InstaAccount? account) 
+        private bool UiLogInSaveCookies(InstaAccount account) 
         {
             var res = base.Login(account);
-            _cookieUtil.SaveCookies();
+            _cookieUtil.SaveCookies(account.Username);
             return res;
         }
     }

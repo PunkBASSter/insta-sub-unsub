@@ -4,6 +4,8 @@ using InstaPersistence.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using InstaCommon.Contracts;
+using InstaCommon;
 
 namespace InstaPersistence
 {
@@ -21,6 +23,7 @@ namespace InstaPersistence
             });
             services.AddTransient(typeof(IReadRepository), typeof(ReadRepository));
             services.AddTransient(typeof(IRepository), typeof(Repository.Repository));
+            services.AddScoped<IKeyValueObjectStorage<InstaCookies>, JsonDbStorage<InstaCookies>>();
         }
     }
 }
