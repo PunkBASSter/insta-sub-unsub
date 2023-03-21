@@ -25,7 +25,7 @@ namespace SeleniumUtils.Helpers
         {
             ValidateKey(username);
 
-            var cookies = new InstaCookies(_driver.Manage().Cookies.AllCookies.Cast<DeserializeableCookie>());
+            var cookies = new InstaCookies(_driver.Manage().Cookies.AllCookies.Select(c => new DeserializeableCookie(c)));
 #pragma warning disable CS8604 //validation will fail if null
             _cookieStorage.Write(_cookieKey + username, cookies);
 #pragma warning restore CS8604
