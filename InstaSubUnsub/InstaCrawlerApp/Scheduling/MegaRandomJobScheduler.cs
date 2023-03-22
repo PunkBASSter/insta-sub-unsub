@@ -2,7 +2,7 @@
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
 
-namespace InstaCrawlerApp
+namespace InstaCrawlerApp.Scheduling
 {
     /// <summary>
     /// Decorates the ordinary job to be executed with randomized intervals 
@@ -10,35 +10,11 @@ namespace InstaCrawlerApp
     /// To make it work just schedule the decorated job at the new day start.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class FuzzyJobScheduler<T> where T : JobBase
+    public class MegaRandomJobScheduler<T> : JobSchedulerBase<T> where T : JobBase
     {
-    //    private readonly IRepository _repository;
-    //    private readonly IConfiguration _configuration;
-        private readonly T _jobInstance;
-        
-        public FuzzyJobScheduler(T jobInstance)//, IRepository repo, IConfiguration conf) 
-        {
-            //_repository = repo;
-            //_configuration = conf;
-            _jobInstance = jobInstance;
-        }
+        public MegaRandomJobScheduler(T jobInstance) : base(jobInstance) { }
 
-        public async Task Execute(CancellationToken cancellationToken)
-        {
-            var schedule = GenerateSchedule();
-
-            foreach(var iteration in schedule)
-            {
-                var timeDiff = iteration.Start - DateTime.UtcNow;
-                if (timeDiff.Seconds > 0)
-                {
-                    await Task.Delay(timeDiff, cancellationToken);
-                    await _jobInstance.Execute(cancellationToken);
-                }
-            }
-        }
-
-        private JobSchedule[] GenerateSchedule()
+        protected override JobScheduleItem[] GenerateSchedule()
         {
             var rnd = new Random(DateTime.Now.Millisecond);
             var startingHour = TimeSpan.FromHours(10);
@@ -49,19 +25,19 @@ namespace InstaCrawlerApp
 
             var dailyLimit = 45 + rnd.Next(-3, 4);
             var iterationsNumber = rnd.Next(3, 11);
-            var iterationLimitBase = dailyLimit/iterationsNumber;
+            var iterationLimitBase = dailyLimit / iterationsNumber;
 
-            var iterationsPlanned = new JobSchedule[iterationsNumber];
-            
+            var iterationsPlanned = new JobScheduleItem[iterationsNumber];
+
             var iterationSum = 0;
             var workingTimeSpan = periodEnd - periodStart;
-            var intervalBetweenIterations = workingTimeSpan.TotalSeconds / (iterationsNumber-1);
+            var intervalBetweenIterations = workingTimeSpan.TotalSeconds / (iterationsNumber - 1);
             int intervalDispersion = Math.Min(Convert.ToInt32(intervalBetweenIterations / 2), 2400);
             for (var i = 1; i < iterationsNumber; i++)
             {
-                var iteration = new JobSchedule
+                var iteration = new JobScheduleItem
                 {
-                    Start = periodStart
+                    StartTime = periodStart
                     + TimeSpan.FromSeconds((i - 1) * intervalBetweenIterations
                     + rnd.Next(-intervalDispersion, intervalDispersion)),
                     LimitPerIteration = iterationLimitBase + rnd.Next(-1, 1),
@@ -71,11 +47,11 @@ namespace InstaCrawlerApp
             }
 
             //last iteration calculated separately
-            iterationsPlanned[iterationsNumber - 1] = new JobSchedule
+            iterationsPlanned[iterationsNumber - 1] = new JobScheduleItem
             {
-                Start = periodEnd + TimeSpan.FromSeconds(rnd.Next(-intervalDispersion, intervalDispersion)),
+                StartTime = periodEnd + TimeSpan.FromSeconds(rnd.Next(-intervalDispersion, intervalDispersion)),
                 LimitPerIteration = dailyLimit - iterationSum,
-            }; 
+            };
 
             return iterationsPlanned;
         }

@@ -7,17 +7,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.Extensions;
+using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
+using SeleniumUtils.UiActions.Base;
 
 namespace SeleniumUtils.UiActions
 {
-    public class InstaUiUserDetailsProvider : UiActionBase, IUserDetailsProvider
+    public class InstaUiUserDetailsProvider : PersistentAuthActionBase, IUserDetailsProvider
     {
         private const double MinimumRank = 3.0; //minimum ratio of followings/followers to proceed with user data mining
 
-        public InstaUiUserDetailsProvider(IWebDriver driver, ILogger<InstaUiUserDetailsProvider> logger, IConfiguration config) : base(driver, logger, config)
-        {
-        }
+        public InstaUiUserDetailsProvider(IWebDriver driver, ILogger<InstaUiUserFollower> logger,
+            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driver, logger, conf, cookieUtil) { }
 
         protected override string ConfigSectionName => "CrawlUser";
 

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
+using SeleniumUtils.UiActions.Base;
 
 namespace SeleniumUtils.UiActions
 {
@@ -12,8 +13,8 @@ namespace SeleniumUtils.UiActions
     {
         private readonly int _postsToLike = 2;
 
-        public InstaUiUserFollower(IWebDriver driver, PersistentCookieUtil cookieUtil,
-            ILogger<InstaUiUserFollower> logger, IConfiguration conf) : base(driver, cookieUtil, logger, conf)
+        public InstaUiUserFollower(IWebDriver driver, ILogger<InstaUiUserFollower> logger, 
+            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driver, logger, conf, cookieUtil)
         {
         }
 

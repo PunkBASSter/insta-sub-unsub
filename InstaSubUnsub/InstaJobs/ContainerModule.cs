@@ -12,8 +12,8 @@ namespace InstaJobs
         {
             services.AddTransient<QuartzJobWrapper<UserCrawler>>();
             services.AddTransient<QuartzJobWrapper<UserFullDetailsProvider>>();
-            services.AddTransient<QuartzFuzzyJobWrapper<Follower>>();
-            services.AddTransient<QuartzFuzzyJobWrapper<Unfollower>>();
+            services.AddTransient<MegaRandomQuartzJobWrapper<Follower>>();
+            services.AddTransient<MegaRandomQuartzJobWrapper<Unfollower>>();
             //services.AddTransient<>
 
             //var quartzOptions = 
@@ -39,13 +39,13 @@ namespace InstaJobs
                 // (requires version 3.2)
                 //var jobKey = new JobKey(nameof(Unfollower));
 
-                q.ScheduleJob<QuartzFuzzyJobWrapper<Unfollower>>(trigger => trigger
+                q.ScheduleJob<MegaRandomQuartzJobWrapper<Unfollower>>(trigger => trigger
                     .WithIdentity(nameof(Unfollower))
                     .StartNow()
                     //.StartAt(DateBuilder.EvenHourDate(DateTimeOffset.Now))
-                    //.WithDailyTimeIntervalSchedule(x => x.WithInterval(2, IntervalUnit.Day))
+                    .WithDailyTimeIntervalSchedule(x => x.WithInterval(2, IntervalUnit.Day))
                     //.WithCronSchedule("0 0 1-31/2 * *")
-                    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(1, 41))
+                    //.WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(1, 59))
                 );
 
                 /*

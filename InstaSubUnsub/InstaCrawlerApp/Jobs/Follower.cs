@@ -1,4 +1,5 @@
-﻿using InstaDomain;
+﻿using InstaCommon.Config.Jobs;
+using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
@@ -11,29 +12,14 @@ namespace InstaCrawlerApp.Jobs
         private readonly IRepository _repo;
         private readonly int _subLimitPerIteration;
 
-        public Follower(IUserFollower userFollower, IRepository repo, ILogger<Follower> logger) : base(repo, logger)
+        public Follower(IUserFollower userFollower, IRepository repo, ILogger<Follower> logger, FollowerJobConfig config) : base(repo, logger, config)
         {
             _userFollower = userFollower;
             _repo = repo;
-            _subLimitPerIteration = 13 + new Random(DateTime.Now.Millisecond).Next(-2, 2);
+            _subLimitPerIteration = Config.LimitPerIteration + new Random(DateTime.Now.Millisecond).Next(-Config.LimitDispersion, Config.LimitPerIteration);
         }
 
-        protected override int LimitPerIteration { get; set; }
-
-        protected override async Task<JobAuditRecord> ExecuteInternal(JobAuditRecord auditRecord, CancellationToken stoppingToken)
-        {
-            return await Task.Run(() =>
-            {
-                var followed = Follow();
-                auditRecord.ProcessedNumber = followed;
-                auditRecord.LimitPerIteration = LimitPerIteration;
-                auditRecord.AccountName = _userFollower.LoggedInUsername ?? string.Empty;
-
-                return auditRecord;
-            }, stoppingToken);
-        }
-
-        public int Follow()
+        protected override int ExecuteInternal()
         {
             var usersToFollow = _repo.Query<InstaUser>().Where(u => u.Rank >= 3 && u.HasRussianText == true
                 && u.LastPostDate >= DateTime.UtcNow.AddDays(-7).Date

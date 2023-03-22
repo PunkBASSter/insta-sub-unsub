@@ -4,13 +4,16 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
+using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
+using SeleniumUtils.UiActions.Base;
 
 namespace SeleniumUtils.UiActions
 {
-    public class InstaUiFollowersProvider : UiActionBase, IFollowersProvider
+    public class InstaUiFollowersProvider : PersistentAuthActionBase, IFollowersProvider
     {
-        public InstaUiFollowersProvider(IWebDriver driver, ILogger<InstaUiFollowersProvider> logger, IConfiguration config) : base(driver, logger, config) { }
+        public InstaUiFollowersProvider(IWebDriver driver, ILogger<InstaUiUserFollower> logger,
+            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driver, logger, conf, cookieUtil) { }
 
         protected override string ConfigSectionName => "CrawlUser";
 

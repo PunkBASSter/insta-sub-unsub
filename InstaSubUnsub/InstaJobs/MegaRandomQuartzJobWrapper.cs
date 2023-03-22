@@ -1,14 +1,14 @@
-﻿using InstaCrawlerApp;
-using InstaCrawlerApp.Jobs;
+﻿using InstaCrawlerApp.Jobs;
+using InstaCrawlerApp.Scheduling;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
 
 namespace InstaJobs
 {
     [DisallowConcurrentExecution]
-    internal class QuartzFuzzyJobWrapper<T> : QuartzJobWrapper<T> where T : JobBase
+    public class MegaRandomQuartzJobWrapper<T> : QuartzJobWrapper<T> where T : JobBase
     {
-        public QuartzFuzzyJobWrapper(IServiceProvider serviceProvider) : base(serviceProvider)
+        public MegaRandomQuartzJobWrapper(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
 
@@ -16,8 +16,7 @@ namespace InstaJobs
         {
             using var scope = _serviceProvider.CreateScope();
 
-            var job = scope.ServiceProvider.GetRequiredService<T>();
-            var fuzzyScheduledJob = new FuzzyJobScheduler<T>(job);
+            var fuzzyScheduledJob = scope.ServiceProvider.GetRequiredService<MegaRandomJobScheduler<T>>();
             await fuzzyScheduledJob.Execute(stoppingToken);
         }
     }

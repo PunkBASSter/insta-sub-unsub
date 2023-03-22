@@ -5,15 +5,16 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
+using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
+using SeleniumUtils.UiActions.Base;
 
 namespace SeleniumUtils.UiActions
 {
-    public class InstaUiFollowingsProvider : UiActionBase, IFollowingsProvider
+    public class InstaUiFollowingsProvider : PersistentAuthActionBase, IFollowingsProvider
     {
-        public InstaUiFollowingsProvider(IWebDriver driver, ILogger<UiActionBase> logger, IConfiguration conf) : base(driver, logger, conf)
-        {
-        }
+        public InstaUiFollowingsProvider(IWebDriver driver, ILogger<InstaUiUserFollower> logger,
+            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driver, logger, conf, cookieUtil) { }
 
         public int Limit { get; set; }
 

@@ -5,6 +5,7 @@ using InstaDomain.Enums;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Logging;
 using System.Data;
+using InstaCommon.Config.Jobs;
 
 namespace InstaCrawlerApp.Jobs
 {
@@ -19,15 +20,13 @@ namespace InstaCrawlerApp.Jobs
         private readonly InstaAccount _account;
 
         public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider,
-            IRepository repo, ILogger<Unfollower> logger, IConfiguration conf) : base(repo, logger)
+            IRepository repo, ILogger<Unfollower> logger, UnfollowerJobConfig conf) : base(repo, logger, conf)
         {
             _userUnfollower = unfollower;
             _repo = repo;
             _followingsProvider = followingsProvider;
-            _account = new InstaAccount(conf.GetRequiredSection("FollowUser:Username").Value,
-                conf.GetRequiredSection("FollowUser:Password").Value);
-            LimitPerIteration = Convert.ToInt32(conf.GetRequiredSection("Unfollow:LimitPerIteration").Value)
-                + new Random(DateTime.Now.Microsecond).Next(-4, 4);
+            _account = new InstaAccount(conf.Expose().GetRequiredSection("FollowUser:Username").Value,
+                conf.Expose().GetRequiredSection("FollowUser:Password").Value);
         }
 
         private InstaUser? _mainAccountUser;
@@ -40,22 +39,7 @@ namespace InstaCrawlerApp.Jobs
             }
         }
 
-        protected override int LimitPerIteration { get; set; }
-
-        protected override async Task<JobAuditRecord> ExecuteInternal(JobAuditRecord auditRecord, CancellationToken stoppingToken)
-        {
-            return await Task.Run(() =>
-            {
-                var crawled = Unfollow();
-                auditRecord.ProcessedNumber = crawled;
-                auditRecord.LimitPerIteration = LimitPerIteration;
-                auditRecord.AccountName = _followingsProvider.LoggedInUsername ?? string.Empty;
-
-                return auditRecord;
-            }, stoppingToken);
-        }
-
-        public int Unfollow()
+        protected override int ExecuteInternal()
         {
             _userUnfollower.Login(_account);
 

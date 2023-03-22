@@ -5,13 +5,13 @@ using OpenQA.Selenium;
 using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
 
-namespace SeleniumUtils.UiActions
+namespace SeleniumUtils.UiActions.Base
 {
     public abstract class PersistentAuthActionBase : UiActionBase
     {
         private readonly PersistentCookieUtil _cookieUtil;
 
-        public PersistentAuthActionBase(IWebDriver driver, PersistentCookieUtil persistentCookieUtil, ILogger<UiActionBase> logger, IConfiguration configuration) : base(driver, logger, configuration)
+        public PersistentAuthActionBase(IWebDriver driver, ILogger<UiActionBase> logger, IConfiguration configuration, PersistentCookieUtil persistentCookieUtil) : base(driver, logger, configuration)
         {
             _cookieUtil = persistentCookieUtil;
         }
@@ -45,7 +45,7 @@ namespace SeleniumUtils.UiActions
             return true;
         }
 
-        private bool UiLogInSaveCookies(InstaAccount account) 
+        private bool UiLogInSaveCookies(InstaAccount account)
         {
             var res = base.Login(account);
             _cookieUtil.SaveCookies(account.Username);

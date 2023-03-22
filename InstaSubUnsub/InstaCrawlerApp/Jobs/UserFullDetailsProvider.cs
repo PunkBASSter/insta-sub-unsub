@@ -3,6 +3,7 @@ using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using InstaDomain.Enums;
 using Microsoft.Extensions.Logging;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
+using InstaCommon.Config.Jobs;
 
 namespace InstaCrawlerApp.Jobs
 {
@@ -11,8 +12,9 @@ namespace InstaCrawlerApp.Jobs
     /// </summary>
     public class UserFullDetailsProvider : UserQuickDetailsProvider
     {
-        public UserFullDetailsProvider(IUserDetailsProvider detailsProvider, IRepository repo, ILogger<UserFullDetailsProvider> logger)
-            : base(detailsProvider, repo, logger)
+        public UserFullDetailsProvider(IUserDetailsProvider detailsProvider, IRepository repo,
+            ILogger<UserFullDetailsProvider> logger, UserFullDetailsProviderJobConfig config)
+            : base(detailsProvider, repo, logger, config)
         {
         }
 
@@ -24,7 +26,7 @@ namespace InstaCrawlerApp.Jobs
                 && u.Rank == 0
                 && u.FollowingDate == null
                 && u.UnfollowingDate == null
-            ).Take(_batchSize).ToList();
+            ).Take(LimitPerIteration).ToList();
 
             return usersToVisit;
         }

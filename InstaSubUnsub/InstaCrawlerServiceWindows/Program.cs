@@ -1,5 +1,7 @@
+using InstaCommon.Config.Jobs;
 using InstaPersistence;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 IHost host = Host.CreateDefaultBuilder(args)
     .ConfigureServices((hostBuilderContext, services) =>
@@ -11,6 +13,12 @@ IHost host = Host.CreateDefaultBuilder(args)
         new SeleniumUtils.ContainerModule().Register(services, config);
         new InstaJobs.ContainerModule().Register(services, config); //Already contains Quartz HostService registration.
         //services.AddHostedService<ScopedWorker>();
+
+        var configurationRoot = config;
+
+        var options =
+            configurationRoot.GetSection(nameof(JobConfigBase))
+                             .Get<JobConfigBase>();
     })
     .Build();
 

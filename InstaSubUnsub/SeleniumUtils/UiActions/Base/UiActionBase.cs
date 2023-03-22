@@ -1,12 +1,11 @@
-﻿using InstaCommon.Exceptions;
-using InstaDomain;
+﻿using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumUtils.PageObjects;
 
-namespace SeleniumUtils.UiActions
+namespace SeleniumUtils.UiActions.Base
 {
     public abstract class UiActionBase : ILoggedInUserState
     {
@@ -44,7 +43,7 @@ namespace SeleniumUtils.UiActions
             if (!string.IsNullOrWhiteSpace(LoggedInUsername))
                 //TODO implement re-logging as the required user
                 return false;
-            
+
             var loginPage = new LoginPage(_webDriver);
             loginPage.Load();
             loginPage.Login(account.Username, account.Password);

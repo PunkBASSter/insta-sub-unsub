@@ -1,4 +1,5 @@
 ﻿using InstaCommon;
+using InstaCommon.Config.Jobs;
 using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
@@ -12,29 +13,13 @@ namespace InstaCrawlerApp.Jobs
         private readonly IUserDetailsProvider _detailsProvider;
 
         public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider,
-            IRepository repo, ILogger<UserCrawler> logger) : base(repo, logger)
+            IRepository repo, ILogger<UserCrawler> logger, UserCrawlerJobConfig config) : base(repo, logger, config)
         {
             _followersProvider = followersProvider;
             _detailsProvider = detailsProvider;
-            LimitPerIteration += new Random(DateTime.Now.Microsecond).Next(-82, 47); //randomizing the iteration limit
         }
 
-        protected override int LimitPerIteration { get; set; }
-
-        protected override async Task<JobAuditRecord> ExecuteInternal(JobAuditRecord auditRecord, CancellationToken stoppingToken)
-        {
-            return await Task.Run(() =>
-            {
-                var crawled = Crawl();
-                auditRecord.ProcessedNumber = crawled;
-                auditRecord.LimitPerIteration = LimitPerIteration;
-                auditRecord.AccountName = _followersProvider.LoggedInUsername ?? string.Empty;
-
-                return auditRecord;
-            }, stoppingToken);
-        }
-
-        public int Crawl()
+        protected override int ExecuteInternal()
         {
             var crawledUsersCount = 0;
 

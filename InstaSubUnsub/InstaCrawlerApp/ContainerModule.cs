@@ -1,5 +1,5 @@
 ﻿using InstaCrawlerApp.Jobs;
-using InstaDomain;
+using InstaCrawlerApp.Scheduling;
 using InstaInfrastructureAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +17,9 @@ namespace InstaCrawlerApp
 
             services.AddScoped<UserCrawler>();
             services.AddScoped<UserFullDetailsProvider>();
+
+            services.AddScoped(typeof(MegaRandomJobScheduler<>));
+            services.AddScoped(typeof(RandomDelayJobScheduler<>));
         }
     }
 }

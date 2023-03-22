@@ -1,4 +1,5 @@
-﻿using InstaCommon.Exceptions;
+﻿using InstaCommon.Config.Jobs;
+using InstaCommon.Exceptions;
 using InstaDomain;
 using InstaDomain.Enums;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
@@ -11,42 +12,25 @@ namespace InstaCrawlerApp.Jobs
     {
         protected readonly IUserDetailsProvider _userDetailsProvider;
         protected readonly IRepository _repo;
-        protected readonly int _batchSize;
         private int _consequentAntiBotFailures = 0;
         protected readonly ILogger<UserQuickDetailsProvider> _logger;
 
         public UserQuickDetailsProvider(IUserDetailsProvider userDetailsProvider, IRepository repo,
-            ILogger<UserQuickDetailsProvider> logger) : base(repo, logger)
+            ILogger<UserQuickDetailsProvider> logger, UserFullDetailsProviderJobConfig config) : base(repo, logger, config)
         {
             _userDetailsProvider = userDetailsProvider;
             _repo = repo;
-            _batchSize = 200 + new Random(DateTime.Now.Microsecond).Next(-14, 17);
             _logger = logger;
         }
 
-        protected override int LimitPerIteration { get; set; }
-
-        protected override async Task<JobAuditRecord> ExecuteInternal(JobAuditRecord auditRecord, CancellationToken stoppingToken)
-        {
-            return await Task.Run(() =>
-            {
-                var crawled = ProvideDetails();
-                auditRecord.ProcessedNumber = crawled;
-                auditRecord.LimitPerIteration = LimitPerIteration;
-                auditRecord.AccountName = _userDetailsProvider.LoggedInUsername ?? string.Empty;
-
-                return auditRecord;
-            }, stoppingToken);
-        }
-
-        public int ProvideDetails()
+        protected override int ExecuteInternal()
         {
             var users = FetchUsersToFill();
 
             if (users.Count < 1 || !Initialize())
                 return 0;
 
-            _logger.LogInformation("Started {0} iteration. Max BatchSize is {1}", GetType().Name, _batchSize);
+            _logger.LogInformation("Started {0} iteration. Max BatchSize is {1}", GetType().Name, LimitPerIteration);
 
             var processed = 0;
             foreach (var user in users)
@@ -86,7 +70,7 @@ namespace InstaCrawlerApp.Jobs
                 && u.FollowingDate == null
                 && u.UnfollowingDate == null
              )
-            .Take(_batchSize).ToList();
+            .Take(LimitPerIteration).ToList();
         }
 
         protected bool VisitUserProfile(InstaUser user, out InstaUser modified)
