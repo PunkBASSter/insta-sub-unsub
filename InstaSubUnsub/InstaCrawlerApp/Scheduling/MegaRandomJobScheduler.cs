@@ -1,6 +1,5 @@
-﻿using InstaCrawlerApp.Jobs;
-using InstaInfrastructureAbstractions.PersistenceInterfaces;
-using Microsoft.Extensions.Configuration;
+﻿using InstaCommon.Config.Jobs;
+using InstaCrawlerApp.Jobs;
 
 namespace InstaCrawlerApp.Scheduling
 {
@@ -12,48 +11,55 @@ namespace InstaCrawlerApp.Scheduling
     /// <typeparam name="T"></typeparam>
     public class MegaRandomJobScheduler<T> : JobSchedulerBase<T> where T : JobBase
     {
-        public MegaRandomJobScheduler(T jobInstance) : base(jobInstance) { }
+        private readonly JobConfigBase _jobConfig;
 
-        protected override JobScheduleItem[] GenerateSchedule()
+        public MegaRandomJobScheduler(T jobInstance) : base(jobInstance)
+        {
+            _jobConfig = jobInstance.GetConfig();
+        }
+
+        protected override JobExecutionDetails[] GenerateSchedule()
         {
             var rnd = new Random(DateTime.Now.Millisecond);
-            var startingHour = TimeSpan.FromHours(10);
-            var duration = TimeSpan.FromHours(15);
-            var midnight = DateTime.UtcNow.Date;
-            var periodStart = (midnight + startingHour).AddSeconds(rnd.Next(1800));
-            var periodEnd = (periodStart + duration).AddSeconds(-rnd.Next(1800));
 
-            var dailyLimit = 45 + rnd.Next(-3, 4);
-            var iterationsNumber = rnd.Next(3, 11);
-            var iterationLimitBase = dailyLimit / iterationsNumber;
+            var startingHour = TimeSpan.FromHours(_jobConfig.WorkStartingHour ?? 10);
+            var duration = TimeSpan.FromHours(_jobConfig.WorkDurationHours ?? 15);
 
-            var iterationsPlanned = new JobScheduleItem[iterationsNumber];
+            var periodStart = (DateTime.UtcNow.Date + startingHour).AddSeconds(rnd.Next(_jobConfig.MinDelay, _jobConfig.MaxDelay));
+            var periodEnd = (periodStart + duration).AddSeconds(-rnd.Next(_jobConfig.MinDelay, _jobConfig.MaxDelay));
+
+            var dailyLimit = _jobConfig.LimitPerDay + rnd.Next(-_jobConfig.LimitPerDayDispersion, _jobConfig.LimitPerDayDispersion);
+            var iterationsNumber = rnd.Next(_jobConfig.MinIterationsPerDay, _jobConfig.MaxIterationsPerDay);
+            var iterationLimitBase = Math.Max(dailyLimit / iterationsNumber, _jobConfig.LimitPerIteration);
+
+            var iterationsPlanned = new JobExecutionDetails[iterationsNumber];
 
             var iterationSum = 0;
             var workingTimeSpan = periodEnd - periodStart;
             var intervalBetweenIterations = workingTimeSpan.TotalSeconds / (iterationsNumber - 1);
-            int intervalDispersion = Math.Min(Convert.ToInt32(intervalBetweenIterations / 2), 2400);
+            int intervalDispersion = Math.Min(Convert.ToInt32(intervalBetweenIterations / 2), _jobConfig.MaxIntervalDispersion);
             for (var i = 1; i < iterationsNumber; i++)
             {
-                var iteration = new JobScheduleItem
+                var iteration = new JobExecutionDetails
                 {
                     StartTime = periodStart
                     + TimeSpan.FromSeconds((i - 1) * intervalBetweenIterations
                     + rnd.Next(-intervalDispersion, intervalDispersion)),
-                    LimitPerIteration = iterationLimitBase + rnd.Next(-1, 1),
+                    LimitPerIteration = iterationLimitBase + rnd.Next(-_jobConfig.LimitPerIterationDispersion,
+                        _jobConfig.LimitPerIterationDispersion),
                 };
                 iterationsPlanned[i - 1] = iteration;
                 iterationSum += iteration.LimitPerIteration;
             }
 
             //last iteration calculated separately
-            iterationsPlanned[iterationsNumber - 1] = new JobScheduleItem
+            iterationsPlanned[iterationsNumber - 1] = new JobExecutionDetails
             {
                 StartTime = periodEnd + TimeSpan.FromSeconds(rnd.Next(-intervalDispersion, intervalDispersion)),
                 LimitPerIteration = dailyLimit - iterationSum,
             };
 
-            return iterationsPlanned;
+            return iterationsPlanned.OrderBy(i => i.StartTime).ToArray();
         }
     }
 }

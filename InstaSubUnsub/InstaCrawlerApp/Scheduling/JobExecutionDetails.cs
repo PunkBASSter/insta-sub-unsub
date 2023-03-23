@@ -3,7 +3,7 @@ using InstaDomain;
 
 namespace InstaCrawlerApp.Scheduling
 {
-    public class JobScheduleItem : BaseEntity
+    public class JobExecutionDetails : BaseEntity
     {
         public string JobName { get; set; } = nameof(JobBase);
         public DateTime ScheduledAt { get; init; } = DateTime.UtcNow;

@@ -10,13 +10,11 @@ namespace InstaCrawlerApp.Jobs
     {
         private readonly IUserFollower _userFollower;
         private readonly IRepository _repo;
-        private readonly int _subLimitPerIteration;
 
         public Follower(IUserFollower userFollower, IRepository repo, ILogger<Follower> logger, FollowerJobConfig config) : base(repo, logger, config)
         {
             _userFollower = userFollower;
             _repo = repo;
-            _subLimitPerIteration = Config.LimitPerIteration + new Random(DateTime.Now.Millisecond).Next(-Config.LimitDispersion, Config.LimitPerIteration);
         }
 
         protected override int ExecuteInternal()
@@ -25,7 +23,7 @@ namespace InstaCrawlerApp.Jobs
                 && u.LastPostDate >= DateTime.UtcNow.AddDays(-7).Date
                 && u.FollowingDate == null && u.UnfollowingDate == null)
                 .OrderByDescending(u => u.LastPostDate)
-                .Take(_subLimitPerIteration)
+                .Take(LimitPerIteration)
                 .ToArray();
 
             var followed = 0;

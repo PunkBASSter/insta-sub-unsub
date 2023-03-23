@@ -12,12 +12,6 @@ namespace InstaCrawlerApp.Jobs
         protected readonly ILogger<JobBase> Logger;
         protected readonly JobConfigBase Config;
 
-        /// <summary>
-        /// Optional information about the current scheduled job execution.
-        /// If passed, overwrites the config values, particularly LimitPerIteration if non-default.
-        /// </summary>
-        protected JobScheduleItem ScheduleItem { get; private set; } = new JobScheduleItem();
-
         private int? _limitPerIteration;
         protected virtual int LimitPerIteration => _limitPerIteration.GetValueOrDefault();
         
@@ -26,19 +20,20 @@ namespace InstaCrawlerApp.Jobs
             Repository = repo;
             Logger = logger;
             Config = config;
-            _limitPerIteration ??= Config.LimitPerIteration + new Random(DateTime.Now.Millisecond).Next(-Config.LimitDispersion, Config.LimitDispersion);
+            _limitPerIteration ??= Config.LimitPerIteration + new Random(DateTime.Now.Millisecond)
+                .Next(-Config.LimitPerIterationDispersion, Config.LimitPerIterationDispersion);
         }
 
-        public async Task<JobScheduleItem> Execute(JobScheduleItem scheduleItem, CancellationToken cancellation)
+        public async Task<JobExecutionDetails> Execute(JobExecutionDetails scheduleItem, CancellationToken cancellation)
         {
-            ScheduleItem = scheduleItem;
-            if (ScheduleItem.LimitPerIteration != default)
-                _limitPerIteration = ScheduleItem.LimitPerIteration;
+            var executionDetails = scheduleItem;
+            if (executionDetails.LimitPerIteration != default)
+                _limitPerIteration = executionDetails.LimitPerIteration;
 
             Logger.LogInformation("Job {0} started, limit per iteration: {1}.", GetType().Name, LimitPerIteration);
 
-            ScheduleItem.JobName = GetType().Name;
-            ScheduleItem.StartTime = DateTime.UtcNow;
+            executionDetails.JobName = GetType().Name;
+            executionDetails.StartTime = DateTime.UtcNow;
 
             int processed = 0;
             try
@@ -47,19 +42,19 @@ namespace InstaCrawlerApp.Jobs
             }
             catch (Exception ex)
             {
-                ScheduleItem.ErrorInfo = JsonSerializer.Serialize(ex);
+                executionDetails.ErrorInfo = JsonSerializer.Serialize(ex);
             }
 
-            ScheduleItem.ProcessedNumber = processed;
-            ScheduleItem.CompletionTime = DateTime.UtcNow;
+            executionDetails.ProcessedNumber = processed;
+            executionDetails.CompletionTime = DateTime.UtcNow;
 
-            Repository.Insert(ScheduleItem);
+            Repository.Insert(executionDetails);
             Repository.SaveChanges();
 
             Logger.LogInformation("Job {0} finished, limit per iteration: {1}, actually processed {2}.",
-                GetType().Name, LimitPerIteration, ScheduleItem.ProcessedNumber);
+                GetType().Name, LimitPerIteration, executionDetails.ProcessedNumber);
 
-            return ScheduleItem;
+            return executionDetails;
         }
 
         public JobConfigBase GetConfig() => Config;

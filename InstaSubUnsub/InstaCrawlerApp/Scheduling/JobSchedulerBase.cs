@@ -1,16 +1,17 @@
-﻿using InstaCrawlerApp.Jobs;
-using InstaInfrastructureAbstractions.PersistenceInterfaces;
-using Microsoft.Extensions.Configuration;
+﻿using InstaCommon.Config.Jobs;
+using InstaCrawlerApp.Jobs;
 
 namespace InstaCrawlerApp.Scheduling
 {
     public abstract class JobSchedulerBase<T> where T: JobBase
     {
         protected readonly T JobInstance;
+        protected readonly JobConfigBase _jobConfig;
 
         public JobSchedulerBase(T jobInstance)
         {
             JobInstance = jobInstance;
+            _jobConfig = JobInstance.GetConfig();
         }
 
         public virtual async Task Execute(CancellationToken cancellationToken)
@@ -28,6 +29,6 @@ namespace InstaCrawlerApp.Scheduling
             }
         }
 
-        protected abstract JobScheduleItem[] GenerateSchedule();
+        protected abstract JobExecutionDetails[] GenerateSchedule();
     }
 }

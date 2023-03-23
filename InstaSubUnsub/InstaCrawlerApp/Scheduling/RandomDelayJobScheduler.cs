@@ -1,5 +1,4 @@
-﻿using InstaCommon.Config.Schedulers;
-using InstaCrawlerApp.Jobs;
+﻿using InstaCrawlerApp.Jobs;
 
 namespace InstaCrawlerApp.Scheduling
 {
@@ -11,20 +10,15 @@ namespace InstaCrawlerApp.Scheduling
     /// <typeparam name="T"></typeparam>
     public class RandomDelayJobScheduler<T> : JobSchedulerBase<T> where T : JobBase
     {
-        private readonly RandomDelayJobSchedulerConfig _config;
+        public RandomDelayJobScheduler(T jobInstance): base(jobInstance) { }
 
-        public RandomDelayJobScheduler(T jobInstance, RandomDelayJobSchedulerConfig config): base(jobInstance)
-        {
-            _config = config;
-        }
-
-        protected override JobScheduleItem[] GenerateSchedule()
+        protected override JobExecutionDetails[] GenerateSchedule()
         {
             var rnd = new Random(DateTime.Now.Millisecond);
 
-            var scheduleItem = new JobScheduleItem
+            var scheduleItem = new JobExecutionDetails
             {
-                StartTime = DateTime.UtcNow + TimeSpan.FromSeconds(rnd.Next(_config.MinDelay, _config.MaxDelay)),
+                StartTime = DateTime.UtcNow + TimeSpan.FromSeconds(rnd.Next(_jobConfig.MinDelay, _jobConfig.MaxDelay)),
             };
 
             return new[] { scheduleItem };

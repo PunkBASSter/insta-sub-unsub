@@ -1,5 +1,4 @@
-﻿using InstaCommon.Contracts;
-using InstaCrawlerApp;
+﻿using InstaCrawlerApp.Scheduling;
 using InstaDomain;
 using InstaPersistence.DataSeed;
 using InstaPersistence.Utils;
@@ -16,7 +15,7 @@ namespace InstaPersistence
 
         public DbSet<UserRelation> UserRelations { get; set; }
 
-        public DbSet<JobAuditRecord> JobAudit { get; set; }
+        public DbSet<JobExecutionDetails> JobExecutionDetails { get; set; }
 
         public DbSet<KeyValueJson> KeyValueJsonObjects { get; set; }
 
