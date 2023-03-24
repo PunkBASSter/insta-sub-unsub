@@ -1,9 +1,11 @@
 ﻿using InstaCommon.Config.Jobs;
+using InstaCommon.JsonConverters;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaCrawlerApp.Scheduling;
 using InstaDomain.Account;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace InstaCrawlerApp.Jobs
@@ -40,6 +42,7 @@ namespace InstaCrawlerApp.Jobs
             Logger.LogInformation("Job {0} started, limit per iteration: {1}.", GetType().Name, LimitPerIteration);
 
             executionDetails.JobName = GetType().Name;
+            executionDetails.Username = Account.Username;
             executionDetails.StartTime = DateTime.UtcNow;
 
             int processed = 0;
@@ -49,7 +52,7 @@ namespace InstaCrawlerApp.Jobs
             }
             catch (Exception ex)
             {
-                executionDetails.ErrorInfo = JsonSerializer.Serialize(ex);
+                executionDetails.ErrorInfo = HandleException(ex);
             }
 
             executionDetails.ProcessedNumber = processed;
@@ -69,5 +72,23 @@ namespace InstaCrawlerApp.Jobs
         public JobConfigBase GetConfig() => Config;
 
         protected abstract int ExecuteInternal();
+
+        private string HandleException(Exception ex)
+        {
+            Logger.LogError(ex, ex.Message, ex.StackTrace);
+            var error = "ERROR";
+            try
+            {
+                var options = new JsonSerializerOptions();
+                options.Converters.Add(new ExceptionConverter());
+                error = JsonSerializer.Serialize(ex, options);
+            }
+            catch (Exception e)
+            {
+                Logger.LogError(e, e.Message, e.StackTrace);
+            }
+
+            return error;
+        }
     }
 }
