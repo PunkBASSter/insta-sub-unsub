@@ -4,7 +4,7 @@ using InstaDomain.Enums;
 using Microsoft.Extensions.Logging;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaCommon.Config.Jobs;
-using InstaInfrastructureAbstractions;
+using InstaCrawlerApp.Account.Interfaces;
 
 namespace InstaCrawlerApp.Jobs
 {

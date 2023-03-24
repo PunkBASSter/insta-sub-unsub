@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using System.Data;
 using InstaCommon.Config.Jobs;
 using InstaDomain.Account;
-using InstaInfrastructureAbstractions;
+using InstaCrawlerApp.Account.Interfaces;
 
 namespace InstaCrawlerApp.Jobs
 {

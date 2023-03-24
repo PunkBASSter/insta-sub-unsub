@@ -1,5 +1,6 @@
 ﻿using InstaCrawlerApp.Scheduling;
 using InstaDomain;
+using InstaDomain.Account;
 using InstaPersistence.DataSeed;
 using InstaPersistence.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,8 @@ namespace InstaPersistence
         public DbSet<JobExecutionDetails> JobExecutionDetails { get; set; }
 
         public DbSet<KeyValueJson> KeyValueJsonObjects { get; set; }
+
+        public DbSet<AccountUsageHistory> ServiceAccountsHistory { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

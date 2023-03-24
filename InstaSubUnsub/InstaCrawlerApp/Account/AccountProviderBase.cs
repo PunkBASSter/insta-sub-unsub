@@ -1,5 +1,5 @@
-﻿using InstaDomain.Account;
-using InstaInfrastructureAbstractions;
+﻿using InstaCrawlerApp.Account.Interfaces;
+using InstaDomain.Account;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 
 namespace InstaCrawlerApp.Account

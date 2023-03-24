@@ -1,7 +1,10 @@
-﻿using InstaCommon;
+﻿using Domain.Account;
+using InstaCommon;
 using InstaCrawlerApp.Account;
+using InstaCrawlerApp.Account.Interfaces;
 using InstaCrawlerApp.Jobs;
 using InstaCrawlerApp.Scheduling;
+using InstaDomain.Account;
 using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +26,10 @@ namespace InstaCrawlerApp
 
             services.AddScoped(typeof(MegaRandomJobScheduler<>));
             services.AddScoped(typeof(RandomDelayJobScheduler<>));
+
+            //This is required to generate migrations as AccountUsageHistory entity does not have a default ctor.
+            services.AddTransient<InstaAccount>(sp =>
+                new ConfigurableInstaAccount(sp.GetRequiredService<IConfiguration>().GetRequiredSection("CrawlUser")));
 
             services.AddScoped<IAccountProvider<Follower>, AccountFromConfigProvider<Follower>>(sp =>
                 new AccountFromConfigProvider<Follower>(

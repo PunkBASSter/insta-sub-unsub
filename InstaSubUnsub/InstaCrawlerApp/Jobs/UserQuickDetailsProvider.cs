@@ -1,8 +1,8 @@
 ﻿using InstaCommon.Config.Jobs;
 using InstaCommon.Exceptions;
+using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain;
 using InstaDomain.Enums;
-using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;

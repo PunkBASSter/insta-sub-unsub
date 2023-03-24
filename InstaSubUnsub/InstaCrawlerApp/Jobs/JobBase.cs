@@ -1,7 +1,7 @@
 ﻿using InstaCommon.Config.Jobs;
+using InstaCrawlerApp.Account.Interfaces;
 using InstaCrawlerApp.Scheduling;
 using InstaDomain.Account;
-using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
 using System.Text.Json;

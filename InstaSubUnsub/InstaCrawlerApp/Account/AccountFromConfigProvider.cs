@@ -1,6 +1,6 @@
 ﻿using Domain.Account;
+using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain.Account;
-using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
 

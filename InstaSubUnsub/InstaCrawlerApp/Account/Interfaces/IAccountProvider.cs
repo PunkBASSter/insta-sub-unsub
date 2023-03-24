@@ -1,6 +1,6 @@
 ﻿using InstaDomain.Account;
 
-namespace InstaInfrastructureAbstractions
+namespace InstaCrawlerApp.Account.Interfaces
 {
     public interface IAccountProvider<out TConsumer> : IAccountUsageHistorySaver where TConsumer : class
     {

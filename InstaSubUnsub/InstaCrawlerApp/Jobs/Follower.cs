@@ -1,6 +1,6 @@
 ﻿using InstaCommon.Config.Jobs;
+using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain;
-using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
