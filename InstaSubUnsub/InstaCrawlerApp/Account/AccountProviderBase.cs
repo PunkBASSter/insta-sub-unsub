@@ -27,7 +27,7 @@ namespace InstaCrawlerApp.Account
         /// Saves history of the account returned by Get() method.
         /// </summary>
         /// <param name="lastEntitiesProcessed"></param>
-        public virtual void SaveUsageHistory(int lastEntitiesProcessed)
+        public virtual void SaveUsageHistory(int lastEntitiesProcessed, DateTime? antiBotDetectedTime)
         {
             _lastUsedAccount ??= Get();
             var history = new AccountUsageHistory 
@@ -37,6 +37,7 @@ namespace InstaCrawlerApp.Account
                 LastEntitiesProcessed = lastEntitiesProcessed,
                 LastUsedTime = DateTime.UtcNow,
                 LastUsedInService = GetType().GetGenericArguments().First().Name,
+                AntiBotDetectedTime = antiBotDetectedTime
             };
 
             Repository.InsertOrUpdate(history, h => h.Username == history.Username);

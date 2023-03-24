@@ -1,11 +1,11 @@
 ﻿using InstaCommon.Config.Jobs;
+using InstaCommon.Exceptions;
 using InstaCommon.JsonConverters;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaCrawlerApp.Scheduling;
 using InstaDomain.Account;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace InstaCrawlerApp.Jobs
@@ -45,10 +45,15 @@ namespace InstaCrawlerApp.Jobs
             executionDetails.Username = Account.Username;
             executionDetails.StartTime = DateTime.UtcNow;
 
+            DateTime? antiBotDetectedTime = null;
             int processed = 0;
             try
             {
                 processed = await Task.Run(ExecuteInternal, cancellation);
+            }
+            catch (InstaAntiBotException)
+            {
+                antiBotDetectedTime= DateTime.UtcNow;
             }
             catch (Exception ex)
             {
@@ -64,7 +69,7 @@ namespace InstaCrawlerApp.Jobs
             Logger.LogInformation("Job {0} finished, limit per iteration: {1}, actually processed {2}.",
                 GetType().Name, LimitPerIteration, executionDetails.ProcessedNumber);
 
-            _accountProvider.SaveUsageHistory(processed);
+            _accountProvider.SaveUsageHistory(processed, antiBotDetectedTime);
 
             return executionDetails;
         }

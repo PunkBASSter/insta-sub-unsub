@@ -40,7 +40,7 @@ namespace InstaCrawlerApp.Jobs
                 if (_consequentAntiBotFailures >= 3)
                 {
                     _logger.LogWarning("Consequent anti-bot errors number equals 3. Stopping...", user.Name);
-                    break;
+                    throw new InstaAntiBotException($"Detected anti-bot for user {Account.Username}.");
                 }
 
                 if (VisitUserProfile(user, out InstaUser modified))

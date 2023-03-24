@@ -8,5 +8,7 @@ namespace InstaDomain.Account
         public string? LastUsedInService { get; init; }
 
         public int? LastEntitiesProcessed { get; init; }
+
+        public DateTime? AntiBotDetectedTime { get; init; }
     }
 }

@@ -16,7 +16,7 @@ namespace InstaCommon
         protected override InstaAccount GetAccount()
         {
             var acc = Repository.Query<AccountUsageHistory>().OrderBy(auh => auh.LastUsedTime).FirstOrDefault(auh =>
-                auh.LastEntitiesProcessed == null || auh.LastEntitiesProcessed > 0);
+                auh.AntiBotDetectedTime == null || auh.AntiBotDetectedTime > DateTime.UtcNow.AddHours(-24));
 
             if (acc == null)
             {
