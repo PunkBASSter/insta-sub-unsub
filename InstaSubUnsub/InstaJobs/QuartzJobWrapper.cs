@@ -6,11 +6,11 @@ using Quartz;
 namespace InstaJobs
 {
     [DisallowConcurrentExecution]
-    public class QuartzJobWrapper<T> : IJob where T: JobBase
+    public class QuartzJobWrapper<T> : IJob where T : JobBase
     {
         protected readonly IServiceProvider _serviceProvider;
 
-        public QuartzJobWrapper(IServiceProvider serviceProvider) 
+        public QuartzJobWrapper(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
         }
@@ -18,8 +18,8 @@ namespace InstaJobs
         protected virtual async Task Execute(CancellationToken stoppingToken)
         {
             using var scope = _serviceProvider.CreateScope();
-            
-            var job = scope.ServiceProvider.GetRequiredService<RandomDelayJobScheduler<T>>();
+
+            var job = scope.ServiceProvider.GetRequiredService<BasicScheduler<T>>();
             await job.Execute(stoppingToken);
         }
 

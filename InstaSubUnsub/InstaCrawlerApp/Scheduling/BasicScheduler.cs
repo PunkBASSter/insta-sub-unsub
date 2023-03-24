@@ -3,12 +3,12 @@ using InstaCrawlerApp.Jobs;
 
 namespace InstaCrawlerApp.Scheduling
 {
-    public abstract class JobSchedulerBase<T> where T: JobBase
+    public class BasicScheduler<T> where T: JobBase
     {
         protected readonly T JobInstance;
         protected readonly JobConfigBase JobConfig;
 
-        public JobSchedulerBase(T jobInstance)
+        public BasicScheduler(T jobInstance)
         {
             JobInstance = jobInstance;
             JobConfig = JobInstance.GetConfig();
@@ -16,12 +16,13 @@ namespace InstaCrawlerApp.Scheduling
 
         public virtual async Task Execute(CancellationToken cancellationToken)
         {
-            var schedule = GenerateSchedule().Where(js => js.StartTime > DateTime.UtcNow);
+            var refTime = DateTime.UtcNow.AddSeconds(-1);
+            var schedule = GenerateSchedule().Where(js => js.StartTime > refTime);
 
             foreach (var iteration in schedule)
             {
-                var timeDiff = iteration.StartTime - DateTime.UtcNow;
-                if (timeDiff.TotalSeconds >= -1)
+                var timeDiff = iteration.StartTime - refTime;
+                if (timeDiff.TotalSeconds >= 0)
                 {
                     await Task.Delay(timeDiff, cancellationToken);
                     await JobInstance.Execute(iteration, cancellationToken);
@@ -29,6 +30,9 @@ namespace InstaCrawlerApp.Scheduling
             }
         }
 
-        protected abstract JobExecutionDetails[] GenerateSchedule();
+        protected virtual JobExecutionDetails[] GenerateSchedule()
+        {
+            return new[] { new JobExecutionDetails() { StartTime = DateTime.UtcNow } };
+        }
     }
 }

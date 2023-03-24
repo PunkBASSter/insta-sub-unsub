@@ -24,6 +24,7 @@ namespace InstaCrawlerApp
             services.AddScoped<UserCrawler>();
             services.AddScoped<UserFullDetailsProvider>();
 
+            services.AddScoped(typeof(BasicScheduler<>));
             services.AddScoped(typeof(MegaRandomJobScheduler<>));
             services.AddScoped(typeof(RandomDelayJobScheduler<>));
 
@@ -58,6 +59,8 @@ namespace InstaCrawlerApp
                     sp.GetRequiredService<IConfiguration>().GetRequiredSection("CrawlUser")
                     )
                 );
+
+            services.AddTransient<InitialAccountImporterFromConfig>();
         }
     }
 }

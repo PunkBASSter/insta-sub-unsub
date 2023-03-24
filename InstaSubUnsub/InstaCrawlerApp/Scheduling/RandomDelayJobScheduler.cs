@@ -8,7 +8,7 @@ namespace InstaCrawlerApp.Scheduling
     /// To make it work just schedule the decorated job at the new day start.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class RandomDelayJobScheduler<T> : JobSchedulerBase<T> where T : JobBase
+    public class RandomDelayJobScheduler<T> : BasicScheduler<T> where T : JobBase
     {
         public RandomDelayJobScheduler(T jobInstance): base(jobInstance) { }
 

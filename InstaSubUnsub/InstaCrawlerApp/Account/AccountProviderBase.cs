@@ -29,8 +29,11 @@ namespace InstaCrawlerApp.Account
         /// <param name="lastEntitiesProcessed"></param>
         public virtual void SaveUsageHistory(int lastEntitiesProcessed)
         {
-            var history = new AccountUsageHistory(_lastUsedAccount ?? Get())
+            _lastUsedAccount ??= Get();
+            var history = new AccountUsageHistory 
             {
+                Username = _lastUsedAccount.Username, 
+                Password = _lastUsedAccount.Password,
                 LastEntitiesProcessed = lastEntitiesProcessed,
                 LastUsedTime = DateTime.UtcNow,
                 LastUsedInService = GetType().GetGenericArguments().First().Name,

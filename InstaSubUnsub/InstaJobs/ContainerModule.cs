@@ -10,10 +10,14 @@ namespace InstaJobs
     {
         public void Register(IServiceCollection services, IConfiguration config)
         {
-            services.AddTransient<QuartzJobWrapper<UserCrawler>>();
-            services.AddTransient<QuartzJobWrapper<UserFullDetailsProvider>>();
-            services.AddTransient<MegaRandomQuartzJobWrapper<Follower>>();
-            services.AddTransient<MegaRandomQuartzJobWrapper<Unfollower>>();
+            services.AddTransient(typeof(QuartzJobWrapper<>));
+            services.AddTransient(typeof(RandomDelayQuartzJobWrapper<>));
+            services.AddTransient(typeof(MegaRandomQuartzJobWrapper<>));
+
+            //services.AddTransient<RandomDelayQuartzJobWrapper<UserCrawler>>();
+            //services.AddTransient<RandomDelayQuartzJobWrapper<UserFullDetailsProvider>>();
+            //services.AddTransient<MegaRandomQuartzJobWrapper<Follower>>();
+            //services.AddTransient<MegaRandomQuartzJobWrapper<Unfollower>>();
             //services.AddTransient<>
 
             //var quartzOptions = 
@@ -37,16 +41,36 @@ namespace InstaJobs
 
                 // quickest way to create a job with single trigger is to use ScheduleJob
                 // (requires version 3.2)
-                //var jobKey = new JobKey(nameof(Unfollower));
 
-                q.ScheduleJob<MegaRandomQuartzJobWrapper<Unfollower>>(trigger => trigger
-                    .WithIdentity(nameof(Unfollower))
-                    .StartNow()
-                    //.StartAt(DateBuilder.EvenHourDate(DateTimeOffset.Now))
-                    .WithDailyTimeIntervalSchedule(x => x.WithInterval(2, IntervalUnit.Day))
-                    //.WithCronSchedule("0 0 1-31/2 * *")
-                    //.WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(1, 59))
-                );
+                q.ScheduleJob<QuartzJobWrapper<UserCrawler>>(trigger => trigger.WithIdentity(nameof(UserCrawler)).StartNow());
+                //q.ScheduleJob<QuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger.WithIdentity(nameof(UserFullDetailsProvider)).StartNow());
+                //q.ScheduleJob<QuartzJobWrapper<Follower>>(trigger => trigger.WithIdentity(nameof(Follower)).StartNow());
+                //q.ScheduleJob<QuartzJobWrapper<Unfollower>>(trigger => trigger.WithIdentity(nameof(Unfollower)).StartNow());
+
+
+                //q.ScheduleJob<RandomDelayQuartzJobWrapper<UserCrawler>>(trigger => trigger
+                //    .WithIdentity(nameof(UserCrawler))
+                //    .StartNow()
+                //    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(8, 00))
+                //);
+                //
+                //q.ScheduleJob<RandomDelayQuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger
+                //    .WithIdentity(nameof(UserFullDetailsProvider))
+                //    .StartNow()
+                //    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(8, 00))
+                //);
+                //
+                //q.ScheduleJob<MegaRandomQuartzJobWrapper<Follower>>(trigger => trigger
+                //    .WithIdentity(nameof(Follower))
+                //    .StartNow()
+                //    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(8, 00))
+                //);
+                //
+                //q.ScheduleJob<MegaRandomQuartzJobWrapper<Unfollower>>(trigger => trigger
+                //    .WithIdentity(nameof(Unfollower))
+                //    .StartNow()
+                //    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(8, 00))
+                //);
 
                 /*
                  * # Will only run on odd days:
