@@ -1,5 +1,6 @@
 ﻿using InstaCommon.Config.Jobs;
 using InstaDomain;
+using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,9 @@ namespace InstaCrawlerApp.Jobs
         private readonly IUserFollower _userFollower;
         private readonly IRepository _repo;
 
-        public Follower(IUserFollower userFollower, IRepository repo, ILogger<Follower> logger, FollowerJobConfig config) : base(repo, logger, config)
+        public Follower(IUserFollower userFollower, IRepository repo, ILogger<Follower> logger,
+            FollowerJobConfig config, IAccountProvider<Follower> accountProvider)
+            : base(repo, logger, config, accountProvider)
         {
             _userFollower = userFollower;
             _repo = repo;
@@ -29,7 +32,7 @@ namespace InstaCrawlerApp.Jobs
             var followed = 0;
             foreach (var user in usersToFollow)
             {
-                if (_userFollower.Follow(user))
+                if (_userFollower.Follow(user, Account))
                 {
                     var updated = user;
                     updated.FollowingDate = DateTime.UtcNow;

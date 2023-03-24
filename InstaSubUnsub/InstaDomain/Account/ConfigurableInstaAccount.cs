@@ -1,7 +1,7 @@
-﻿using InstaDomain;
+﻿using InstaDomain.Account;
 using Microsoft.Extensions.Configuration;
 
-namespace SeleniumUtils.UiActions
+namespace Domain.Account
 {
     public class ConfigurableInstaAccount : InstaAccount
     {

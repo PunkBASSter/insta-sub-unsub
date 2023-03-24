@@ -11,33 +11,30 @@ namespace InstaCrawlerApp.Scheduling
     /// <typeparam name="T"></typeparam>
     public class MegaRandomJobScheduler<T> : JobSchedulerBase<T> where T : JobBase
     {
-        private readonly JobConfigBase _jobConfig;
-
         public MegaRandomJobScheduler(T jobInstance) : base(jobInstance)
         {
-            _jobConfig = jobInstance.GetConfig();
         }
 
         protected override JobExecutionDetails[] GenerateSchedule()
         {
             var rnd = new Random(DateTime.Now.Millisecond);
 
-            var startingHour = TimeSpan.FromHours(_jobConfig.WorkStartingHour ?? 10);
-            var duration = TimeSpan.FromHours(_jobConfig.WorkDurationHours ?? 15);
+            var startingHour = TimeSpan.FromHours(JobConfig.WorkStartingHour ?? 10);
+            var duration = TimeSpan.FromHours(JobConfig.WorkDurationHours ?? 15);
 
-            var periodStart = (DateTime.UtcNow.Date + startingHour).AddSeconds(rnd.Next(_jobConfig.MinDelay, _jobConfig.MaxDelay));
-            var periodEnd = (periodStart + duration).AddSeconds(-rnd.Next(_jobConfig.MinDelay, _jobConfig.MaxDelay));
+            var periodStart = (DateTime.UtcNow.Date + startingHour).AddSeconds(rnd.Next(JobConfig.MinDelay, JobConfig.MaxDelay));
+            var periodEnd = (periodStart + duration).AddSeconds(-rnd.Next(JobConfig.MinDelay, JobConfig.MaxDelay));
 
-            var dailyLimit = _jobConfig.LimitPerDay + rnd.Next(-_jobConfig.LimitPerDayDispersion, _jobConfig.LimitPerDayDispersion);
-            var iterationsNumber = rnd.Next(_jobConfig.MinIterationsPerDay, _jobConfig.MaxIterationsPerDay);
-            var iterationLimitBase = Math.Max(dailyLimit / iterationsNumber, _jobConfig.LimitPerIteration);
+            var dailyLimit = JobConfig.LimitPerDay + rnd.Next(-JobConfig.LimitPerDayDispersion, JobConfig.LimitPerDayDispersion);
+            var iterationsNumber = rnd.Next(JobConfig.MinIterationsPerDay, JobConfig.MaxIterationsPerDay);
+            var iterationLimitBase = Math.Max(dailyLimit / iterationsNumber, JobConfig.LimitPerIteration);
 
             var iterationsPlanned = new JobExecutionDetails[iterationsNumber];
 
             var iterationSum = 0;
             var workingTimeSpan = periodEnd - periodStart;
             var intervalBetweenIterations = workingTimeSpan.TotalSeconds / (iterationsNumber - 1);
-            int intervalDispersion = Math.Min(Convert.ToInt32(intervalBetweenIterations / 2), _jobConfig.MaxIntervalDispersion);
+            int intervalDispersion = Math.Min(Convert.ToInt32(intervalBetweenIterations / 2), JobConfig.MaxIntervalDispersion);
             for (var i = 1; i < iterationsNumber; i++)
             {
                 var iteration = new JobExecutionDetails
@@ -45,8 +42,8 @@ namespace InstaCrawlerApp.Scheduling
                     StartTime = periodStart
                     + TimeSpan.FromSeconds((i - 1) * intervalBetweenIterations
                     + rnd.Next(-intervalDispersion, intervalDispersion)),
-                    LimitPerIteration = iterationLimitBase + rnd.Next(-_jobConfig.LimitPerIterationDispersion,
-                        _jobConfig.LimitPerIterationDispersion),
+                    LimitPerIteration = iterationLimitBase + rnd.Next(-JobConfig.LimitPerIterationDispersion,
+                        JobConfig.LimitPerIterationDispersion),
                 };
                 iterationsPlanned[i - 1] = iteration;
                 iterationSum += iteration.LimitPerIteration;

@@ -1,4 +1,5 @@
 ﻿using InstaDomain;
+using InstaDomain.Account;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,9 +15,7 @@ namespace SeleniumUtils.UiActions
         public InstaUiUserUnfollower(IWebDriver driver, ILogger<InstaUiUserFollower> logger,
             IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driver, logger, conf, cookieUtil) { }
 
-        protected override string ConfigSectionName => "FollowUser";
-
-        public bool Unfollow(InstaUser user, InstaAccount? account = null)
+        public bool Unfollow(InstaUser user, InstaAccount account)
         {
             Login(account);
 

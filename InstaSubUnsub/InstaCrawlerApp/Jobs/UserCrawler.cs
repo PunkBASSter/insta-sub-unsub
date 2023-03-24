@@ -1,6 +1,7 @@
 ﻿using InstaCommon;
 using InstaCommon.Config.Jobs;
 using InstaDomain;
+using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,8 @@ namespace InstaCrawlerApp.Jobs
         private readonly IUserDetailsProvider _detailsProvider;
 
         public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider,
-            IRepository repo, ILogger<UserCrawler> logger, UserCrawlerJobConfig config) : base(repo, logger, config)
+            IRepository repo, ILogger<UserCrawler> logger, UserCrawlerJobConfig config, IAccountProvider<UserCrawler> accProvider)
+            : base(repo, logger, config, accProvider)
         {
             _followersProvider = followersProvider;
             _detailsProvider = detailsProvider;
@@ -54,7 +56,7 @@ namespace InstaCrawlerApp.Jobs
                 if (seedUser == null)
                     throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
 
-                var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser);
+                var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser, Account);
                 Repository.Update(detailedSeedUser);
                 Repository.SaveChanges();
                 seedUser = detailedSeedUser;
@@ -70,7 +72,7 @@ namespace InstaCrawlerApp.Jobs
             var detailedSeedUser = GetSeedUser();
 
             _followersProvider.LoggedInUsername = _detailsProvider.LoggedInUsername; //wierd way to transfer state between infrastructure services
-            var followerItems = _followersProvider.GetByUser(detailedSeedUser);
+            var followerItems = _followersProvider.GetByUser(detailedSeedUser, Account);
 
             int savedCount = 0;
             foreach (var user in followerItems)

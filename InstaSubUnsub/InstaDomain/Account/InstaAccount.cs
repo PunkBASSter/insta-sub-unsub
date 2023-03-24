@@ -1,9 +1,6 @@
-﻿namespace InstaDomain
+﻿namespace InstaDomain.Account
 {
-    /// <summary>
-    /// It's more like an infrastructure-related model, but not actually a domain one
-    /// </summary>
-    public class InstaAccount
+    public class InstaAccount : BaseEntity
     {
         private readonly string _username;
         private readonly string _password;

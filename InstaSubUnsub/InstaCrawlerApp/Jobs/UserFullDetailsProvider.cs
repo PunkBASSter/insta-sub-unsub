@@ -4,6 +4,7 @@ using InstaDomain.Enums;
 using Microsoft.Extensions.Logging;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaCommon.Config.Jobs;
+using InstaInfrastructureAbstractions;
 
 namespace InstaCrawlerApp.Jobs
 {
@@ -13,8 +14,9 @@ namespace InstaCrawlerApp.Jobs
     public class UserFullDetailsProvider : UserQuickDetailsProvider
     {
         public UserFullDetailsProvider(IUserDetailsProvider detailsProvider, IRepository repo,
-            ILogger<UserFullDetailsProvider> logger, UserFullDetailsProviderJobConfig config)
-            : base(detailsProvider, repo, logger, config)
+            ILogger<UserFullDetailsProvider> logger, UserFullDetailsProviderJobConfig config,
+            IAccountProvider<UserFullDetailsProvider> accountProvider)
+            : base(detailsProvider, repo, logger, config, accountProvider)
         {
         }
 

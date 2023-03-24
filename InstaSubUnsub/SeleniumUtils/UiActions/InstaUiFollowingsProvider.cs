@@ -1,6 +1,7 @@
 ﻿using InstaCommon.Exceptions;
 using InstaCommon.Extensions;
 using InstaDomain;
+using InstaDomain.Account;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,8 +19,6 @@ namespace SeleniumUtils.UiActions
 
         public int Limit { get; set; }
 
-        protected override string ConfigSectionName => "FollowUser";
-
         /// <summary>
         /// Gets the list of users followed by us from InstaUI, the output needs to be filtered by Status != Protected (3)
         /// </summary>
@@ -27,7 +26,7 @@ namespace SeleniumUtils.UiActions
         /// <param name="account"></param>
         /// <returns></returns>
         /// <exception cref="LoginFailedException"></exception>
-        public IList<InstaUser> GetByUser(InstaUser user, InstaAccount? account=null)
+        public IList<InstaUser> GetByUser(InstaUser user, InstaAccount account)
         {
             Login(account);
 

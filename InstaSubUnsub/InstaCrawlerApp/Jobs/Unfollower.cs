@@ -6,6 +6,8 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using InstaCommon.Config.Jobs;
+using InstaDomain.Account;
+using InstaInfrastructureAbstractions;
 
 namespace InstaCrawlerApp.Jobs
 {
@@ -20,7 +22,8 @@ namespace InstaCrawlerApp.Jobs
         private readonly InstaAccount _account;
 
         public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider,
-            IRepository repo, ILogger<Unfollower> logger, UnfollowerJobConfig conf) : base(repo, logger, conf)
+            IRepository repo, ILogger<Unfollower> logger, UnfollowerJobConfig conf, IAccountProvider<Unfollower> accProvider)
+            : base(repo, logger, conf, accProvider)
         {
             _userUnfollower = unfollower;
             _repo = repo;
@@ -85,7 +88,7 @@ namespace InstaCrawlerApp.Jobs
             var total = 0;
             foreach (var user in users)
             {
-                if (_userUnfollower.Unfollow(user))
+                if (_userUnfollower.Unfollow(user, Account))
                 {
                     var updUser = user;
                     UnfollowUserInDb(updUser);

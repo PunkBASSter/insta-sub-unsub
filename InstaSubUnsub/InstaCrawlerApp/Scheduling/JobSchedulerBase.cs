@@ -6,12 +6,12 @@ namespace InstaCrawlerApp.Scheduling
     public abstract class JobSchedulerBase<T> where T: JobBase
     {
         protected readonly T JobInstance;
-        protected readonly JobConfigBase _jobConfig;
+        protected readonly JobConfigBase JobConfig;
 
         public JobSchedulerBase(T jobInstance)
         {
             JobInstance = jobInstance;
-            _jobConfig = JobInstance.GetConfig();
+            JobConfig = JobInstance.GetConfig();
         }
 
         public virtual async Task Execute(CancellationToken cancellationToken)

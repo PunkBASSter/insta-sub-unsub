@@ -18,7 +18,7 @@ namespace InstaCrawlerApp.Scheduling
 
             var scheduleItem = new JobExecutionDetails
             {
-                StartTime = DateTime.UtcNow + TimeSpan.FromSeconds(rnd.Next(_jobConfig.MinDelay, _jobConfig.MaxDelay)),
+                StartTime = DateTime.UtcNow + TimeSpan.FromSeconds(rnd.Next(JobConfig.MinDelay, JobConfig.MaxDelay)),
             };
 
             return new[] { scheduleItem };

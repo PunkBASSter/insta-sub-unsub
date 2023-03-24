@@ -2,13 +2,14 @@
 using InstaCommon.Exceptions;
 using InstaDomain;
 using InstaDomain.Enums;
+using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
 
 namespace InstaCrawlerApp.Jobs
 {
-    public class UserQuickDetailsProvider : JobBase
+    public abstract class UserQuickDetailsProvider : JobBase
     {
         protected readonly IUserDetailsProvider _userDetailsProvider;
         protected readonly IRepository _repo;
@@ -16,7 +17,8 @@ namespace InstaCrawlerApp.Jobs
         protected readonly ILogger<UserQuickDetailsProvider> _logger;
 
         public UserQuickDetailsProvider(IUserDetailsProvider userDetailsProvider, IRepository repo,
-            ILogger<UserQuickDetailsProvider> logger, UserFullDetailsProviderJobConfig config) : base(repo, logger, config)
+            ILogger<UserQuickDetailsProvider> logger, UserFullDetailsProviderJobConfig config,
+            IAccountProvider<UserQuickDetailsProvider> accProvider) : base(repo, logger, config, accProvider)
         {
             _userDetailsProvider = userDetailsProvider;
             _repo = repo;
@@ -59,26 +61,14 @@ namespace InstaCrawlerApp.Jobs
 
         protected virtual bool Initialize() { return true; }
 
-        protected virtual IList<InstaUser> FetchUsersToFill()
-        {
-            throw new NotImplementedException("Unathenticated qiuck data mining is not supposed to be supported.");
-
-            return _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New
-                && u.HasRussianText == true
-                && u.IsClosed != true
-                && u.Rank == 0
-                && u.FollowingDate == null
-                && u.UnfollowingDate == null
-             )
-            .Take(LimitPerIteration).ToList();
-        }
+        protected abstract IList<InstaUser> FetchUsersToFill();
 
         protected bool VisitUserProfile(InstaUser user, out InstaUser modified)
         {
             modified = user;
             try
             {
-                modified = _userDetailsProvider.GetUserDetails(user);
+                modified = _userDetailsProvider.GetUserDetails(user, Account);
                 return modified != null;
             }
             catch (InstaAntiBotException ex)

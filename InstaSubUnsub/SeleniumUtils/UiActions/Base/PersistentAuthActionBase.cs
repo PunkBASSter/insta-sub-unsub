@@ -1,4 +1,4 @@
-﻿using InstaDomain;
+﻿using InstaDomain.Account;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
@@ -22,9 +22,8 @@ namespace SeleniumUtils.UiActions.Base
         /// </summary>
         /// <param name="account"></param>
         /// <returns></returns>
-        public override bool Login(InstaAccount? account = null)
+        public override bool Login(InstaAccount account)
         {
-            account ??= GetInstaAccount();
             var profilePage = new ProfilePage(_webDriver, account.Username);
             profilePage.Load();
 

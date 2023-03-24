@@ -1,4 +1,4 @@
-﻿using InstaDomain;
+﻿using InstaDomain.Account;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -21,22 +21,13 @@ namespace SeleniumUtils.UiActions.Base
             _configuration = configuration;
         }
 
-        protected abstract string ConfigSectionName { get; }
-
-        protected virtual InstaAccount GetInstaAccount()
-        {
-            return new ConfigurableInstaAccount(_configuration, ConfigSectionName);
-        }
-
         /// <summary>
         /// Performs login via UI
         /// </summary>
         /// <param name="account"></param>
         /// <returns></returns>
-        public virtual bool Login(InstaAccount? account = null)
+        public virtual bool Login(InstaAccount account)
         {
-            account ??= GetInstaAccount();
-
             if (account.Username == LoggedInUsername)
                 return true;
 

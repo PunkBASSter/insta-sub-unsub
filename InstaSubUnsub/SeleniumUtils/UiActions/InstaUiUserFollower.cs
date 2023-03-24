@@ -1,4 +1,5 @@
 ﻿using InstaDomain;
+using InstaDomain.Account;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -18,9 +19,7 @@ namespace SeleniumUtils.UiActions
         {
         }
 
-        protected override string ConfigSectionName => "FollowUser";
-
-        public bool Follow(InstaUser user, InstaAccount? account = null)
+        public bool Follow(InstaUser user, InstaAccount account)
         {
             Login(account);
 
