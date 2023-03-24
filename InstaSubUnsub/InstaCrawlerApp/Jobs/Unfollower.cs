@@ -19,8 +19,7 @@ namespace InstaCrawlerApp.Jobs
         private readonly IUserUnfollower _userUnfollower;
         private readonly IFollowingsProvider _followingsProvider;
         private readonly IRepository _repo;
-        private readonly InstaAccount _account;
-
+        
         public Unfollower(IUserUnfollower unfollower, IFollowingsProvider followingsProvider,
             IRepository repo, ILogger<Unfollower> logger, UnfollowerJobConfig conf, IAccountProvider<Unfollower> accProvider)
             : base(repo, logger, conf, accProvider)
@@ -28,8 +27,6 @@ namespace InstaCrawlerApp.Jobs
             _userUnfollower = unfollower;
             _repo = repo;
             _followingsProvider = followingsProvider;
-            _account = new InstaAccount(conf.Expose().GetRequiredSection("FollowUser:Username").Value,
-                conf.Expose().GetRequiredSection("FollowUser:Password").Value);
         }
 
         private InstaUser? _mainAccountUser;
@@ -37,14 +34,14 @@ namespace InstaCrawlerApp.Jobs
         {
             get
             {
-                _mainAccountUser ??= _repo.Query<InstaUser>().First(u => u.Name == _account.Username);
+                _mainAccountUser ??= _repo.Query<InstaUser>().First(u => u.Name == Account.Username);
                 return _mainAccountUser;
             }
         }
 
         protected override int ExecuteInternal()
         {
-            _userUnfollower.Login(_account);
+            _userUnfollower.Login(Account);
 
             var unfollowedCount = UnfollowBasedOnDb();
 
@@ -74,9 +71,9 @@ namespace InstaCrawlerApp.Jobs
         {
             var protectedUserNames = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.Protected).Select(u => u.Name).ToArray();
 
-            _followingsProvider.LoggedInUsername = _account.Username;
+            _followingsProvider.LoggedInUsername = Account.Username;
             _followingsProvider.Limit = number + protectedUserNames.Length;
-            var uiUsersToUnfollow = _followingsProvider.GetByUser(MainAccountUser, _account);
+            var uiUsersToUnfollow = _followingsProvider.GetByUser(MainAccountUser, Account);
 
             uiUsersToUnfollow = uiUsersToUnfollow.ExceptBy(protectedUserNames, u => u.Name).Take(number).ToArray();
 
