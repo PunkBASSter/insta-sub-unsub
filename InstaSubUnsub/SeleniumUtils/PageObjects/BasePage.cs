@@ -56,8 +56,12 @@ namespace SeleniumUtils.PageObjects
         /// </summary>
         protected abstract By LoadIndicatingElementLocator { get; set; }
 
-        protected virtual By LoadErrorElementLocator
-            => By.XPath("//body//main//*[contains(text(),'К сожалению, эта страница недоступна.')]");
+        protected virtual By[] LoadErrorElementLocators => new[]
+        {
+            By.XPath("//body//main//*[contains(text(),'К сожалению, эта страница недоступна.')]"),
+            By.XPath("//body//*[contains(text(),'Произошла ошибка')]")
+        };
+            
 
         public virtual string Url { get; } = "https://www.instagram.com";
 

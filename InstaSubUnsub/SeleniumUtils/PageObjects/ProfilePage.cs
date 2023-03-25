@@ -39,14 +39,18 @@ namespace SeleniumUtils.PageObjects
         protected override bool HandleLoadErrors()
         {
             //Instagram error is displayed on the page (anti-bot or something like that).
-            if (ElementIsVisible(LoadErrorElementLocator)(_driver))
+            foreach(var errorElement in LoadErrorElementLocators)
             {
-                if (_titleObserver.GetTitleChanges().FirstOrDefault(title => title.Contains(_userName)) != null)
-                    throw new InstaAntiBotException($"Detected: К сожалению, эта страница недоступна." +
-                        $" However page title contained {_userName} which indicates that the page exists but Instagram hides it for the current user agent.");
-                else
-                    throw new UserPageUnavailable("Detected: К сожалению, эта страница недоступна. But there's no sign of anti-scrapping measures.");
+                if (ElementIsVisible(errorElement)(_driver))
+                {
+                    if (_titleObserver.GetTitleChanges().FirstOrDefault(title => title.Contains(_userName)) != null)
+                        throw new InstaAntiBotException($"Detected: К сожалению, эта страница недоступна." +
+                            $" However page title contained {_userName} which indicates that the page exists but Instagram hides it for the current user agent.");
+                    else
+                        throw new UserPageUnavailable("Detected: К сожалению, эта страница недоступна. But there's no sign of anti-scrapping measures.");
+                }
             }
+
             return base.HandleLoadErrors();
         }
 
@@ -98,10 +102,10 @@ namespace SeleniumUtils.PageObjects
         }
 
         public IWebElement FollowersNumElement =>
-            _driver.FindElement(By.XPath(".//section/ul/li[2]//div/span/span"));
+            _driver.FindElement(By.XPath(".//section/ul/li[2]//a/span/span"));
 
         public IWebElement FollowingsNumElement =>
-            _driver.FindElement(By.XPath(".//section/ul/li[3]//div/span/span"));
+            _driver.FindElement(By.XPath(".//section/ul/li[3]//a/span/span"));
 
         private ReadOnlyCollection<IWebElement> PostLinks =>
             _driver.FindElements(By.XPath(".//article/div/div/div/div/a"));
