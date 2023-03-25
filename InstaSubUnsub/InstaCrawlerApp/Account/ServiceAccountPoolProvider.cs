@@ -54,7 +54,9 @@ namespace InstaCommon
 
         public override void SaveUsageHistory(int lastEntitiesProcessed, DateTime? antiBotDetectedTime)
         {
-            LastUsedAccount ??= Get();
+            if (LastUsedAccount == null)
+                return;
+
             var history = new AccountUsageHistory
             {
                 Username = LastUsedAccount.Username,
