@@ -8,7 +8,7 @@ namespace InstaCrawlerApp.Account
     {
         protected readonly IRepository Repository;
 
-        private InstaAccount? _lastUsedAccount;
+        protected InstaAccount? LastUsedAccount;
 
         public AccountProviderBase(IRepository repo) 
         {
@@ -17,8 +17,8 @@ namespace InstaCrawlerApp.Account
 
         public virtual InstaAccount Get()
         {
-            _lastUsedAccount ??= GetAccount();
-            return _lastUsedAccount;
+            LastUsedAccount ??= GetAccount();
+            return LastUsedAccount;
         }
 
         protected abstract InstaAccount GetAccount();
@@ -29,19 +29,6 @@ namespace InstaCrawlerApp.Account
         /// <param name="lastEntitiesProcessed"></param>
         public virtual void SaveUsageHistory(int lastEntitiesProcessed, DateTime? antiBotDetectedTime)
         {
-            _lastUsedAccount ??= Get();
-            var history = new AccountUsageHistory 
-            {
-                Username = _lastUsedAccount.Username, 
-                Password = _lastUsedAccount.Password,
-                LastEntitiesProcessed = lastEntitiesProcessed,
-                LastUsedTime = DateTime.UtcNow,
-                LastUsedInService = GetType().GetGenericArguments().First().Name,
-                AntiBotDetectedTime = antiBotDetectedTime
-            };
-
-            Repository.InsertOrUpdate(history, h => h.Username == history.Username);
-            Repository.SaveChanges();
         }
     }
 }

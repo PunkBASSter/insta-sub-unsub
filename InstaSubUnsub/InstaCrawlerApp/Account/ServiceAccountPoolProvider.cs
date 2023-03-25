@@ -10,7 +10,7 @@ namespace InstaCommon
     public class ServiceAccountPoolProvider<TConsumer> : AccountFromConfigProvider<TConsumer>,
         IAccountProvider<TConsumer>, IDisposable where TConsumer : class
     {
-        private static readonly HashSet<string> BusyAccounts = new HashSet<string>();
+        private static readonly HashSet<string> BusyAccounts = new HashSet<string>(); //consider concurent collections
         private static readonly object Lock = new();
         private InstaAccount? _accountInUse;
 
@@ -23,6 +23,7 @@ namespace InstaCommon
             var acc = GetFreeLastUsedAccount();
             if (acc == null)
             {
+                //throw new InstaAntiBotException("Unable to provide a free account which is not blocked or throttled.");
                 return base.GetAccount(); //Take an account from the config as a fallback
             }
 
@@ -36,7 +37,7 @@ namespace InstaCommon
 
             lock(Lock) 
             {
-                _accountInUse = Repository.Query<AccountUsageHistory>()
+                _accountInUse = Repository.TrackedQuery<AccountUsageHistory>()
                     .Where(auh => !BusyAccounts.Contains(auh.Username))
                     .OrderBy(auh => auh.LastUsedTime)
                     .FirstOrDefault(auh =>
@@ -49,6 +50,23 @@ namespace InstaCommon
             }
 
             return _accountInUse;
+        }
+
+        public override void SaveUsageHistory(int lastEntitiesProcessed, DateTime? antiBotDetectedTime)
+        {
+            LastUsedAccount ??= Get();
+            var history = new AccountUsageHistory
+            {
+                Username = LastUsedAccount.Username,
+                Password = LastUsedAccount.Password,
+                LastEntitiesProcessed = lastEntitiesProcessed,
+                LastUsedTime = DateTime.UtcNow,
+                LastUsedInService = GetType().GetGenericArguments().First().Name,
+                AntiBotDetectedTime = antiBotDetectedTime
+            };
+
+            Repository.Update(history);
+            Repository.SaveChanges();
         }
 
         public void Dispose()
