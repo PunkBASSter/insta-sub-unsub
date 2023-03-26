@@ -10,7 +10,7 @@ namespace InstaCrawlerApp.Account
     {
         private readonly IConfigurationSection _section;
 
-        public AccountFromConfigProvider(IRepository repo, IConfigurationSection section) : base(repo)
+        public AccountFromConfigProvider(IConfigurationSection section)
         {
             _section = section;
         }

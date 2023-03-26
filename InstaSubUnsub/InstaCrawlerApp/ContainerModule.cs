@@ -6,7 +6,6 @@ using InstaCrawlerApp.Jobs;
 using InstaCrawlerApp.Scheduling;
 using InstaDomain.Account;
 using InstaInfrastructureAbstractions;
-using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,7 +16,6 @@ namespace InstaCrawlerApp
         public void Register(IServiceCollection services, IConfiguration config)
         {
             //services.AddScoped<UserQuickDetailsProvider>(); potentially useless
-
             services.AddScoped<Follower>();
             services.AddScoped<Unfollower>();
 
@@ -34,31 +32,31 @@ namespace InstaCrawlerApp
 
             services.AddScoped<IAccountProvider<Follower>, AccountFromConfigProvider<Follower>>(sp =>
                 new AccountFromConfigProvider<Follower>(
-                    sp.GetRequiredService<IRepository>(),
                     sp.GetRequiredService<IConfiguration>().GetRequiredSection("FollowUser")
                     )
                 );
 
             services.AddScoped<IAccountProvider<Unfollower>, AccountFromConfigProvider<Unfollower>>(sp =>
                 new AccountFromConfigProvider<Unfollower>(
-                    sp.GetRequiredService<IRepository>(),
                     sp.GetRequiredService<IConfiguration>().GetRequiredSection("FollowUser")
                     )
                 );
 
             services.AddScoped<IAccountProvider<UserCrawler>, ServiceAccountPoolProvider<UserCrawler>>(sp =>
                 new ServiceAccountPoolProvider<UserCrawler>(
-                    sp.GetRequiredService<IRepository>(),
+                    sp.GetRequiredService<AccountPool>(),
                     sp.GetRequiredService<IConfiguration>().GetRequiredSection("CrawlUser")
                     )
                 );
 
             services.AddScoped<IAccountProvider<UserFullDetailsProvider>, ServiceAccountPoolProvider<UserFullDetailsProvider>>(sp =>
                 new ServiceAccountPoolProvider<UserFullDetailsProvider>(
-                    sp.GetRequiredService<IRepository>(),
+                    sp.GetRequiredService<AccountPool>(),
                     sp.GetRequiredService<IConfiguration>().GetRequiredSection("CrawlUser")
                     )
                 );
+
+            services.AddSingleton<AccountPool>();
 
             services.AddTransient<InitialAccountImporterFromConfig>();
         }

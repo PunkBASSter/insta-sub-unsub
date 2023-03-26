@@ -1,19 +1,11 @@
 ﻿using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain.Account;
-using InstaInfrastructureAbstractions.PersistenceInterfaces;
 
 namespace InstaCrawlerApp.Account
 {
     public abstract class AccountProviderBase : IAccountUsageHistorySaver
     {
-        protected readonly IRepository Repository;
-
         protected InstaAccount? LastUsedAccount;
-
-        public AccountProviderBase(IRepository repo) 
-        {
-            Repository = repo;
-        }
 
         public virtual InstaAccount Get()
         {
