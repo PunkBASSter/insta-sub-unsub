@@ -1,7 +1,7 @@
-﻿using InstaCrawlerApp.Account;
+﻿using InstaCommon.Exceptions;
+using InstaCrawlerApp.Account;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain.Account;
-using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Configuration;
 
 namespace InstaCommon
@@ -23,8 +23,8 @@ namespace InstaCommon
             var acc = _accountPool.GetLeastRecentAccount();
             if (acc == null)
             {
-                //throw new InstaAntiBotException("Unable to provide a free account which is not blocked or throttled.");
-                return base.GetAccount(); //Take an account from the config as a fallback
+                throw new InstaAntiBotException("Unable to provide a free account which is not blocked or throttled.");
+                //return base.GetAccount(); //Take an account from the config as a fallback
             }
 
             return acc;

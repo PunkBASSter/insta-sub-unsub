@@ -24,6 +24,7 @@ namespace InstaCrawlerApp.Account
         public void Dispose()
         {
             _singletonScope.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         public InstaAccount? GetLeastRecentAccount()
@@ -33,7 +34,7 @@ namespace InstaCrawlerApp.Account
                 var accountsOrderedByLastUse = _repository.Query<AccountUsageHistory>()
                     .OrderBy(auh => auh.LastUsedTime)
                     .Where(auh =>
-                        auh.AntiBotDetectedTime == null || auh.AntiBotDetectedTime < DateTime.UtcNow.AddHours(-24))
+                        auh.AntiBotDetectedTime == null || auh.AntiBotDetectedTime > DateTime.UtcNow.AddHours(-24))
                     .ToList();
 
                 var res = accountsOrderedByLastUse.FirstOrDefault(a => !_accountsInUse.ContainsKey(a.Username));
