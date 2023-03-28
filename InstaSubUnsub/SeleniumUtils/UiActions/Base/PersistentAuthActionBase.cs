@@ -24,6 +24,9 @@ namespace SeleniumUtils.UiActions.Base
         /// <returns></returns>
         public override bool Login(InstaAccount account)
         {
+            if (LoggedInUsername == account.Username)
+                return true;
+
             var profilePage = new ProfilePage(_webDriver, account.Username);
             profilePage.Load();
 

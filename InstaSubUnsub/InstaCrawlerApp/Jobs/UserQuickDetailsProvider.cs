@@ -6,6 +6,7 @@ using InstaDomain.Enums;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
+using OpenQA.Selenium.DevTools.V107.Tracing;
 
 namespace InstaCrawlerApp.Jobs
 {
@@ -32,9 +33,8 @@ namespace InstaCrawlerApp.Jobs
             if (users.Count < 1 || !Initialize())
                 return 0;
 
-            _logger.LogInformation("Started {0} iteration. Max BatchSize is {1}", GetType().Name, LimitPerIteration);
-
             var processed = 0;
+            var fitsForFollowing = 0;
             foreach (var user in users)
             {
                 if (_consequentAntiBotFailures >= 3)
@@ -48,6 +48,8 @@ namespace InstaCrawlerApp.Jobs
                     _repo.Update(modified);
                     _repo.SaveChanges();
                     processed++;
+                    if (new Follower.UsersToFollowFilter().Get()(modified))
+                        fitsForFollowing++;
                 }
                 else if (modified.Status == UserStatus.Error || modified.Status == UserStatus.Unavailable)
                 {
@@ -56,7 +58,7 @@ namespace InstaCrawlerApp.Jobs
                 }
             }
 
-            return processed;
+            return fitsForFollowing;
         }
 
         protected virtual bool Initialize() { return true; }
@@ -86,7 +88,7 @@ namespace InstaCrawlerApp.Jobs
             catch (Exception ex)
             {
                 modified.Status = UserStatus.Error;
-                _logger.LogError("Unexpected error:", ex.Data.Values);
+                _logger.LogError("Unexpected error whilie processing user: {0}", Account.Username);
                 _logger.LogError(ex, ex.Message, ex.Data.Values);
                 return false;
             }

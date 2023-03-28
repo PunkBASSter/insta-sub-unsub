@@ -22,9 +22,7 @@ namespace InstaCrawlerApp.Jobs
 
         protected override int ExecuteInternal()
         {
-            var usersToFollow = _repo.Query<InstaUser>().Where(u => u.Rank >= 3 && u.HasRussianText == true
-                && u.LastPostDate >= DateTime.UtcNow.AddDays(-7).Date
-                && u.FollowingDate == null && u.UnfollowingDate == null)
+            var usersToFollow = _repo.Query<InstaUser>().Where(new UsersToFollowFilter().Get())
                 .OrderByDescending(u => u.LastPostDate)
                 .Take(LimitPerIteration)
                 .ToArray();
@@ -44,6 +42,16 @@ namespace InstaCrawlerApp.Jobs
             }
 
             return followed;
+        }
+
+        public class UsersToFollowFilter
+        {
+            public Func<InstaUser, bool> Get()
+            {
+                return u => u.Rank >= 3 && u.HasRussianText == true
+                    && u.LastPostDate >= DateTime.UtcNow.AddDays(-7).Date
+                    && u.FollowingDate == null && u.UnfollowingDate == null;
+            }
         }
     }
 }

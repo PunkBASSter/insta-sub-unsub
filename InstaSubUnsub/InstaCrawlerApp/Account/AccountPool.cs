@@ -31,7 +31,7 @@ namespace InstaCrawlerApp.Account
         {
             lock (_lockObject)
             {
-                var accountsOrderedByLastUse = _repository.Query<AccountUsageHistory>()
+                var accountsOrderedByLastUse = _repository.TrackedQuery<AccountUsageHistory>()
                     .OrderBy(auh => auh.LastUsedTime)
                     .Where(auh =>
                         auh.AntiBotDetectedTime == null || auh.AntiBotDetectedTime > DateTime.UtcNow.AddHours(-24))
@@ -46,23 +46,19 @@ namespace InstaCrawlerApp.Account
             }
         }
 
-        public void ReleaseAccountAndSaveUsageHistory(InstaAccount account, int lastEntitiesProcessed, DateTime? antiBotDetectedTime)
+        public void ReleaseAccountAndSaveUsageHistory(InstaAccount account, string jobName, int lastEntitiesProcessed, DateTime? antiBotDetectedTime)
         {
             lock (_lockObject)
             {
+                var accountInstance = _accountsInUse[account.Username];
                 _accountsInUse.Remove(account.Username);
 
-                var history = new AccountUsageHistory
-                {
-                    Username = account.Username,
-                    Password = account.Password,
-                    LastEntitiesProcessed = lastEntitiesProcessed,
-                    LastUsedTime = DateTime.UtcNow,
-                    LastUsedInService = GetType().GetGenericArguments().First().Name,
-                    AntiBotDetectedTime = antiBotDetectedTime
-                };
+                accountInstance.LastEntitiesProcessed = lastEntitiesProcessed;
+                accountInstance.LastUsedTime = DateTime.UtcNow;
+                accountInstance.LastUsedInService = jobName;
+                accountInstance.AntiBotDetectedTime = antiBotDetectedTime;
 
-                _repository.Update(history);
+                _repository.Update(accountInstance);
                 _repository.SaveChanges();
             }
         }

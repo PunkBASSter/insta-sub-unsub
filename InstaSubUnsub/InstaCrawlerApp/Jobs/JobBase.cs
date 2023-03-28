@@ -41,6 +41,7 @@ namespace InstaCrawlerApp.Jobs
 
             Logger.LogInformation("Job {0} started, limit per iteration: {1}.", GetType().Name, LimitPerIteration);
 
+            executionDetails.LimitPerIteration = _limitPerIteration.GetValueOrDefault();
             executionDetails.JobName = GetType().Name;
             executionDetails.Username = Account.Username;
             executionDetails.StartTime = DateTime.UtcNow;

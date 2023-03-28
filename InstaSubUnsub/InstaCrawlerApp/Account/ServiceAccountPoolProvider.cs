@@ -35,7 +35,8 @@ namespace InstaCommon
             if (LastUsedAccount == null)
                 return;
 
-            _accountPool.ReleaseAccountAndSaveUsageHistory(LastUsedAccount, lastEntitiesProcessed, antiBotDetectedTime);
+            var jobName = GetType().GetGenericArguments().First().Name;
+            _accountPool.ReleaseAccountAndSaveUsageHistory(LastUsedAccount, jobName, lastEntitiesProcessed, antiBotDetectedTime);
         }
     }
 }
