@@ -22,15 +22,47 @@ namespace InstaCrawlerApp.Jobs
 
         protected override IList<InstaUser> FetchUsersToFill()
         {
-            var usersToVisit = _repo.Query<InstaUser>().Where(u => u.Status == UserStatus.New
-                && u.HasRussianText == true
+            var query = _repo.Query<InstaUser>();
+
+            //First take all with recent posts (stories detected by crawler)
+            var usersToVisit = query.Where(u => u.Rank == 0
                 && u.IsClosed != true
-                && u.Rank == 0
+                && u.LastPostDate >= DateTime.UtcNow.Date.AddDays(-7)
                 && u.FollowingDate == null
                 && u.UnfollowingDate == null
             ).Take(LimitPerIteration).ToList();
 
-            return usersToVisit;
+            var leftForLimit = LimitPerIteration - usersToVisit.Count;
+
+            if (leftForLimit == 0)
+                return usersToVisit;
+
+            //Then take the rest with known Russian text in descriotion (found by crawler)
+            var usersLeftToVisitRus = query.Where(u => u.Rank == 0
+                && u.HasRussianText == true
+                && u.IsClosed != true
+                && u.LastPostDate == null
+                && u.FollowingDate == null
+                && u.UnfollowingDate == null
+            ).Take(leftForLimit).ToList();
+
+            leftForLimit = leftForLimit - usersLeftToVisitRus.Count;
+            usersToVisit.AddRange(usersLeftToVisitRus);
+            if (leftForLimit == 0)
+                return usersToVisit; 
+
+            //Take the rest without aby known info
+            var usersLeftToVisit = query.Where(u => u.Rank == 0
+                && u.HasRussianText == null
+                && u.IsClosed != true
+                && u.LastPostDate == null
+                && u.FollowingDate == null
+                && u.UnfollowingDate == null
+            ).Take(leftForLimit).ToList();
+
+            usersToVisit.AddRange(usersLeftToVisit);
+
+            return usersToVisit.Distinct().ToList();
         }
     }
 }

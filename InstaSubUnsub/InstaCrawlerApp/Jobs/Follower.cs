@@ -48,8 +48,8 @@ namespace InstaCrawlerApp.Jobs
         {
             public Func<InstaUser, bool> Get()
             {
-                return u => u.Rank >= 3 && u.HasRussianText == true
-                    && u.LastPostDate >= DateTime.UtcNow.AddDays(-7).Date
+                return u => u.Rank >= 3 && u.HasRussianText == true && u.IsClosed != true
+                    && u.LastPostDate >= DateTime.UtcNow.Date.AddDays(-7)
                     && u.FollowingDate == null && u.UnfollowingDate == null;
             }
         }
