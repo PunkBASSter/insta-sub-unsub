@@ -1,5 +1,6 @@
 ﻿using InstaCommon.Config.Jobs;
 using InstaCrawlerApp.Jobs;
+using Microsoft.Extensions.Logging;
 
 namespace InstaCrawlerApp.Scheduling
 {
@@ -7,11 +8,13 @@ namespace InstaCrawlerApp.Scheduling
     {
         protected readonly T JobInstance;
         protected readonly JobConfigBase JobConfig;
+        protected readonly ILogger<BasicScheduler<T>> _logger;
 
-        public BasicScheduler(T jobInstance)
+        public BasicScheduler(T jobInstance, ILogger<BasicScheduler<T>> logger)
         {
             JobInstance = jobInstance;
             JobConfig = JobInstance.GetConfig();
+            _logger = logger;
         }
 
         public virtual async Task Execute(CancellationToken cancellationToken)
@@ -24,6 +27,8 @@ namespace InstaCrawlerApp.Scheduling
                 var timeDiff = iteration.StartTime - refTime;
                 if (timeDiff.TotalSeconds >= 0)
                 {
+                    _logger.LogInformation("{0} will start after {1} seconds",
+                         JobInstance.GetType().Name, timeDiff.TotalSeconds);
                     await Task.Delay(timeDiff, cancellationToken);
                     await JobInstance.Execute(iteration, cancellationToken);
                 }

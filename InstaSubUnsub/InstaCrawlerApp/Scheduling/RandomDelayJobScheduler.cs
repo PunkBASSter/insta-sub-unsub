@@ -1,4 +1,5 @@
 ﻿using InstaCrawlerApp.Jobs;
+using Microsoft.Extensions.Logging;
 
 namespace InstaCrawlerApp.Scheduling
 {
@@ -10,7 +11,8 @@ namespace InstaCrawlerApp.Scheduling
     /// <typeparam name="T"></typeparam>
     public class RandomDelayJobScheduler<T> : BasicScheduler<T> where T : JobBase
     {
-        public RandomDelayJobScheduler(T jobInstance): base(jobInstance) { }
+        public RandomDelayJobScheduler(T jobInstance, ILogger<RandomDelayJobScheduler<T>> logger)
+            : base(jobInstance, logger) { }
 
         protected override JobExecutionDetails[] GenerateSchedule()
         {

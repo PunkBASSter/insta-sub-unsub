@@ -41,47 +41,44 @@ namespace InstaJobs
                     tp.MaxConcurrency = 4; // 1 for each possible job
                 });
 
-                // quickest way to create a job with single trigger is to use ScheduleJob
-                // (requires version 3.2)
-
-                //q.ScheduleJob<QuartzJobWrapper<UserCrawler>>(trigger => trigger.WithIdentity(nameof(UserCrawler)).StartNow());
+                //FOR TESTS AND DEBUG:
+                q.ScheduleJob<QuartzJobWrapper<UserCrawler>>(trigger => trigger.WithIdentity(nameof(UserCrawler)).StartNow());
                 //q.ScheduleJob<QuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger.WithIdentity(nameof(UserFullDetailsProvider)).StartNow());
-                q.ScheduleJob<QuartzJobWrapper<Follower>>(trigger => trigger.WithIdentity(nameof(Follower)).StartNow());
+                //q.ScheduleJob<QuartzJobWrapper<Follower>>(trigger => trigger.WithIdentity(nameof(Follower)).StartNow());
                 //q.ScheduleJob<QuartzJobWrapper<Unfollower>>(trigger => trigger.WithIdentity(nameof(Unfollower)).StartNow());
 
 
+                //var crawlerConfig = new UserCrawlerJobConfig(config);
+                //var crawlStartHour = crawlerConfig.WorkStartingHour ?? 7;
+                //var crawlEndHour = crawlStartHour + (crawlerConfig.WorkDurationHours ?? 16);
                 //q.ScheduleJob<RandomDelayQuartzJobWrapper<UserCrawler>>(trigger => trigger
                 //    .WithIdentity(nameof(UserCrawler))
-                //    .StartNow()
-                //    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(8, 00))
+                //    .WithCronSchedule($"0 0 {crawlStartHour}-{crawlEndHour}/3 * * ?",
+                //        x => x.WithMisfireHandlingInstructionFireAndProceed())
                 //);
-                //
-
-
+                
                 //var detailsProviderConf = new UserFullDetailsProviderJobConfig(config);
-                //var detailsStartHour = detailsProviderConf.WorkStartingHour ?? 8;
-                //var detailsEndHour = detailsStartHour + (detailsProviderConf.WorkDurationHours ?? 18);
+                //var detailsStartHour = detailsProviderConf.WorkStartingHour ?? 7;
+                //var detailsEndHour = detailsStartHour + (detailsProviderConf.WorkDurationHours ?? 16);
                 //q.ScheduleJob<RandomDelayQuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger
                 //    .WithIdentity(nameof(UserFullDetailsProvider))
-                //    //.StartAt(DateBuilder.DateOf(detailsStartHour, 0, 0))
-                //    //.EndAt(DateBuilder.DateOf(detailsEndHour, 0, 0))
-                //    .WithCronSchedule($"0 0/60 {detailsStartHour}-{detailsEndHour} * * ?")
-                //    //.WithSimpleSchedule(x => x.WithIntervalInHours(1).RepeatForever())
+                //    .WithCronSchedule($"0 0 {detailsStartHour}-{detailsEndHour}/1 * * ?", 
+                //        x => x.WithMisfireHandlingInstructionFireAndProceed())
                 //);
-
-
-                //
-                //q.ScheduleJob<MegaRandomQuartzJobWrapper<Follower>>(trigger => trigger
-                //    .WithIdentity(nameof(Follower))
-                //    .StartNow()
-                //    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(8, 00))
-                //);
-                //
-                //q.ScheduleJob<MegaRandomQuartzJobWrapper<Unfollower>>(trigger => trigger
-                //    .WithIdentity(nameof(Unfollower))
-                //    .StartNow()
-                //    .WithCronSchedule(CronScheduleBuilder.DailyAtHourAndMinute(8, 00))
-                //);
+                
+                q.ScheduleJob<MegaRandomQuartzJobWrapper<Follower>>(trigger => trigger
+                    .WithIdentity(nameof(Follower))
+                    //.StartNow()
+                    .WithCronSchedule($"0 0 8 * * ?",
+                        x => x.WithMisfireHandlingInstructionFireAndProceed())
+                );
+                
+                q.ScheduleJob<MegaRandomQuartzJobWrapper<Unfollower>>(trigger => trigger
+                    .WithIdentity(nameof(Unfollower))
+                    //.StartNow()
+                    .WithCronSchedule($"0 0 8 * * ?",
+                        x => x.WithMisfireHandlingInstructionFireAndProceed())
+                );
 
                 /*
                  * # Will only run on odd days:

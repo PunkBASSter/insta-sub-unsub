@@ -1,5 +1,5 @@
-﻿using InstaCommon.Config.Jobs;
-using InstaCrawlerApp.Jobs;
+﻿using InstaCrawlerApp.Jobs;
+using Microsoft.Extensions.Logging;
 
 namespace InstaCrawlerApp.Scheduling
 {
@@ -11,7 +11,8 @@ namespace InstaCrawlerApp.Scheduling
     /// <typeparam name="T"></typeparam>
     public class MegaRandomJobScheduler<T> : BasicScheduler<T> where T : JobBase
     {
-        public MegaRandomJobScheduler(T jobInstance) : base(jobInstance)
+        public MegaRandomJobScheduler(T jobInstance, Logger<MegaRandomJobScheduler<T>> logger)
+            : base(jobInstance, logger)
         {
         }
 

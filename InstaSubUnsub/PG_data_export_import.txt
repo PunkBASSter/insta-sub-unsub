@@ -1,0 +1,4 @@
+#Export PG dump
+docker exec -t <CONTAINER_NAME> pg_dumpall -c -U <PG_ROLE_NAME> > dump_db.sql
+
+#Import and restore PG dump
