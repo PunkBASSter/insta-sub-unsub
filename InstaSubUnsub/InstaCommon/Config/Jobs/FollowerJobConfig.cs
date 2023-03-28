@@ -9,5 +9,10 @@ namespace InstaCommon.Config.Jobs
         }
 
         public override string SectionName => nameof(FollowerJobConfig);
+
+        public double MinimumRank { get; set; } = 3.0;
+        public int PostRecencyDays { get; set; } = 7;
+        public bool HasRussianText { get; set; } = true;
+        public bool IgnoreClosed { get; set; } = true;
     }
 }

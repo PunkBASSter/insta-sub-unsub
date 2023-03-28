@@ -4,7 +4,7 @@ using InstaDomain.Account;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OpenQA.Selenium;
+using SeleniumPageObjects;
 using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
 using SeleniumUtils.UiActions.Base;
@@ -13,14 +13,14 @@ namespace SeleniumUtils.UiActions
 {
     public class InstaUiFollowersProvider : PersistentAuthActionBase, IFollowersProvider
     {
-        public InstaUiFollowersProvider(IWebDriver driver, ILogger<InstaUiUserFollower> logger,
-            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driver, logger, conf, cookieUtil) { }
+        public InstaUiFollowersProvider(IWebDriverFactory driverFactory, ILogger<InstaUiUserFollower> logger,
+            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driverFactory, logger, conf, cookieUtil) { }
 
         public IList<InstaUser> GetByUser(InstaUser user, InstaAccount account)
         {
             Login(account);
 
-            var followersPage = new FollowersPage(_webDriver, user.Name);
+            var followersPage = new FollowersPage(WebDriver, user.Name);
             followersPage.Load();
 
             var items = followersPage.InfiniteScrollToBottomWithItemsLoading();

@@ -3,7 +3,7 @@ using InstaDomain.Account;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OpenQA.Selenium;
+using SeleniumPageObjects;
 using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
 using SeleniumUtils.UiActions.Base;
@@ -14,8 +14,8 @@ namespace SeleniumUtils.UiActions
     {
         private readonly int _postsToLike = 2;
 
-        public InstaUiUserFollower(IWebDriver driver, ILogger<InstaUiUserFollower> logger, 
-            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driver, logger, conf, cookieUtil)
+        public InstaUiUserFollower(IWebDriverFactory driverFactory, ILogger<InstaUiUserFollower> logger, 
+            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driverFactory, logger, conf, cookieUtil)
         {
         }
 
@@ -23,7 +23,7 @@ namespace SeleniumUtils.UiActions
         {
             Login(account);
 
-            var profilePage = new ProfilePage(_webDriver, user.Name);
+            var profilePage = new ProfilePage(WebDriver, user.Name);
             profilePage.Load();
 
             //Leave likes under last 2 posts

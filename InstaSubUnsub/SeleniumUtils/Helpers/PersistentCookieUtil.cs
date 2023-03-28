@@ -2,6 +2,7 @@
 using InstaInfrastructureAbstractions;
 using Microsoft.Extensions.Configuration;
 using OpenQA.Selenium;
+using SeleniumPageObjects;
 
 namespace SeleniumUtils.Helpers
 {
@@ -10,13 +11,14 @@ namespace SeleniumUtils.Helpers
     /// </summary>
     public class PersistentCookieUtil
     {
-        private readonly IWebDriver _driver;
+        private readonly Lazy<IWebDriver> _lazyDriver;
+        private IWebDriver _driver => _lazyDriver.Value;
         private readonly string? _cookieKey;
         private readonly IKeyValueObjectStorage<InstaCookies> _cookieStorage;
 
-        public PersistentCookieUtil(IWebDriver driver, IConfiguration conf, IKeyValueObjectStorage<InstaCookies> cookieStorage)
+        public PersistentCookieUtil(IWebDriverFactory driverFactory, IConfiguration conf, IKeyValueObjectStorage<InstaCookies> cookieStorage)
         {
-            _driver = driver;
+            _lazyDriver = new Lazy<IWebDriver>(() => driverFactory.GetInstance());
             _cookieKey = conf.GetRequiredSection("SavedCookiesPath").Value;
             _cookieStorage = cookieStorage;
         }

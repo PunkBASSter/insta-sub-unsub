@@ -5,10 +5,22 @@ using System.Reflection;
 
 namespace SeleniumPageObjects
 {
-    public class WebDriverFactory
+    //Scoped factory
+    public sealed class WebDriverFactory : IWebDriverFactory
     {
+        private IWebDriver? _driverInstance;
+
+        public void Dispose()
+        {
+            _driverInstance?.Dispose();
+            GC.SuppressFinalize(this);
+        }
+
         public IWebDriver GetInstance()
         {
+            if (_driverInstance != null)
+                return _driverInstance;
+
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
 
             var options = new ChromeOptions();
@@ -16,14 +28,20 @@ namespace SeleniumPageObjects
 
             var chromeDriverPath = Path.Combine(currentDir, "chromedriver.exe");
             if (File.Exists(chromeDriverPath))
-                return new ChromeDriver(chromeDriverPath, options);
+            {
+                _driverInstance = new ChromeDriver(chromeDriverPath, options);
+                return _driverInstance;
+            }
 
             var edgeConfig = new EdgeOptions();
             edgeConfig.AddArgument("--inPrivate");
 
             var edgeDriverPath = Path.Combine(currentDir, "msedgedriver.exe");
             if (File.Exists(edgeDriverPath))
-                return new EdgeDriver(edgeDriverPath, edgeConfig);
+            {
+                _driverInstance = new EdgeDriver(edgeDriverPath, edgeConfig);
+                return _driverInstance;
+            }
 
             throw new NotImplementedException("Unable to find supported WebDriver EXE file.");
         }

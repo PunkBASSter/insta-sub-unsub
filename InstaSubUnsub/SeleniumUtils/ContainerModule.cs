@@ -19,7 +19,7 @@ namespace SeleniumUtils
             services.AddTransient<IUserUnfollower, InstaUiUserUnfollower>();
             services.AddTransient<IFollowingsProvider, InstaUiFollowingsProvider>();
             services.AddTransient<IUserDetailsProvider, InstaUiUserDetailsProvider>();
-            services.AddScoped<IWebDriver>(f => new WebDriverFactory().GetInstance());
+            services.AddScoped<IWebDriverFactory>(f => new WebDriverFactory());
             
             services.AddScoped<PersistentCookieUtil>();
         }

@@ -5,7 +5,7 @@ using InstaDomain.Account;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OpenQA.Selenium;
+using SeleniumPageObjects;
 using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
 using SeleniumUtils.UiActions.Base;
@@ -14,8 +14,8 @@ namespace SeleniumUtils.UiActions
 {
     public class InstaUiFollowingsProvider : PersistentAuthActionBase, IFollowingsProvider
     {
-        public InstaUiFollowingsProvider(IWebDriver driver, ILogger<InstaUiUserFollower> logger,
-            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driver, logger, conf, cookieUtil) { }
+        public InstaUiFollowingsProvider(IWebDriverFactory driverFactory, ILogger<InstaUiUserFollower> logger,
+            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driverFactory, logger, conf, cookieUtil) { }
 
         public int Limit { get; set; }
 
@@ -30,7 +30,7 @@ namespace SeleniumUtils.UiActions
         {
             Login(account);
 
-            var followingsPage = new FollowingPage(_webDriver, user.Name);
+            var followingsPage = new FollowingPage(WebDriver, user.Name);
             followingsPage.Load();
 
             var items = followingsPage.InfiniteScrollToBottomWithItemsLoading(Limit);

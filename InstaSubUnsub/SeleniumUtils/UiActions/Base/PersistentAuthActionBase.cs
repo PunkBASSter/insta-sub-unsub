@@ -1,7 +1,7 @@
 ﻿using InstaDomain.Account;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OpenQA.Selenium;
+using SeleniumPageObjects;
 using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
 
@@ -11,7 +11,8 @@ namespace SeleniumUtils.UiActions.Base
     {
         private readonly PersistentCookieUtil _cookieUtil;
 
-        public PersistentAuthActionBase(IWebDriver driver, ILogger<UiActionBase> logger, IConfiguration configuration, PersistentCookieUtil persistentCookieUtil) : base(driver, logger, configuration)
+        public PersistentAuthActionBase(IWebDriverFactory driverFactory, ILogger<UiActionBase> logger,
+            IConfiguration configuration, PersistentCookieUtil persistentCookieUtil) : base(driverFactory, logger, configuration)
         {
             _cookieUtil = persistentCookieUtil;
         }
@@ -27,7 +28,7 @@ namespace SeleniumUtils.UiActions.Base
             if (LoggedInUsername == account.Username)
                 return true;
 
-            var profilePage = new ProfilePage(_webDriver, account.Username);
+            var profilePage = new ProfilePage(WebDriver, account.Username);
             profilePage.Load();
 
             if (!_cookieUtil.LoadCookies(account.Username))

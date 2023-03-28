@@ -3,20 +3,23 @@ using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
+using SeleniumPageObjects;
 using SeleniumUtils.PageObjects;
 
 namespace SeleniumUtils.UiActions.Base
 {
     public abstract class UiActionBase : ILoggedInUserState
     {
-        protected readonly IWebDriver _webDriver;
+        private readonly Lazy<IWebDriver> _lazyDriver;
+        protected IWebDriver WebDriver => _lazyDriver.Value;
+
         public string? LoggedInUsername { get; set; } = null;
         protected readonly ILogger<UiActionBase> _logger;
         protected readonly IConfiguration _configuration;
 
-        public UiActionBase(IWebDriver driver, ILogger<UiActionBase> logger, IConfiguration configuration)
+        public UiActionBase(IWebDriverFactory driverFactory, ILogger<UiActionBase> logger, IConfiguration configuration)
         {
-            _webDriver = driver;
+            _lazyDriver = new Lazy<IWebDriver>(() => driverFactory.GetInstance());
             _logger = logger;
             _configuration = configuration;
         }
@@ -35,7 +38,7 @@ namespace SeleniumUtils.UiActions.Base
                 //TODO implement re-logging as the required user
                 return false;
 
-            var loginPage = new LoginPage(_webDriver);
+            var loginPage = new LoginPage(WebDriver);
             loginPage.Load();
             loginPage.Login(account.Username, account.Password);
             LoggedInUsername = account.Username;

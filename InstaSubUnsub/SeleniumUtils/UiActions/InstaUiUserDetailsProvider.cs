@@ -1,4 +1,5 @@
 ﻿using InstaCommon;
+using InstaCommon.Config.Jobs;
 using InstaCommon.Extensions;
 using InstaDomain;
 using InstaDomain.Account;
@@ -6,7 +7,7 @@ using InstaDomain.Enums;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using OpenQA.Selenium;
+using SeleniumPageObjects;
 using SeleniumUtils.Extensions;
 using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
@@ -16,11 +17,14 @@ namespace SeleniumUtils.UiActions
 {
     public class InstaUiUserDetailsProvider : PersistentAuthActionBase, IUserDetailsProvider
     {
-        private const double MinimumRank = 3.0; //minimum ratio of followings/followers to proceed with user data mining
+        private readonly double MinimumRank; //minimum ratio of followings/followers to proceed with user data mining
 
-        public InstaUiUserDetailsProvider(IWebDriver driver, ILogger<InstaUiUserFollower> logger,
+        public InstaUiUserDetailsProvider(IWebDriverFactory driverFactory, ILogger<InstaUiUserFollower> logger,
             IConfiguration conf, PersistentCookieUtil cookieUtil)
-            : base(driver, logger, conf, cookieUtil) { }
+            : base(driverFactory, logger, conf, cookieUtil)
+        {
+            MinimumRank = new FollowerJobConfig(conf).MinimumRank;
+        }
 
         protected virtual InstaUser VisitUserProfileExtended(ProfilePage profilePage, InstaUser user)
         {
@@ -54,7 +58,7 @@ namespace SeleniumUtils.UiActions
 
             //Data available for anonymous users
             var detailedUser = user;
-            var profilePage = new ProfilePage(_webDriver, user.Name);
+            var profilePage = new ProfilePage(WebDriver, user.Name);
 
             if (!profilePage.Load())
                 return detailedUser;
