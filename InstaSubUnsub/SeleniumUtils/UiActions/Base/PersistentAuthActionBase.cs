@@ -36,12 +36,6 @@ namespace SeleniumUtils.UiActions.Base
                 return UiLogInSaveCookies(account);
             }
 
-            profilePage.Load();
-            if (!profilePage.IsLoggedIn())
-            {
-                return UiLogInSaveCookies(account);
-            }
-
             LoggedInUsername ??= account.Username;
             _cookieUtil.SaveCookies(account.Username);
 
