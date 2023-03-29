@@ -11,7 +11,7 @@ namespace InstaCrawlerApp.Scheduling
     /// <typeparam name="T"></typeparam>
     public class MegaRandomJobScheduler<T> : BasicScheduler<T> where T : JobBase
     {
-        public MegaRandomJobScheduler(T jobInstance, Logger<MegaRandomJobScheduler<T>> logger)
+        public MegaRandomJobScheduler(T jobInstance, ILogger<MegaRandomJobScheduler<T>> logger)
             : base(jobInstance, logger)
         {
         }
