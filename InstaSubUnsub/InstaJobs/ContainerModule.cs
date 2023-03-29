@@ -43,28 +43,28 @@ namespace InstaJobs
 
                 //FOR TESTS AND DEBUG:
                 //q.ScheduleJob<QuartzJobWrapper<UserCrawler>>(trigger => trigger.WithIdentity(nameof(UserCrawler)).StartNow());
-                q.ScheduleJob<QuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger.WithIdentity(nameof(UserFullDetailsProvider)).StartNow());
+                //q.ScheduleJob<QuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger.WithIdentity(nameof(UserFullDetailsProvider)).StartNow());
                 //q.ScheduleJob<QuartzJobWrapper<Follower>>(trigger => trigger.WithIdentity(nameof(Follower)).StartNow());
                 //q.ScheduleJob<QuartzJobWrapper<Unfollower>>(trigger => trigger.WithIdentity(nameof(Unfollower)).StartNow());
 
 
                 var crawlerConfig = new UserCrawlerJobConfig(config);
-                var crawlStartHour = crawlerConfig.WorkStartingHour ?? 7;
+                var crawlStartHour = crawlerConfig.WorkStartingHour ?? 3;
                 var crawlEndHour = crawlStartHour + (crawlerConfig.WorkDurationHours ?? 16);
                 q.ScheduleJob<RandomDelayQuartzJobWrapper<UserCrawler>>(trigger => trigger
                     .WithIdentity(nameof(UserCrawler))
-                    .WithCronSchedule($"0 0 {crawlStartHour}-{crawlEndHour}/3 * * ?",
+                    .WithCronSchedule($"0 0 {crawlStartHour}-{crawlEndHour}/2 * * ?",
                         x => x.WithMisfireHandlingInstructionFireAndProceed())
                 );
                 
-                //var detailsProviderConf = new UserFullDetailsProviderJobConfig(config);
-                //var detailsStartHour = detailsProviderConf.WorkStartingHour ?? 7;
-                //var detailsEndHour = detailsStartHour + (detailsProviderConf.WorkDurationHours ?? 16);
-                //q.ScheduleJob<RandomDelayQuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger
-                //    .WithIdentity(nameof(UserFullDetailsProvider))
-                //    .WithCronSchedule($"0 0/30 {detailsStartHour}-{detailsEndHour} * * ?", 
-                //        x => x.WithMisfireHandlingInstructionFireAndProceed())
-                //);
+                var detailsProviderConf = new UserFullDetailsProviderJobConfig(config);
+                var detailsStartHour = detailsProviderConf.WorkStartingHour ?? 1;
+                var detailsEndHour = detailsStartHour + (detailsProviderConf.WorkDurationHours ?? 16);
+                q.ScheduleJob<RandomDelayQuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger
+                    .WithIdentity(nameof(UserFullDetailsProvider))
+                    .WithCronSchedule($"0 0 {detailsStartHour}-{detailsEndHour}/1 * * ?", 
+                        x => x.WithMisfireHandlingInstructionFireAndProceed())
+                );
                 
                 q.ScheduleJob<MegaRandomQuartzJobWrapper<Follower>>(trigger => trigger
                     .WithIdentity(nameof(Follower))

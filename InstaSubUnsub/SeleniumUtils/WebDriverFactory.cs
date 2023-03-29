@@ -25,6 +25,7 @@ namespace SeleniumPageObjects
 
             var options = new ChromeOptions();
             options.AddArgument("--incognito");
+            options.AddArgument("--start-maximized");
 
             var chromeDriverPath = Path.Combine(currentDir, "chromedriver.exe");
             if (File.Exists(chromeDriverPath))
@@ -35,6 +36,7 @@ namespace SeleniumPageObjects
 
             var edgeConfig = new EdgeOptions();
             edgeConfig.AddArgument("--inPrivate");
+            edgeConfig.AddArgument("--start-maximized");
 
             var edgeDriverPath = Path.Combine(currentDir, "msedgedriver.exe");
             if (File.Exists(edgeDriverPath))

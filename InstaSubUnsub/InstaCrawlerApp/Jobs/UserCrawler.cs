@@ -13,6 +13,9 @@ namespace InstaCrawlerApp.Jobs
         private readonly IFollowersProvider _followersProvider;
         private readonly IUserDetailsProvider _detailsProvider;
 
+        private IEnumerable<InstaUser>? _seedUsers;
+        private IEnumerator<InstaUser>? _seedUsersEnumerator;
+
         public UserCrawler(IFollowersProvider followersProvider, IUserDetailsProvider detailsProvider,
             IRepository repo, ILogger<UserCrawler> logger, UserCrawlerJobConfig config, IAccountProvider<UserCrawler> accProvider)
             : base(repo, logger, config, accProvider)
@@ -34,35 +37,43 @@ namespace InstaCrawlerApp.Jobs
             return crawledUsersCount;
         }
 
+        private InstaUser? EnumerateUsers(IEnumerable<InstaUser> users)
+        {
+            _seedUsersEnumerator ??= users.GetEnumerator();
+            if (!_seedUsersEnumerator.MoveNext())
+                return null;
+            return _seedUsersEnumerator.Current;
+        }
+
         private InstaUser GetSeedUser()
         {
             var userQuery = Repository.Query<InstaUser>();
-            InstaUser? seedUser;
-            var attempts = 10;
-            do
+            
+            _seedUsers ??= userQuery.Where(u =>
+            u.HasRussianText == true
+                && u.IsClosed != true
+                && u.Rank >= 3
+                && u.LastPostDate >= DateTime.UtcNow.AddDays(-15))
+                .OrderByDescending(u => u.Id).Take(100)
+                .ToList();
+
+            //softer criteria
+            _seedUsers ??= userQuery.Where(u => u.HasRussianText == true && u.IsClosed != true)
+                .OrderByDescending(u => u.Id).Take(100)
+                .ToList();
+
+            InstaUser? seedUser = null;
+            seedUser = EnumerateUsers(_seedUsers);
+            if (seedUser == null)
+                throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
+
+            if (seedUser.Status == InstaDomain.Enums.UserStatus.New)
             {
-                seedUser = userQuery.Where(u =>
-                u.HasRussianText == true
-                    && u.IsClosed != true
-                    && u.Rank >= 3
-                    && u.LastPostDate >= DateTime.UtcNow.AddDays(-15))
-                    .OrderBy(u => u.Id)
-                    .LastOrDefault();
-
-                //softer criteria
-                seedUser ??= userQuery.Where(u => u.HasRussianText == true && u.IsClosed != true)
-                    .OrderBy(u => u.Id)
-                    .LastOrDefault();
-                if (seedUser == null)
-                    throw new InvalidOperationException("FATAL: Could not find any suitable user to start crawling. Probably database is empty.");
-
                 var detailedSeedUser = _detailsProvider.GetUserDetails(seedUser, Account);
                 Repository.Update(detailedSeedUser);
                 Repository.SaveChanges();
                 seedUser = detailedSeedUser;
-                attempts--;
             }
-            while ((seedUser.IsClosed == true || seedUser.FollowersNum == 0) && attempts > 0);
 
             return seedUser;
         }
