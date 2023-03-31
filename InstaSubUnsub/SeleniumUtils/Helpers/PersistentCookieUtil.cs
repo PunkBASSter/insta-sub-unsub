@@ -9,7 +9,7 @@ namespace SeleniumUtils.Helpers
     /// <summary>
     /// Manages cookies save/load for a single browser instance (supports only 1 Instagram user).
     /// </summary>
-    public class PersistentCookieUtil
+    public class PersistentCookieUtil : IPersistentCookieUtil
     {
         private readonly Lazy<IWebDriver> _lazyDriver;
         private IWebDriver _driver => _lazyDriver.Value;
@@ -49,6 +49,11 @@ namespace SeleniumUtils.Helpers
         {
             if (string.IsNullOrWhiteSpace(_cookieKey + username))
                 throw new ArgumentNullException("No value assigned for SavedCookiePath parameter.");
+        }
+
+        public void DeleteCookies(string username)
+        {
+            _cookieStorage.Delete(_cookieKey + username);
         }
     }
 }

@@ -11,5 +11,7 @@ namespace InstaInfrastructureAbstractions.PersistenceInterfaces
         long Insert<T>(T entity) where T : BaseEntity;
         void Update<T>(T entity) where T : BaseEntity;
         void SaveChanges();
+        void Delete<T>(long id) where T : BaseEntity;
+        void Delete<T>(T entity) where T : BaseEntity;
     }
 }

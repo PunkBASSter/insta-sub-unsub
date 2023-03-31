@@ -7,13 +7,17 @@ namespace SeleniumUtils.Extensions
     {
         public static int GetInstaSubNumber(this IWebElement sourceElem)
         {
+            //todo consider parsing title attribute 
             var txt = sourceElem.Text;
             var mul = 1;
-            if (txt.Contains("млн")) mul = 1000000;
-            if (txt.Contains("тыс.")) mul = 1000;
+            if (txt.Contains("млн") || txt.Contains("M")) mul = 1000000;
+            if (txt.Contains("тыс.") || txt.Contains("K")) mul = 1000;
             txt = txt.Replace(" ", string.Empty);
             txt = txt.Replace("млн", string.Empty);
             txt = txt.Replace("тыс.", string.Empty);
+            txt = txt.Replace("M", string.Empty);
+            txt = txt.Replace("K", string.Empty);
+
             var dbl = Convert.ToDouble(txt) * mul;
             return Convert.ToInt32(dbl);
         }

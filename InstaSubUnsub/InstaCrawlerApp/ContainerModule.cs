@@ -45,14 +45,16 @@ namespace InstaCrawlerApp
             services.AddScoped<IAccountProvider<UserCrawler>, ServiceAccountPoolProvider<UserCrawler>>(sp =>
                 new ServiceAccountPoolProvider<UserCrawler>(
                     sp.GetRequiredService<AccountPool>(),
-                    sp.GetRequiredService<IConfiguration>().GetRequiredSection("CrawlUser")
+                    sp.GetRequiredService<IConfiguration>().GetRequiredSection("CrawlUser"),
+                    sp.GetRequiredService<IPersistentCookieUtil>()
                     )
                 );
 
             services.AddScoped<IAccountProvider<UserFullDetailsProvider>, ServiceAccountPoolProvider<UserFullDetailsProvider>>(sp =>
                 new ServiceAccountPoolProvider<UserFullDetailsProvider>(
                     sp.GetRequiredService<AccountPool>(),
-                    sp.GetRequiredService<IConfiguration>().GetRequiredSection("CrawlUser")
+                    sp.GetRequiredService<IConfiguration>().GetRequiredSection("CrawlUser"),
+                    sp.GetRequiredService<IPersistentCookieUtil>()
                     )
                 );
 

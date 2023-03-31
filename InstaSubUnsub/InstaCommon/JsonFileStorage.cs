@@ -21,5 +21,13 @@ namespace InstaCommon
             var fileContents = reader.ReadToEnd();
             return JsonSerializer.Deserialize<T>(fileContents);
         }
+
+        public void Delete(string filePath)
+        {
+            if (!File.Exists(filePath))
+                return;
+
+            File.Delete(filePath);
+        }
     }
 }

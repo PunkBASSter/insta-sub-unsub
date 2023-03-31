@@ -1,7 +1,9 @@
-﻿using InstaCommon.Exceptions;
+﻿using InstaCommon.Contracts;
+using InstaCommon.Exceptions;
 using InstaCrawlerApp.Account;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain.Account;
+using InstaInfrastructureAbstractions;
 using Microsoft.Extensions.Configuration;
 
 namespace InstaCommon
@@ -10,12 +12,14 @@ namespace InstaCommon
     public class ServiceAccountPoolProvider<TConsumer> : AccountFromConfigProvider<TConsumer>,
         IAccountProvider<TConsumer> where TConsumer : class
     {
-
         private readonly AccountPool _accountPool;
-        
-        public ServiceAccountPoolProvider(AccountPool pool, IConfigurationSection section) : base(section)
+        private readonly IPersistentCookieUtil _cookiesStorage;
+
+        public ServiceAccountPoolProvider(AccountPool pool, IConfigurationSection section, IPersistentCookieUtil cookiesStorage)
+            : base(section)
         {
             _accountPool = pool;
+            _cookiesStorage = cookiesStorage;
         }
 
         protected override InstaAccount GetAccount()
@@ -34,6 +38,9 @@ namespace InstaCommon
         {
             if (LastUsedAccount == null)
                 return;
+
+            if (antiBotDetectedTime > default(DateTime))
+                _cookiesStorage.DeleteCookies(LastUsedAccount.Username);
 
             var jobName = GetType().GetGenericArguments().First().Name;
             _accountPool.ReleaseAccountAndSaveUsageHistory(LastUsedAccount, jobName, lastEntitiesProcessed, antiBotDetectedTime);

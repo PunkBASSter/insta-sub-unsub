@@ -4,5 +4,6 @@
     {
         void Write(string key, T objectToWrite);
         T? Read(string key);
+        void Delete(string key);
     }
 }

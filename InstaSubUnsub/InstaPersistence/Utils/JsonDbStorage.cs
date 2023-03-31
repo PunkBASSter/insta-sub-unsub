@@ -32,5 +32,14 @@ namespace InstaCommon
             _repository.InsertOrUpdate(dbRecord, i => i.Key == dbRecord.Key);
             _repository.SaveChanges();
         }
+
+        public void Delete(string key)
+        {
+            var obj = _repository.TrackedQuery<KeyValueJson>().FirstOrDefault(o => o.Key == key);
+            if (obj == null)
+                return;
+            _repository.Delete(obj);
+            _repository.SaveChanges();
+        }
     }
 }
