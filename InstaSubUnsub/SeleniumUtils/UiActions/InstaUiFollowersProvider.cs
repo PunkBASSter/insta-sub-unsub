@@ -1,6 +1,7 @@
 ﻿using InstaCommon.Extensions;
 using InstaDomain;
 using InstaDomain.Account;
+using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -14,7 +15,7 @@ namespace SeleniumUtils.UiActions
     public class InstaUiFollowersProvider : PersistentAuthActionBase, IFollowersProvider
     {
         public InstaUiFollowersProvider(IWebDriverFactory driverFactory, ILogger<InstaUiUserFollower> logger,
-            IConfiguration conf, PersistentCookieUtil cookieUtil) : base(driverFactory, logger, conf, cookieUtil) { }
+            IConfiguration conf, IPersistentCookieUtil cookieUtil) : base(driverFactory, logger, conf, cookieUtil) { }
 
         public IList<InstaUser> GetByUser(InstaUser user, InstaAccount account)
         {

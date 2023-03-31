@@ -55,6 +55,7 @@ namespace InstaCrawlerApp.Jobs
             catch (InstaAntiBotException)
             {
                 antiBotDetectedTime= DateTime.UtcNow;
+                executionDetails.ErrorInfo = nameof(InstaAntiBotException);
             }
             catch (Exception ex)
             {

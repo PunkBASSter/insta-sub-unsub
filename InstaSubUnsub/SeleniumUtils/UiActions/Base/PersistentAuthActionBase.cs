@@ -1,18 +1,18 @@
 ﻿using InstaDomain.Account;
+using InstaInfrastructureAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SeleniumPageObjects;
-using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
 
 namespace SeleniumUtils.UiActions.Base
 {
     public abstract class PersistentAuthActionBase : UiActionBase
     {
-        private readonly PersistentCookieUtil _cookieUtil;
+        private readonly IPersistentCookieUtil _cookieUtil;
 
         public PersistentAuthActionBase(IWebDriverFactory driverFactory, ILogger<UiActionBase> logger,
-            IConfiguration configuration, PersistentCookieUtil persistentCookieUtil) : base(driverFactory, logger, configuration)
+            IConfiguration configuration, IPersistentCookieUtil persistentCookieUtil) : base(driverFactory, logger, configuration)
         {
             _cookieUtil = persistentCookieUtil;
         }

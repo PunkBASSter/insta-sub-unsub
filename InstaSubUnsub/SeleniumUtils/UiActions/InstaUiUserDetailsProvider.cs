@@ -4,12 +4,12 @@ using InstaCommon.Extensions;
 using InstaDomain;
 using InstaDomain.Account;
 using InstaDomain.Enums;
+using InstaInfrastructureAbstractions;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SeleniumPageObjects;
 using SeleniumUtils.Extensions;
-using SeleniumUtils.Helpers;
 using SeleniumUtils.PageObjects;
 using SeleniumUtils.UiActions.Base;
 
@@ -20,7 +20,7 @@ namespace SeleniumUtils.UiActions
         private readonly double MinimumRank; //minimum ratio of followings/followers to proceed with user data mining
 
         public InstaUiUserDetailsProvider(IWebDriverFactory driverFactory, ILogger<InstaUiUserFollower> logger,
-            IConfiguration conf, PersistentCookieUtil cookieUtil)
+            IConfiguration conf, IPersistentCookieUtil cookieUtil)
             : base(driverFactory, logger, conf, cookieUtil)
         {
             MinimumRank = new FollowerJobConfig(conf).MinimumRank;
@@ -84,10 +84,10 @@ namespace SeleniumUtils.UiActions
 
         protected virtual double CalculateRank(InstaUser user)
         {
-            var followers = Math.Max(user.FollowersNum ?? 1, 1);
-            var followings = user.FollowingsNum ?? 0;
+            double followers = Math.Max(user.FollowersNum ?? 1, 1);
+            double followings = user.FollowingsNum ?? 0;
 
-            var followingsRatio = followings / followers;
+            double followingsRatio = followings / followers;
 
             return followingsRatio;
         }
