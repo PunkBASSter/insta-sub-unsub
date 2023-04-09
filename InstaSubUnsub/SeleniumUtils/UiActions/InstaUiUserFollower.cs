@@ -27,7 +27,8 @@ namespace SeleniumUtils.UiActions
             profilePage.Load();
 
             //Leave likes under last 2 posts
-            for (var i = 0; i< _postsToLike; i++)
+            var postsTotal = profilePage.PostLinks.Count;
+            for (var i = 0; i< Math.Min(_postsToLike, postsTotal); i++)
             {
                 var openingAttempts = 2;
                 Post? post;

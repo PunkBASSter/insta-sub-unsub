@@ -62,8 +62,18 @@ namespace SeleniumUtils.PageObjects
             var blueButton = new Wait(_driver).WaitForElement(_followButtonLocator);
             blueButton?.Click();
 
-            var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator);
-            return greyButton != null && greyButton.Displayed;
+            var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator, 40);
+            return greyButton != null && greyButton.Displayed && CheckAntiBotProtectionOnSubscription();
+        }
+
+        private bool CheckAntiBotProtectionOnSubscription()
+        {
+            new Wait(_driver).TryFindElement(
+                By.XPath("//div[@role='dialog']//span[contains(text(),'Повторите попытку позже')]"), out IWebElement? antiBotDialog);
+            if (antiBotDialog != null && antiBotDialog.Displayed)
+                throw new InstaAntiBotException("Anti-bot dialog was shown after an attempt to follow a user.");
+
+            return true;
         }
 
         public bool Unfollow() 
@@ -107,7 +117,7 @@ namespace SeleniumUtils.PageObjects
         public IWebElement FollowingsNumElement =>
             _driver.FindElement(By.XPath(".//section/ul/li[3]//a/span/span"));
 
-        private ReadOnlyCollection<IWebElement> PostLinks =>
+        public ReadOnlyCollection<IWebElement> PostLinks =>
             _driver.FindElements(By.XPath(".//article/div/div/div/div/a"));
 
         public bool OpenPost(out Post? postObj, int postNumFromTopLeft = 0)
@@ -119,7 +129,7 @@ namespace SeleniumUtils.PageObjects
             }
             
             PostLinks[postNumFromTopLeft].Click();
-            postObj = new Post(_driver);
+            postObj = new Post(_driver).Load();
             
             return (postObj.PublishDate > default(DateTime));
         }

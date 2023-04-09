@@ -25,7 +25,8 @@ namespace InstaCrawlerApp.Jobs
             var query = _repo.Query<InstaUser>();
 
             //First take all with recent posts (stories detected by crawler)
-            var usersToVisit = query.Where(u => u.Rank == 0
+            var usersToVisit = query.Where(u => u.Status == UserStatus.New
+                && u.Rank == 0
                 && u.IsClosed != true
                 && u.LastPostDate >= DateTime.UtcNow.Date.AddDays(-7)
                 && u.FollowingDate == null
@@ -38,7 +39,8 @@ namespace InstaCrawlerApp.Jobs
                 return usersToVisit;
 
             //Then take the rest with known Russian text in descriotion (found by crawler)
-            var usersLeftToVisitRus = query.Where(u => u.Rank == 0
+            var usersLeftToVisitRus = query.Where(u => u.Status == UserStatus.New
+                && u.Rank == 0
                 && u.HasRussianText == true
                 && u.IsClosed != true
                 && u.LastPostDate == null
@@ -46,13 +48,14 @@ namespace InstaCrawlerApp.Jobs
                 && u.UnfollowingDate == null
             ).Take(leftForLimit).ToList();
 
-            leftForLimit = leftForLimit - usersLeftToVisitRus.Count;
+            leftForLimit -= usersLeftToVisitRus.Count;
             usersToVisit.AddRange(usersLeftToVisitRus);
             if (leftForLimit == 0)
                 return usersToVisit; 
 
-            //Take the rest without aby known info
-            var usersLeftToVisit = query.Where(u => u.Rank == 0
+            //Take the rest without any known info
+            var usersLeftToVisit = query.Where(u => u.Status == UserStatus.New
+                && u.Rank == 0
                 && u.HasRussianText == null
                 && u.IsClosed != true
                 && u.LastPostDate == null

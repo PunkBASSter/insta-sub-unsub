@@ -1,4 +1,5 @@
 ﻿using InstaCommon.Config.Jobs;
+using InstaCommon.Exceptions;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
@@ -20,28 +21,40 @@ namespace InstaCrawlerApp.Jobs
             _repo = repo;
         }
 
-        protected override int ExecuteInternal()
+        protected override void ExecuteInternal()
         {
             var usersToFollow = _repo.Query<InstaUser>().Where(new UsersToFollowFilter().Get())
                 .OrderByDescending(u => u.LastPostDate)
                 .Take(LimitPerIteration)
                 .ToArray();
 
-            var followed = 0;
             foreach (var user in usersToFollow)
             {
-                if (_userFollower.Follow(user, Account))
+                try
+                {
+                    if (_userFollower.Follow(user, Account))
+                    {
+                        var updated = user;
+                        updated.FollowingDate = DateTime.UtcNow;
+                        updated.Status = InstaDomain.Enums.UserStatus.Followed; //todo condider deprecating status
+                        _repo.Update(updated);
+                        _repo.SaveChanges();
+                        ItemsProcessedPerIteration++;
+                    }
+                }
+                catch(UserPageUnavailable ex) 
                 {
                     var updated = user;
-                    updated.FollowingDate = DateTime.UtcNow;
-                    updated.Status = InstaDomain.Enums.UserStatus.Followed; //todo condider deprecating status
+                    updated.Status = InstaDomain.Enums.UserStatus.Error; 
                     _repo.Update(updated);
                     _repo.SaveChanges();
-                    followed++;
                 }
+                catch(InstaAntiBotException ex)
+                { 
+                    throw ex; 
+                }
+                //Consider catching everything here or delegate it to the caller
             }
-
-            return followed;
         }
 
         public class UsersToFollowFilter

@@ -26,15 +26,14 @@ namespace InstaCrawlerApp.Jobs
             _logger = logger;
         }
 
-        protected override int ExecuteInternal()
+        protected override void ExecuteInternal()
         {
             var users = FetchUsersToFill();
 
             if (users.Count < 1 || !Initialize())
-                return 0;
+                return;
 
             var processed = 0;
-            var fitsForFollowing = 0;
             foreach (var user in users)
             {
                 if (_consequentAntiBotFailures >= 3)
@@ -49,7 +48,7 @@ namespace InstaCrawlerApp.Jobs
                     _repo.SaveChanges();
                     processed++;
                     if (new Follower.UsersToFollowFilter().Get()(modified))
-                        fitsForFollowing++;
+                        ItemsProcessedPerIteration++;
                 }
                 else if (modified.Status == UserStatus.Error || modified.Status == UserStatus.Unavailable)
                 {
@@ -57,8 +56,6 @@ namespace InstaCrawlerApp.Jobs
                     _repo.SaveChanges(); ;
                 }
             }
-
-            return fitsForFollowing;
         }
 
         protected virtual bool Initialize() { return true; }

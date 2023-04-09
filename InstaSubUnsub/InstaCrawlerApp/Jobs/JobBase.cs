@@ -19,7 +19,7 @@ namespace InstaCrawlerApp.Jobs
         private readonly IAccountProvider<JobBase> _accountProvider;
 
         protected InstaAccount Account => _accountProvider.Get();
-
+        protected int ItemsProcessedPerIteration = 0;
         private int? _limitPerIteration;
         protected virtual int LimitPerIteration => _limitPerIteration.GetValueOrDefault();
         
@@ -47,10 +47,9 @@ namespace InstaCrawlerApp.Jobs
             executionDetails.StartTime = DateTime.UtcNow;
 
             DateTime? antiBotDetectedTime = null;
-            int processed = 0;
             try
             {
-                processed = await Task.Run(ExecuteInternal, cancellation);
+                await Task.Run(ExecuteInternal, cancellation);
             }
             catch (InstaAntiBotException)
             {
@@ -62,7 +61,7 @@ namespace InstaCrawlerApp.Jobs
                 executionDetails.ErrorInfo = HandleException(ex);
             }
 
-            executionDetails.ProcessedNumber = processed;
+            executionDetails.ProcessedNumber = ItemsProcessedPerIteration;
             executionDetails.CompletionTime = DateTime.UtcNow;
 
             Repository.Insert(executionDetails);
@@ -71,14 +70,14 @@ namespace InstaCrawlerApp.Jobs
             Logger.LogInformation("Job {0} finished, limit per iteration: {1}, actually processed {2}.",
                 GetType().Name, LimitPerIteration, executionDetails.ProcessedNumber);
 
-            _accountProvider.SaveUsageHistory(processed, antiBotDetectedTime);
+            _accountProvider.SaveUsageHistory(ItemsProcessedPerIteration, antiBotDetectedTime);
 
             return executionDetails;
         }
 
         public JobConfigBase GetConfig() => Config;
 
-        protected abstract int ExecuteInternal();
+        protected abstract void ExecuteInternal();
 
         private string HandleException(Exception ex)
         {

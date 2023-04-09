@@ -39,19 +39,19 @@ namespace InstaCrawlerApp.Jobs
             }
         }
 
-        protected override int ExecuteInternal()
+        protected override void ExecuteInternal()
         {
             _userUnfollower.Login(Account);
 
-            var unfollowedCount = UnfollowBasedOnDb();
+            ItemsProcessedPerIteration = UnfollowBasedOnDb();
 
-            if (unfollowedCount >= LimitPerIteration)
-                return unfollowedCount;
+            if (ItemsProcessedPerIteration >= LimitPerIteration)
+                return;
 
-            var numberToUnfollowInUi = LimitPerIteration - unfollowedCount;
-            unfollowedCount += UnfollowBasedOnUi(numberToUnfollowInUi);
+            var numberToUnfollowInUi = LimitPerIteration - ItemsProcessedPerIteration;
+            ItemsProcessedPerIteration += UnfollowBasedOnUi(numberToUnfollowInUi);
 
-            return unfollowedCount;
+            return;
         }
 
         private int UnfollowBasedOnDb()

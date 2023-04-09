@@ -21,17 +21,25 @@ namespace InstaCrawlerApp.Scheduling
         {
             var refTime = DateTime.UtcNow.AddSeconds(-1);
             var schedule = GenerateSchedule().Where(js => js.StartTime > refTime);
+            LogScheduleItems(schedule);
 
             foreach (var iteration in schedule)
             {
                 var timeDiff = iteration.StartTime - refTime;
                 if (timeDiff.TotalSeconds >= 0)
                 {
-                    _logger.LogInformation("{0} will start after {1} seconds",
-                         JobInstance.GetType().Name, timeDiff.TotalSeconds);
                     await Task.Delay(timeDiff, cancellationToken);
                     await JobInstance.Execute(iteration, cancellationToken);
                 }
+            }
+        }
+
+        private void LogScheduleItems(IEnumerable<JobExecutionDetails> items)
+        {
+            foreach (var item in items) 
+            {
+                _logger.LogInformation("{0} will start at {1} to process {2}", item.JobName, item.StartTime
+                    , item.LimitPerIteration);
             }
         }
 

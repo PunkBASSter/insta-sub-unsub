@@ -15,6 +15,12 @@ namespace SeleniumUtils.PageObjects
             _element = new Lazy<IWebElement?>(() => new Wait(_driver).TryWaitForElement(By.XPath(".//div[@role='dialog']//article")));
         }
 
+        public Post Load()
+        {
+            _ = _element.Value;
+            return this;
+        }
+
         private string? _description;
         public string Description {
             get
@@ -33,10 +39,10 @@ namespace SeleniumUtils.PageObjects
             {
                 if (_date is null)
                 {
-                    var element = new Wait(_driver, _element.Value).TryWaitForElement(By.XPath(".//a/div/time"));
-                    if (element != null)
+                    var dateElement = _element.Value?.FindElements(By.XPath(".//time")).LastOrDefault();
+                    if (dateElement != null)
                     {
-                        var dateTxt = element.GetAttribute("datetime");
+                        var dateTxt = dateElement.GetAttribute("datetime");
                         _date = DateTime.Parse(dateTxt);
                     }   
                 }
@@ -95,7 +101,7 @@ namespace SeleniumUtils.PageObjects
 
                 _element.Value?.SendKeys(Keys.ArrowRight);
 
-                nextPost = new Post(_driver);
+                nextPost = new Post(_driver).Load();
                 var nextPostDesc = nextPost.Description;
                 var nextPostDate = nextPost.PublishDate;
 

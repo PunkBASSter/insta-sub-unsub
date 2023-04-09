@@ -24,17 +24,13 @@ namespace InstaCrawlerApp.Jobs
             _detailsProvider = detailsProvider;
         }
 
-        protected override int ExecuteInternal()
+        protected override void ExecuteInternal()
         {
-            var crawledUsersCount = 0;
-
-            while (crawledUsersCount <= LimitPerIteration)
+            while (ItemsProcessedPerIteration <= LimitPerIteration)
             {
-                crawledUsersCount += CrawlFromLastUser();
+                ItemsProcessedPerIteration += CrawlFromLastUser();
                 new Delay().Random();
             }
-
-            return crawledUsersCount;
         }
 
         private InstaUser? EnumerateUsers(IEnumerable<InstaUser> users)
