@@ -59,8 +59,9 @@ namespace SeleniumUtils.PageObjects
         
         public bool Follow()
         {
-            var blueButton = new Wait(_driver).WaitForElement(_followButtonLocator);
-            blueButton?.Click();
+            var blueButton = new Wait(_driver).TryWaitForElement(_followButtonLocator, 4);
+            if (blueButton != null)
+                blueButton?.Click();
 
             var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator, 40);
             return greyButton != null && greyButton.Displayed && CheckAntiBotProtectionOnSubscription();

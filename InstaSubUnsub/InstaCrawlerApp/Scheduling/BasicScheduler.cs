@@ -38,8 +38,9 @@ namespace InstaCrawlerApp.Scheduling
         {
             foreach (var item in items) 
             {
-                _logger.LogInformation("{0} will start at {1} to process {2}", item.JobName, item.StartTime
-                    , item.LimitPerIteration);
+                _logger.LogInformation("{0} will start at {1} to process {2}",
+                    GetType().GenericTypeArguments.First().Name, item.StartTime,
+                    item.LimitPerIteration);
             }
         }
 

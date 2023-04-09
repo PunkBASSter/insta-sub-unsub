@@ -69,7 +69,7 @@ namespace SeleniumUtils.PageObjects
                 return false;
 
             var wait = new Wait(_driver, _element.Value);
-            var likeButton = wait.WaitForElement(By.XPath("//article//section//button//*[@aria-label='Нравится']/ancestor::button"));
+            var likeButton = wait.TryWaitForElement(By.XPath("//article//section//button//*[@aria-label='Нравится']/ancestor::button"));
             if (likeButton != null && likeButton.Displayed)
                 likeButton.Click();
 

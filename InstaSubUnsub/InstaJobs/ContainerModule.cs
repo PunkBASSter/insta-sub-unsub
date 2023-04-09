@@ -73,7 +73,7 @@ namespace InstaJobs
                 q.ScheduleJob<RandomDelayQuartzJobWrapper<Follower>>(trigger => trigger
                     .WithIdentity(nameof(Follower))
                     //.StartNow()
-                    .WithCronSchedule($"0 30 {followerStartHour}-{followerEndHour}/1 * * ?",
+                    .WithCronSchedule($"0 0 {followerStartHour}-{followerEndHour}/1 * * ?",
                         x => x.WithMisfireHandlingInstructionFireAndProceed())
                 );
                 
