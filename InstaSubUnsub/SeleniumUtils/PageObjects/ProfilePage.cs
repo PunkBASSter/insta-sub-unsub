@@ -99,7 +99,7 @@ namespace SeleniumUtils.PageObjects
         public bool CheckClosedAccount()
         {
             new Wait(_driver).TryFindElement(By.XPath(".//article/div//*[contains(text(),'закрытый аккаунт')]"), out IWebElement? closedElement);
-            return closedElement != null && closedElement.Displayed;
+            return closedElement != null;
         }
 
         private ReadOnlyCollection<IWebElement> DescriptionParts =>
