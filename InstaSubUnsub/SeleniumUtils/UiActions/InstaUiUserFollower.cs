@@ -21,10 +21,17 @@ namespace SeleniumUtils.UiActions
 
         public bool Follow(InstaUser user, InstaAccount account)
         {
+            return base.InvokeWithScreenshotOnError(() => FollowImplementation(user, account)).Success;
+        }
+
+        private UiActionResult FollowImplementation(InstaUser user, InstaAccount account)
+        {
             Login(account);
 
             var profilePage = new ProfilePage(WebDriver, user.Name);
             profilePage.Load();
+            if (profilePage.CheckClosedAccount())
+                return new UiActionResult { Success = false };
 
             //Leave likes under last 2 posts
             var postsTotal = profilePage.PostLinks.Count;
@@ -41,8 +48,10 @@ namespace SeleniumUtils.UiActions
                     post.Close();
                 }
             }
-            
-            return profilePage.Follow();
+
+            var res = new UiActionResult { Success = profilePage.Follow() };
+
+            return res;
         }
     }
 }

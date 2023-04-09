@@ -2,6 +2,7 @@
 using InstaCommon.Exceptions;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain;
+using InstaDomain.Enums;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
@@ -36,10 +37,17 @@ namespace InstaCrawlerApp.Jobs
                     {
                         var updated = user;
                         updated.FollowingDate = DateTime.UtcNow;
-                        updated.Status = InstaDomain.Enums.UserStatus.Followed; //todo condider deprecating status
+                        updated.Status = UserStatus.Followed;
                         _repo.Update(updated);
                         _repo.SaveChanges();
                         ItemsProcessedPerIteration++;
+                    }
+                    else
+                    {
+                        var updated = user;
+                        updated.Status = UserStatus.Error; 
+                        _repo.Update(updated);
+                        _repo.SaveChanges();
                     }
                 }
                 catch(UserPageUnavailable ex) 
@@ -61,7 +69,8 @@ namespace InstaCrawlerApp.Jobs
         {
             public Func<InstaUser, bool> Get()
             {
-                return u => u.Rank >= 3 && u.HasRussianText == true && u.IsClosed != true
+                return u => u.Status == UserStatus.Visited
+                    && u.Rank >= 3 && u.HasRussianText == true && u.IsClosed != true
                     && u.LastPostDate >= DateTime.UtcNow.Date.AddDays(-7)
                     && u.FollowingDate == null && u.UnfollowingDate == null;
             }

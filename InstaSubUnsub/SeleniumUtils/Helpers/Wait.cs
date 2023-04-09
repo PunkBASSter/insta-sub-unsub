@@ -27,7 +27,6 @@ namespace SeleniumUtils.Helpers
             try
             {
                 return WaitForElement(locator, timeoutSec);
-
             }
             catch (WebDriverTimeoutException) { return null; }
         }

@@ -47,14 +47,15 @@ namespace InstaCrawlerApp.Jobs
                     _repo.Update(modified);
                     _repo.SaveChanges();
                     processed++;
-                    if (new Follower.UsersToFollowFilter().Get()(modified))
-                        ItemsProcessedPerIteration++;
                 }
                 else if (modified.Status == UserStatus.Error || modified.Status == UserStatus.Unavailable)
                 {
                     _repo.Update(modified);
                     _repo.SaveChanges(); ;
                 }
+
+                if (new Follower.UsersToFollowFilter().Get()(modified))
+                    ItemsProcessedPerIteration++;
             }
         }
 

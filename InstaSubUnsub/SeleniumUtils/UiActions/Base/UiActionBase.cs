@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using OpenQA.Selenium;
 using SeleniumPageObjects;
 using SeleniumUtils.PageObjects;
+using System.Reflection;
 
 namespace SeleniumUtils.UiActions.Base
 {
@@ -44,6 +45,29 @@ namespace SeleniumUtils.UiActions.Base
             LoggedInUsername = account.Username;
 
             return true;
+        }
+
+        protected virtual UiActionResult InvokeWithScreenshotOnError(Func<UiActionResult> func)
+        {
+            try
+            {
+                return func();
+            }
+            catch (WebDriverException ex) // assumption: it's a base for other selenium exceptions
+            {
+                var ss = ((ITakesScreenshot)_lazyDriver.Value).GetScreenshot();
+                var pathFromConf = _configuration.GetRequiredSection("Diagnostics:ScreenshotsPath").Value;
+                var dirName = string.IsNullOrWhiteSpace(pathFromConf) 
+                    ? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
+                    : pathFromConf;
+
+                var fileName = Path.Combine(dirName ?? string.Empty, $"ScreenShot_{DateTime.UtcNow:yy-MM-dd_hh-mm}.png");
+                ss.SaveAsFile(fileName, ScreenshotImageFormat.Png);
+                _logger.LogError(ex, ex.Message, ex.Data.Values);
+                _logger.LogError("Screenshot saved. Available here: {0}.", fileName);
+
+                throw;
+            }
         }
     }
 }
