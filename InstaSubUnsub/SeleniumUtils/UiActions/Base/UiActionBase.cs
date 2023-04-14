@@ -56,7 +56,7 @@ namespace SeleniumUtils.UiActions.Base
             catch (WebDriverException ex) // assumption: it's a base for other selenium exceptions
             {
                 var ss = ((ITakesScreenshot)_lazyDriver.Value).GetScreenshot();
-                var pathFromConf = _configuration.GetRequiredSection("Diagnostics:ScreenshotsPath").Value;
+                var pathFromConf = _configuration.GetRequiredSection("WebDriver:ScreenshotsPath").Value;
                 var dirName = string.IsNullOrWhiteSpace(pathFromConf) 
                     ? Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
                     : pathFromConf;

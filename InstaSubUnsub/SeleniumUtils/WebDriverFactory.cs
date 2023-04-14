@@ -1,6 +1,8 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.Extensions.Configuration;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Edge;
+using SeleniumUtils;
 using System.Reflection;
 
 namespace SeleniumPageObjects
@@ -8,12 +10,66 @@ namespace SeleniumPageObjects
     //Scoped factory
     public sealed class WebDriverFactory : IWebDriverFactory
     {
+        private readonly IConfiguration _configuration;
         private IWebDriver? _driverInstance;
+        private readonly BrowserType _browserType;
+        private readonly bool _privateMode = true;
+
+        public WebDriverFactory(IConfiguration conf)
+        { 
+            _configuration = conf;
+            var browserStr = conf.GetRequiredSection("WebDriver:Browser").Value;
+
+            if (!Enum.TryParse(browserStr, true, out _browserType))
+                _browserType = BrowserType.Chrome;
+
+            _privateMode = conf.GetRequiredSection("WebDriver:PrivateMode").Value == "true";
+        }
 
         public void Dispose()
         {
             _driverInstance?.Dispose();
             GC.SuppressFinalize(this);
+        }
+
+        private ChromeOptions GetChromeOptions() 
+        {
+            var options = new ChromeOptions();
+            if (_privateMode)
+                options.AddArgument("--incognito");
+            options.AddArgument("--start-maximized");
+            return options;
+        }
+
+        private IWebDriver? GetChromeDriver(string driversDir)
+        {
+            var chromeDriverPath = Path.Combine(driversDir, "chromedriver.exe");
+            if (File.Exists(chromeDriverPath))
+            {
+                return new ChromeDriver(chromeDriverPath, GetChromeOptions());
+            }
+
+            return null;
+        }
+
+        private EdgeOptions GetEdgeOptions() 
+        {
+            var edgeConfig = new EdgeOptions();
+            if (_privateMode)
+                edgeConfig.AddArgument("--inPrivate");
+            edgeConfig.AddArgument("--start-maximized");
+            return edgeConfig;
+        }
+
+        private IWebDriver? GetEdgeDriver(string driversPath)
+        {
+            var edgeDriverPath = Path.Combine(driversPath, "msedgedriver.exe");
+            if (File.Exists(edgeDriverPath))
+            {
+                return new EdgeDriver(edgeDriverPath, GetEdgeOptions());
+            }
+
+            return null;
         }
 
         public IWebDriver GetInstance()
@@ -23,29 +79,19 @@ namespace SeleniumPageObjects
 
             var currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
 
-            var options = new ChromeOptions();
-            options.AddArgument("--incognito");
-            options.AddArgument("--start-maximized");
-
-            var chromeDriverPath = Path.Combine(currentDir, "chromedriver.exe");
-            if (File.Exists(chromeDriverPath))
+            switch (_browserType)
             {
-                _driverInstance = new ChromeDriver(chromeDriverPath, options);
-                return _driverInstance;
+                case BrowserType.Chrome: _driverInstance = GetChromeDriver(currentDir); break;
+                case BrowserType.Edge: _driverInstance = GetEdgeDriver(currentDir); break;
+                default:
+                    _driverInstance ??= GetChromeDriver(currentDir) ?? GetEdgeDriver(currentDir);
+                    break;
             }
 
-            var edgeConfig = new EdgeOptions();
-            edgeConfig.AddArgument("--inPrivate");
-            edgeConfig.AddArgument("--start-maximized");
+            if (_driverInstance == null)
+                throw new NotImplementedException("Unable to find supported WebDriver EXE file.");
 
-            var edgeDriverPath = Path.Combine(currentDir, "msedgedriver.exe");
-            if (File.Exists(edgeDriverPath))
-            {
-                _driverInstance = new EdgeDriver(edgeDriverPath, edgeConfig);
-                return _driverInstance;
-            }
-
-            throw new NotImplementedException("Unable to find supported WebDriver EXE file.");
+            return _driverInstance;
         }
     }
 }

@@ -59,11 +59,11 @@ namespace SeleniumUtils.PageObjects
         
         public bool Follow()
         {
-            var blueButton = new Wait(_driver).TryWaitForElement(_followButtonLocator, 4);
+            var blueButton = new Wait(_driver).TryWaitForElement(_followButtonLocator);
             if (blueButton != null)
                 blueButton?.Click();
 
-            var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator, 40);
+            var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator);
             return greyButton != null && greyButton.Displayed && CheckAntiBotProtectionOnSubscription();
         }
 
@@ -79,12 +79,15 @@ namespace SeleniumUtils.PageObjects
 
         public bool Unfollow() 
         {
-            var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator);
-            greyButton?.Click();
-
-            var unfollowMenuItem = new Wait(_driver)
-                .WaitForElement(By.XPath(".//div[@role='dialog']//span[contains(text(),'Отменить подписку')]"));
-            unfollowMenuItem?.Click();
+            var greyButton = new Wait(_driver).TryWaitForElement(_followingsButtonLocator);
+            if (greyButton != null)
+            {
+                greyButton?.Click();
+                var unfollowMenuItem = new Wait(_driver)
+                .TryWaitForElement(By.XPath(".//div[@role='dialog']//span[contains(text(),'Отменить подписку')]"));
+                if (unfollowMenuItem != null)
+                    unfollowMenuItem?.Click();
+            }
 
             var blueButton = new Wait(_driver).WaitForElement(_followButtonLocator);
             return blueButton != null && blueButton.Displayed;
