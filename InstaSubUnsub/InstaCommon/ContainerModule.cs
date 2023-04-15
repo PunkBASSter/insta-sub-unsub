@@ -1,4 +1,5 @@
 ﻿using InstaCommon.Config.Jobs;
+using InstaCommon.Config.Limits;
 using InstaInfrastructureAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ namespace InstaCommon
             services.AddScoped<UserFullDetailsProviderJobConfig>();
             services.AddScoped<FollowerJobConfig>();
             services.AddScoped<UnfollowerJobConfig>();
+            services.AddScoped<SharedFollowUnfollowLimitConfig>();
         }
     }
 }

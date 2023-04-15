@@ -50,16 +50,16 @@ namespace InstaCrawlerApp.Jobs
                         _repo.SaveChanges();
                     }
                 }
-                catch(UserPageUnavailable ex) 
+                catch(UserPageUnavailable) 
                 {
                     var updated = user;
-                    updated.Status = InstaDomain.Enums.UserStatus.Error; 
+                    updated.Status = UserStatus.Unavailable; 
                     _repo.Update(updated);
                     _repo.SaveChanges();
                 }
-                catch(InstaAntiBotException ex)
+                catch(InstaAntiBotException)
                 { 
-                    throw ex; 
+                    throw; 
                 }
                 //Consider catching everything here or delegate it to the caller
             }

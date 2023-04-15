@@ -54,7 +54,7 @@ namespace InstaJobs
                 var crawlEndHour = crawlStartHour + (crawlerConfig.WorkDurationHours ?? 16);
                 q.ScheduleJob<RandomDelayQuartzJobWrapper<UserCrawler>>(trigger => trigger
                     .WithIdentity(nameof(UserCrawler))
-                    .WithCronSchedule($"0 0 {crawlStartHour}-{crawlEndHour}/2 * * ?",
+                    .WithCronSchedule($"0 0 {crawlStartHour}-{crawlEndHour}/1 * * ?",
                         x => x.WithMisfireHandlingInstructionFireAndProceed())
                 );
                 
@@ -70,19 +70,20 @@ namespace InstaJobs
                 var followerConf = new FollowerJobConfig(config);
                 var followerStartHour = followerConf.WorkStartingHour ?? 10;
                 var followerEndHour = followerStartHour + (followerConf.WorkDurationHours ?? 12);
-                q.ScheduleJob<RandomDelayQuartzJobWrapper<Follower>>(trigger => trigger
-                    .WithIdentity(nameof(Follower))
-                    //.StartNow()
-                    .WithCronSchedule($"0 0 {followerStartHour}-{followerEndHour}/1 * * ?",
-                        x => x.WithMisfireHandlingInstructionFireAndProceed())
-                );
-                
-                //q.ScheduleJob<MegaRandomQuartzJobWrapper<Unfollower>>(trigger => trigger
-                //    .WithIdentity(nameof(Unfollower))
-                //    //.StartNow()
-                //    .WithCronSchedule($"0 0 8 * * ?",
+                //q.ScheduleJob<RandomDelayQuartzJobWrapper<Follower>>(trigger => trigger
+                //    .WithIdentity(nameof(Follower))
+                //    .WithCronSchedule($"0 0 {followerStartHour}-{followerEndHour}/2 * * ?",
                 //        x => x.WithMisfireHandlingInstructionFireAndProceed())
                 //);
+                
+                var unfollowerConf = new UnfollowerJobConfig(config);
+                var unfollowerStartHour = unfollowerConf.WorkStartingHour ?? 10;
+                var unfollowerEndHour = unfollowerStartHour + (unfollowerConf.WorkDurationHours ?? 12);
+                q.ScheduleJob<RandomDelayQuartzJobWrapper<Unfollower>>(trigger => trigger
+                    .WithIdentity(nameof(Unfollower))
+                    .WithCronSchedule($"0 30 {unfollowerStartHour}-{unfollowerEndHour}/2 * * ?",
+                        x => x.WithMisfireHandlingInstructionFireAndProceed())
+                );
 
                 /*
                  * # Will only run on odd days:
