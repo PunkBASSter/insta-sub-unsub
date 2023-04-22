@@ -81,7 +81,7 @@ namespace InstaJobs
                 var unfollowerEndHour = unfollowerStartHour + (unfollowerConf.WorkDurationHours ?? 12);
                 q.ScheduleJob<RandomDelayQuartzJobWrapper<Unfollower>>(trigger => trigger
                     .WithIdentity(nameof(Unfollower))
-                    .WithCronSchedule($"0 30 {unfollowerStartHour}-{unfollowerEndHour}/2 * * ?",
+                    .WithCronSchedule($"0 0 {unfollowerStartHour}-{unfollowerEndHour}/2 * * ?",
                         x => x.WithMisfireHandlingInstructionFireAndProceed())
                 );
 

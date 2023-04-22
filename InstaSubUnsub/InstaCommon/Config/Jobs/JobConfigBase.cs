@@ -12,7 +12,7 @@ namespace InstaCommon.Config.Jobs
         {
         }
 
-        
+        public bool Disabled { get; set; } = false;
         public int LimitPerDay { get; set; }
         public int LimitPerDayDispersion { get; set; }
         public int LimitPerIteration { get; set; }

@@ -19,6 +19,12 @@ namespace InstaCrawlerApp.Scheduling
 
         public virtual async Task Execute(CancellationToken cancellationToken)
         {
+            if (JobConfig.Disabled)
+            {
+                _logger.LogWarning("Job {0} is disabled in the App settings. Skipping...", GetType().GenericTypeArguments.First().Name);
+                return;
+            }
+
             var refTime = DateTime.UtcNow.AddSeconds(-1);
             var schedule = GenerateSchedule().Where(js => js.StartTime > refTime);
             LogScheduleItems(schedule);

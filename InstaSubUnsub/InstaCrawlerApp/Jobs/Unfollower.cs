@@ -90,7 +90,8 @@ namespace InstaCrawlerApp.Jobs
                     if (_userUnfollower.Unfollow(user, Account))
                     {
                         var updUser = user;
-                        UnfollowUserInDb(updUser);
+                        if (user.Id > 0) // todo record user in DB ??
+                            UnfollowUserInDb(user);
                         ItemsProcessedPerIteration++;
                     }
                 }

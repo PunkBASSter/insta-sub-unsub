@@ -23,7 +23,7 @@ namespace SeleniumPageObjects
             if (!Enum.TryParse(browserStr, true, out _browserType))
                 _browserType = BrowserType.Chrome;
 
-            _privateMode = conf.GetRequiredSection("WebDriver:PrivateMode").Value == "true";
+            _privateMode = Convert.ToBoolean(conf.GetRequiredSection("WebDriver:PrivateMode").Value);
         }
 
         public void Dispose()
