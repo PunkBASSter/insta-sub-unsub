@@ -70,11 +70,11 @@ namespace InstaJobs
                 var followerConf = new FollowerJobConfig(config);
                 var followerStartHour = followerConf.WorkStartingHour ?? 10;
                 var followerEndHour = followerStartHour + (followerConf.WorkDurationHours ?? 12);
-                //q.ScheduleJob<RandomDelayQuartzJobWrapper<Follower>>(trigger => trigger
-                //    .WithIdentity(nameof(Follower))
-                //    .WithCronSchedule($"0 0 {followerStartHour}-{followerEndHour}/2 * * ?",
-                //        x => x.WithMisfireHandlingInstructionFireAndProceed())
-                //);
+                q.ScheduleJob<RandomDelayQuartzJobWrapper<Follower>>(trigger => trigger
+                    .WithIdentity(nameof(Follower))
+                    .WithCronSchedule($"0 0 {followerStartHour}-{followerEndHour}/2 * * ?",
+                        x => x.WithMisfireHandlingInstructionFireAndProceed())
+                );
                 
                 var unfollowerConf = new UnfollowerJobConfig(config);
                 var unfollowerStartHour = unfollowerConf.WorkStartingHour ?? 10;
