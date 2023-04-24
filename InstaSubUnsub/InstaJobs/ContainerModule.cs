@@ -42,13 +42,14 @@ namespace InstaJobs
                     tp.MaxConcurrency = 4; // 1 for each possible job
                 });
 
-                //FOR TESTS AND DEBUG:
+#if DEBUG
                 //q.ScheduleJob<QuartzJobWrapper<UserCrawler>>(trigger => trigger.WithIdentity(nameof(UserCrawler)).StartNow());
                 //q.ScheduleJob<QuartzJobWrapper<UserFullDetailsProvider>>(trigger => trigger.WithIdentity(nameof(UserFullDetailsProvider)).StartNow());
                 //q.ScheduleJob<QuartzJobWrapper<Follower>>(trigger => trigger.WithIdentity(nameof(Follower)).StartNow());
-                //q.ScheduleJob<QuartzJobWrapper<Unfollower>>(trigger => trigger.WithIdentity(nameof(Unfollower)).StartNow());
+                q.ScheduleJob<QuartzJobWrapper<Unfollower>>(trigger => trigger.WithIdentity(nameof(Unfollower)).StartNow());
+#endif
 
-
+#if RELEASE
                 var crawlerConfig = new UserCrawlerJobConfig(config);
                 var crawlStartHour = crawlerConfig.WorkStartingHour ?? 3;
                 var crawlEndHour = crawlStartHour + (crawlerConfig.WorkDurationHours ?? 16);
@@ -84,6 +85,8 @@ namespace InstaJobs
                     .WithCronSchedule($"0 0 {unfollowerStartHour}-{unfollowerEndHour}/2 * * ?",
                         x => x.WithMisfireHandlingInstructionFireAndProceed())
                 );
+
+#endif
 
                 /*
                  * # Will only run on odd days:
