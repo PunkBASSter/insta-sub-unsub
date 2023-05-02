@@ -29,13 +29,17 @@ namespace SeleniumUtils.UiActions.Base
                 return true;
 
             var profilePage = new ProfilePage(WebDriver, account.Username);
-            try
-            {
-                profilePage.Load();
-            }
-            catch { } //Sometimes the anonymous user is throttled for profiles browsing, we ignore it for now during login
-
+            
+            try { profilePage.Load(); } catch { } //often profile page is not shown properly to the anonymous
+            
             if (!_cookieUtil.LoadCookies(account.Username))
+            {
+                return UiLogInSaveCookies(account);
+            }
+
+            try { profilePage.Load(); } catch { }
+            
+            if (!profilePage.IsLoggedIn())
             {
                 return UiLogInSaveCookies(account);
             }
