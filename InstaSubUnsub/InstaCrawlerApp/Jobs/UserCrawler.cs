@@ -2,6 +2,7 @@
 using InstaCommon.Config.Jobs;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain;
+using InstaDomain.Account;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
 using Microsoft.Extensions.Logging;
@@ -44,17 +45,21 @@ namespace InstaCrawlerApp.Jobs
         private InstaUser GetSeedUser()
         {
             var userQuery = Repository.Query<InstaUser>();
+            var serviceAccounts = Repository.Query<AccountUsageHistory>()
+                .Select(auh => auh.Username).ToList();
             
             _seedUsers ??= userQuery.Where(u =>
             u.HasRussianText == true
                 && u.IsClosed != true
                 && u.Rank >= 3
-                && u.LastPostDate >= DateTime.UtcNow.AddDays(-15))
+                && u.LastPostDate >= DateTime.UtcNow.AddDays(-15)
+                && !serviceAccounts.Contains(u.Name))
                 .OrderByDescending(u => u.Id).Take(100)
                 .ToList();
 
             //softer criteria
-            _seedUsers ??= userQuery.Where(u => u.HasRussianText == true && u.IsClosed != true)
+            _seedUsers ??= userQuery.Where(u => u.HasRussianText == true && u.IsClosed != true
+                && !serviceAccounts.Contains(u.Name))
                 .OrderByDescending(u => u.Id).Take(100)
                 .ToList();
 

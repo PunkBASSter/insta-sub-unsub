@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using InstaCommon.Config.Jobs;
 using InstaCrawlerApp.Account.Interfaces;
+using InstaDomain.Account;
 
 namespace InstaCrawlerApp.Jobs
 {
@@ -24,6 +25,9 @@ namespace InstaCrawlerApp.Jobs
         {
             var query = _repo.Query<InstaUser>();
 
+            var serviceAccounts = _repo.Query<AccountUsageHistory>().Select(auh => auh.Username)
+                .ToList();
+
             //First take all with recent posts (stories detected by crawler)
             var usersToVisit = query.Where(u => u.Status == UserStatus.New
                 && u.Rank == 0
@@ -31,6 +35,7 @@ namespace InstaCrawlerApp.Jobs
                 && u.LastPostDate >= DateTime.UtcNow.Date.AddDays(-7)
                 && u.FollowingDate == null
                 && u.UnfollowingDate == null
+                && !serviceAccounts.Contains(u.Name) 
             ).Take(LimitPerIteration).ToList();
 
             var leftForLimit = LimitPerIteration - usersToVisit.Count;
@@ -46,6 +51,7 @@ namespace InstaCrawlerApp.Jobs
                 && u.LastPostDate == null
                 && u.FollowingDate == null
                 && u.UnfollowingDate == null
+                && !serviceAccounts.Contains(u.Name)
             ).Take(leftForLimit).ToList();
 
             leftForLimit -= usersLeftToVisitRus.Count;
@@ -61,6 +67,7 @@ namespace InstaCrawlerApp.Jobs
                 && u.LastPostDate == null
                 && u.FollowingDate == null
                 && u.UnfollowingDate == null
+                && !serviceAccounts.Contains(u.Name)
             ).Take(leftForLimit).ToList();
 
             usersToVisit.AddRange(usersLeftToVisit);
