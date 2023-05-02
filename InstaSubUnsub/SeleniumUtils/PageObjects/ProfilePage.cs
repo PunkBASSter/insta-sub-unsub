@@ -38,6 +38,8 @@ namespace SeleniumUtils.PageObjects
 
         protected override bool HandleLoadErrors()
         {
+            HandleScrapingWarning();
+
             //Instagram error is displayed on the page (anti-bot or something like that).
             foreach(var errorElement in LoadErrorElementLocators)
             {
@@ -52,6 +54,19 @@ namespace SeleniumUtils.PageObjects
             }
 
             return base.HandleLoadErrors();
+        }
+
+        private void HandleScrapingWarning()
+        {
+            if (_titleObserver.GetTitleChanges().FirstOrDefault(title => title.Contains("Scraping Warning")) != null)
+            {
+                new Wait(_driver).TryFindElement(By.XPath("//div[@role='button']/div/div/span[text()='OK']"),
+                    out IWebElement? okButton);
+
+                okButton?.Click();
+
+                throw new InstaAntiBotException($"Scraping Warning Challenge Page appeared while crawling user {_userName}.");
+            }
         }
 
         private readonly By _followButtonLocator = By.XPath("//header/section//button//*[contains(text(),'Подписаться')]");
