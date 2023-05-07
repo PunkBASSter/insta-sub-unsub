@@ -71,12 +71,19 @@ namespace SeleniumUtils.PageObjects
 
         private readonly By _followButtonLocator = By.XPath("//header/section//button//*[contains(text(),'Подписаться')]");
         private readonly By _followingsButtonLocator = By.XPath("//header/section//button//*[contains(text(),'Подписки')]");
-        
+        private readonly By _blockedButtonLocator = By.XPath("//header/section//button//*[contains(text(),'Разблокировать')]");
+
         public bool Follow()
         {
             var blueButton = new Wait(_driver).TryWaitForElement(_followButtonLocator);
             if (blueButton != null)
                 blueButton?.Click();
+            else
+            {
+                blueButton = new Wait(_driver).TryWaitForElement(_blockedButtonLocator);
+                if (blueButton != null)
+                    return false;
+            }
 
             var greyButton = new Wait(_driver).WaitForElement(_followingsButtonLocator);
             return greyButton != null && greyButton.Displayed && CheckAntiBotProtectionOnSubscription();
@@ -104,7 +111,8 @@ namespace SeleniumUtils.PageObjects
                     unfollowMenuItem?.Click();
             }
 
-            var blueButton = new Wait(_driver).WaitForElement(_followButtonLocator);
+            var blueButton = new Wait(_driver).TryWaitForElement(_followButtonLocator);
+            blueButton ??= new Wait(_driver).TryWaitForElement(_blockedButtonLocator); //Displayed if we blocked the user
             return blueButton != null && blueButton.Displayed;
         }
 
