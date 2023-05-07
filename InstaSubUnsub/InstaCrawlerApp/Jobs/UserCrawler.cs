@@ -1,5 +1,6 @@
 ﻿using InstaCommon;
 using InstaCommon.Config.Jobs;
+using InstaCommon.Exceptions;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaDomain;
 using InstaDomain.Account;
@@ -79,12 +80,34 @@ namespace InstaCrawlerApp.Jobs
             return seedUser;
         }
 
+        private IList<InstaUser> GetFollowerItems(out InstaUser detailedSeedUser)
+        {
+            IList<InstaUser> resItems = new List<InstaUser>();
+            do
+            {
+                detailedSeedUser = GetSeedUser();
+                //wierd way to transfer state between infrastructure services
+                _followersProvider.LoggedInUsername = _detailsProvider.LoggedInUsername;
+
+                try 
+                {
+                    resItems = _followersProvider.GetByUser(detailedSeedUser, Account);
+                }
+                catch (UserPageUnavailable)  
+                {
+                    detailedSeedUser.Status = InstaDomain.Enums.UserStatus.Unavailable;
+                    Repository.Update(detailedSeedUser);
+                    Repository.SaveChanges();
+                }
+            } 
+            while (resItems.Count <= 0);
+
+            return resItems;
+        }
+
         private int CrawlFromLastUser()
         {
-            var detailedSeedUser = GetSeedUser();
-
-            _followersProvider.LoggedInUsername = _detailsProvider.LoggedInUsername; //wierd way to transfer state between infrastructure services
-            var followerItems = _followersProvider.GetByUser(detailedSeedUser, Account);
+            var followerItems = GetFollowerItems(out InstaUser detailedSeedUser);
 
             int savedCount = 0;
             foreach (var user in followerItems)
