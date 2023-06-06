@@ -15,6 +15,7 @@ namespace InstaCommon
             services.AddScoped<UserFullDetailsProviderJobConfig>();
             services.AddScoped<FollowerJobConfig>();
             services.AddScoped<UnfollowerJobConfig>();
+            services.AddScoped<InstaDbSyncherJobConfig>();
             services.AddScoped<SharedFollowUnfollowLimitConfig>();
         }
     }
