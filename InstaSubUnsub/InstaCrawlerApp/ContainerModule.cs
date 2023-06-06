@@ -18,6 +18,7 @@ namespace InstaCrawlerApp
             //services.AddScoped<UserQuickDetailsProvider>(); potentially useless
             services.AddScoped<Follower>();
             services.AddScoped<Unfollower>();
+            services.AddScoped<InstaDbSyncher>();
 
             services.AddScoped<UserCrawler>();
             services.AddScoped<UserFullDetailsProvider>();
@@ -38,6 +39,12 @@ namespace InstaCrawlerApp
 
             services.AddScoped<IAccountProvider<Unfollower>, AccountFromConfigProvider<Unfollower>>(sp =>
                 new AccountFromConfigProvider<Unfollower>(
+                    sp.GetRequiredService<IConfiguration>().GetRequiredSection("FollowUser")
+                    )
+                );
+
+            services.AddScoped<IAccountProvider<InstaDbSyncher>, AccountFromConfigProvider<InstaDbSyncher>>(sp =>
+                new AccountFromConfigProvider<InstaDbSyncher>(
                     sp.GetRequiredService<IConfiguration>().GetRequiredSection("FollowUser")
                     )
                 );
