@@ -22,6 +22,7 @@ namespace InstaDomain
         /// </summary>
         public DateTime? FollowingDate { get; set; }
         public DateTime? UnfollowingDate { get; set; }
+        public DateTime? LastDataUpdate { get; set; }
 
         private UserStatus _status;
         public UserStatus Status 
