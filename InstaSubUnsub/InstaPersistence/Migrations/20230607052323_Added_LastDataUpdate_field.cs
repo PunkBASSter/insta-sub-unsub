@@ -177,6 +177,9 @@ namespace InstaPersistence.Migrations
                 keyValue: 23L,
                 column: "LastDataUpdate",
                 value: null);
+
+            migrationBuilder.Sql(
+                "UPDATE \"InstaUsers\" SET \"LastDataUpdate\" = '2023-06-01 00:00:00+00' WHERE \"Status\" BETWEEN 4 and 6");
         }
 
         /// <inheritdoc />
