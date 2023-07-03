@@ -25,4 +25,4 @@ Drawbacks:
 ## Setup
 1. Download either chromedriver.exe of msedgedriver.exe and put the EXE-file to SeleniumUtils project folder next to the .scproj file.
 2. Provide service Insta accounts credentials in appsettings.json "ServiceAccountsToImport" - will be written to the DB on the first launch (can be removed from appsettings.json after it). It's recommended to have 8-10 accounts for default crawling settings (see appsettings.json).
-3. Provide the Insta account to be pumped credentials via CLI as: FollowUser:Username=<name> FollowUser:Password=<password>. The pumped account will follow other users expecting they follow it and than it will unfollow them after a while.
+3. Provide the Insta account to be pumped credentials via CLI as: FollowUser:Username=XXXX FollowUser:Password=YYYYYYY. The pumped account will follow other users expecting they follow it and than it will unfollow them after a while.
