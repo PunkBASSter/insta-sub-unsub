@@ -10,7 +10,8 @@ Anti-bot protection countermeasures:
 * Detection of implicit scraping block of the current account (excluding it from the pool for a while).
 
 Drawbacks:
-* Some of UI elements locators on Insta side may change breaking the jobs (in average once per 3 months). 
+* Some of UI elements locators on Insta side may change breaking the jobs (in average once per 3 months).
+* Many locators rely on strings in Russian localization (won't work with different cultures selected in the browser).
 * Pumping goes rather slow: 30-50 new followers per day with default settings.
 * Lack of reporting.
 
