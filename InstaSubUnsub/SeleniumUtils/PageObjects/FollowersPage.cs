@@ -51,7 +51,8 @@ namespace SeleniumUtils.PageObjects
             {
                 try
                 {
-                    FollowerItemElements = driver.FindElements(By.XPath("//div[@role='dialog']//div[contains(@style, 'overflow: hidden')]/div/div[@role='button']"));
+                    FollowerItemElements = driver.FindElements(By.XPath(//"//div[@role='dialog']//div[contains(@style, 'overflow: hidden')]/div/div[@role='button']"));
+                        "//div[@role='dialog']//div[@style='display: flex; flex-direction: column; padding-bottom: 0px; padding-top: 0px; position: relative;']/div/div/div/div"));
                     var res = _followerItemsLoaded < FollowerItemElements.Count;
                     _followerItemsLoaded = FollowerItemElements.Count;
                     return res;

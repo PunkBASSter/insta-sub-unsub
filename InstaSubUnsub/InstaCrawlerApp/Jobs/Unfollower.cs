@@ -1,12 +1,10 @@
 ﻿using InstaDomain;
 using InstaInfrastructureAbstractions.PersistenceInterfaces;
-using Microsoft.Extensions.Configuration;
 using InstaDomain.Enums;
 using InstaInfrastructureAbstractions.InstagramInterfaces;
 using Microsoft.Extensions.Logging;
 using System.Data;
 using InstaCommon.Config.Jobs;
-using InstaDomain.Account;
 using InstaCrawlerApp.Account.Interfaces;
 using InstaCommon.Exceptions;
 
@@ -49,8 +47,9 @@ namespace InstaCrawlerApp.Jobs
             if (ItemsProcessedPerIteration >= LimitPerIteration)
                 return;
 
-            var numberToUnfollowInUi = LimitPerIteration - ItemsProcessedPerIteration;
-            UnfollowBasedOnUi(numberToUnfollowInUi);
+            //Disabled unfollowing from UI
+            //var numberToUnfollowInUi = LimitPerIteration - ItemsProcessedPerIteration;
+            //UnfollowBasedOnUi(numberToUnfollowInUi);
 
             return;
         }
@@ -60,8 +59,9 @@ namespace InstaCrawlerApp.Jobs
             var dbUsersToUnfollow = _repo.Query<InstaUser>()
                 .Where(usr => usr.Status == UserStatus.Followed
                     && usr.FollowingDate > default(DateTime)
-                    && usr.FollowingDate <= DateTime.UtcNow.AddDays(-14) && usr.UnfollowingDate == null)
-                .OrderBy(usr => usr.FollowingDate)
+                    && usr.FollowingDate <= DateTime.UtcNow.AddDays(-7)
+                    && usr.UnfollowingDate == null)
+                .OrderByDescending(usr => usr.FollowingDate)
                 .Take(LimitPerIteration)
                 .ToArray();
 

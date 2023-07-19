@@ -39,7 +39,7 @@ namespace SeleniumUtils.PageObjects
         {
             try
             {
-                return _element.FindElement(By.XPath(".//div/span[text()]")).Text;
+                return _element.FindElement(By.XPath(".//div/span/span[text()]")).Text;
             }
             catch(NoSuchElementException) { return string.Empty; }
         }
